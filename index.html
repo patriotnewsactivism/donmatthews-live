@@ -682,15 +682,35 @@
       </div>
       <div class="vip-right">
         <div class="vip-price-block">
-          <div class="vip-price-label" id="vip-billing-label">Billed monthly</div>
-          <div class="vip-price" id="vip-monthly-price"><sup>$</sup>49</div>
+          <div class="vip-price-label" id="vip-billing-label">🔥 Introductory Price · Billed monthly</div>
+          <div class="vip-price" id="vip-monthly-price"><sup>$</sup>79.99</div>
           <div class="vip-price-period" id="vip-period">per month</div>
-          <div class="vip-price-annual" id="vip-annual-note" style="display:none;">= $34/mo · Save $180/yr</div>
+          <div class="vip-price-annual" id="vip-annual-note" style="display:none;">🔥 Annual: $56/mo · Save $288/yr vs. monthly</div>
         </div>
         <button class="btn-vip" onclick="openModal('VIP All-Access Pass', 'vip')">
           👑 Get VIP All-Access
         </button>
-        <div style="font-size:0.7rem; color:var(--muted); margin-top:0.6rem;">vs. $89/mo buying each separately</div>
+        <div style="font-size:0.7rem; color:var(--muted); margin-top:0.5rem; line-height:1.6;">
+  <span style="color:#4ade80; font-weight:700;">🔥 Introductory Price</span> — locks in forever
+</div>
+<div style="margin-top:0.75rem; background:rgba(0,0,0,0.3); border-radius:8px; padding:0.75rem; font-size:0.72rem; text-align:left;">
+  <div style="color:var(--muted); margin-bottom:0.4rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; font-size:0.65rem;">Typical retail value</div>
+  <div style="display:flex; justify-content:space-between; padding:0.2rem 0; border-bottom:1px solid rgba(255,255,255,0.06);"><span>Civil Rights Hub</span><span style="color:var(--text);">$12/mo</span></div>
+  <div style="display:flex; justify-content:space-between; padding:0.2rem 0; border-bottom:1px solid rgba(255,255,255,0.06);"><span>ChatScream Pro</span><span style="color:var(--text);">$19/mo</span></div>
+  <div style="display:flex; justify-content:space-between; padding:0.2rem 0; border-bottom:1px solid rgba(255,255,255,0.06);"><span>CaseBuddy Pro</span><span style="color:var(--text);">$14/mo</span></div>
+  <div style="display:flex; justify-content:space-between; padding:0.2rem 0; border-bottom:1px solid rgba(255,255,255,0.06);"><span>BuildMyBot Pro</span><span style="color:var(--text);">$17/mo</span></div>
+  <div style="display:flex; justify-content:space-between; padding:0.2rem 0; border-bottom:1px solid rgba(255,255,255,0.06);"><span>CodeForge Pro</span><span style="color:var(--text);">$15/mo</span></div>
+  <div style="display:flex; justify-content:space-between; padding:0.2rem 0;"><span>TubeScribe Pro</span><span style="color:var(--text);">$12/mo</span></div>
+  <div style="display:flex; justify-content:space-between; padding:0.4rem 0 0; margin-top:0.3rem; border-top:1px solid rgba(255,255,255,0.12); font-weight:700;">
+    <span style="color:var(--text);">Total value</span>
+    <span style="text-decoration:line-through; color:var(--muted);">$89/mo</span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:0.2rem 0;">
+    <span style="color:#4ade80; font-weight:800;">VIP intro price</span>
+    <span style="color:#4ade80; font-weight:800;" id="savings-display">$79.99/mo</span>
+  </div>
+  <div style="text-align:right; color:var(--gold); font-size:0.68rem; font-weight:700; margin-top:0.15rem;" id="you-save-display">You save $9+/mo ($108+/yr)</div>
+</div>
       </div>
     </div>
 
@@ -922,15 +942,23 @@
     const vipLabel = document.getElementById('vip-billing-label');
 
     if (mode === 'annual') {
-      vipPrice.innerHTML = '<sup>$</sup>34';
+      vipPrice.innerHTML = '<sup>$</sup>56';
       vipPeriod.textContent = 'per month, billed annually';
       vipNote.style.display = 'block';
-      vipLabel.textContent = 'Billed annually ($408/yr)';
+      vipLabel.textContent = 'Billed annually ($672/yr)';
+      const sd = document.getElementById('savings-display');
+      const ys = document.getElementById('you-save-display');
+      if (sd) sd.textContent = '$56/mo (annual)';
+      if (ys) ys.textContent = 'You save $33/mo vs. retail ($396/yr savings!)';
     } else {
-      vipPrice.innerHTML = '<sup>$</sup>49';
+      vipPrice.innerHTML = '<sup>$</sup>79.99';
       vipPeriod.textContent = 'per month';
       vipNote.style.display = 'none';
       vipLabel.textContent = 'Billed monthly';
+      const sd = document.getElementById('savings-display');
+      const ys = document.getElementById('you-save-display');
+      if (sd) sd.textContent = '$79.99/mo';
+      if (ys) ys.textContent = 'You save $9+/mo ($108+/yr)';
     }
   }
 
