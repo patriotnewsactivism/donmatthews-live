@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Don Matthews — Civil Rights Journalist, Developer, Activist</title>
+  <meta name="description" content="Don Matthews is a civil rights journalist, Marine veteran, and independent developer who built tools to fight for government accountability, press freedom, and civil rights." />
+  <meta property="og:title" content="Don Matthews — Civil Rights Journalist, Developer, Activist" />
+  <meta property="og:description" content="Marine. Journalist. Developer. I built my own tools because the system wasn't built for people like us." />
+  <meta property="og:url" content="https://donmatthews.live" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #e63946;
+      --gold: #f4a832;
+      --dark: #0a0a0f;
+      --dark2: #111118;
+      --dark3: #1a1a24;
+      --border: rgba(255,255,255,0.08);
+      --text: #e8e8f0;
+      --muted: #8888aa;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(10,10,15,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-weight: 700; font-size: 1rem; letter-spacing: 0.05em;
+      color: var(--text); text-decoration: none;
+    }
+    .nav-logo span { color: var(--red); }
+    .nav-links { display: flex; gap: 1.75rem; align-items: center; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links .nav-cta {
+      background: var(--red); color: #fff;
+      padding: 0.45rem 1.1rem; border-radius: 6px;
+      font-weight: 600; font-size: 0.8rem;
+    }
+    .nav-links .nav-cta:hover { color: #fff; opacity: 0.9; }
+
+    @media(max-width: 680px) {
+      .nav-links { gap: 1rem; }
+      .nav-links a:not(.nav-cta):not(:last-child) { display: none; }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 8rem 2rem 4rem;
+      max-width: 1100px; margin: 0 auto;
+    }
+    .hero-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem; color: var(--red); letter-spacing: 0.15em;
+      text-transform: uppercase; margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: block;
+      width: 2rem; height: 1px; background: var(--red);
+    }
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 900; line-height: 1.05;
+      letter-spacing: -0.02em; margin-bottom: 1.5rem;
+    }
+    h1 em { font-style: normal; color: var(--red); }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--muted); max-width: 620px;
+      margin-bottom: 2.5rem; line-height: 1.7;
+    }
+    .hero-sub strong { color: var(--text); }
+    .hero-cta { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--red); color: #fff;
+      padding: 0.875rem 1.75rem; border-radius: 6px;
+      font-weight: 600; text-decoration: none; font-size: 0.95rem;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(230,57,70,0.35); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      border: 1px solid var(--border); color: var(--text);
+      padding: 0.875rem 1.75rem; border-radius: 6px;
+      font-weight: 500; text-decoration: none; font-size: 0.95rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.04); }
+    .btn-gold {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, #f4a832, #e8920a);
+      color: #0a0a0f;
+      padding: 0.875rem 1.75rem; border-radius: 6px;
+      font-weight: 700; text-decoration: none; font-size: 0.95rem;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(244,168,50,0.4); }
+
+    .hero-stats {
+      display: flex; flex-wrap: wrap; gap: 2.5rem;
+      margin-top: 4rem; padding-top: 2.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .stat-num {
+      font-size: 2rem; font-weight: 900; color: var(--gold);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+
+    /* ── STORY ── */
+    .story {
+      background: var(--dark2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .story-inner {
+      max-width: 1100px; margin: 0 auto;
+      padding: 5rem 2rem;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 5rem;
+      align-items: center;
+    }
+    @media(max-width: 768px) { .story-inner { grid-template-columns: 1fr; gap: 2.5rem; } }
+    .story-text h2 {
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 800; margin-bottom: 1.5rem; line-height: 1.15;
+    }
+    .story-text p { color: var(--muted); margin-bottom: 1rem; line-height: 1.75; }
+    .story-text p strong { color: var(--text); }
+    .story-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+    .badge {
+      padding: 0.375rem 0.875rem; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em;
+      border: 1px solid;
+    }
+    .badge-red { color: var(--red); border-color: rgba(230,57,70,0.3); background: rgba(230,57,70,0.08); }
+    .badge-gold { color: var(--gold); border-color: rgba(244,168,50,0.3); background: rgba(244,168,50,0.08); }
+    .badge-blue { color: #60a5fa; border-color: rgba(96,165,250,0.3); background: rgba(96,165,250,0.08); }
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-item { display: flex; gap: 1.25rem; padding-bottom: 1.75rem; position: relative; }
+    .tl-item:last-child { padding-bottom: 0; }
+    .tl-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 2rem; }
+    .tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); flex-shrink: 0; margin-top: 0.35rem; }
+    .tl-line { width: 1px; flex: 1; background: var(--border); margin-top: 0.5rem; }
+    .tl-item:last-child .tl-line { display: none; }
+    .tl-date { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--red); margin-bottom: 0.25rem; }
+    .tl-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .tl-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+
+    /* ── APPS ── */
+    .apps-section {
+      max-width: 1100px; margin: 0 auto;
+      padding: 6rem 2rem;
+    }
+    .section-header { margin-bottom: 3.5rem; }
+    .section-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem; color: var(--red); letter-spacing: 0.15em;
+      text-transform: uppercase; margin-bottom: 0.75rem;
+    }
+    .section-header h2 { font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 800; line-height: 1.15; }
+    .section-header p { color: var(--muted); margin-top: 0.75rem; max-width: 560px; }
+
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+    .app-card {
+      background: var(--dark2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .app-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: var(--accent, var(--red));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .app-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    .app-card:hover::before { transform: scaleX(1); }
+    .app-card-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
+    .app-icon {
+      font-size: 1.75rem; line-height: 1;
+      width: 3rem; height: 3rem;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--dark3); border-radius: 10px;
+    }
+    .app-status {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em;
+      padding: 0.25rem 0.6rem; border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .status-live { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .status-building { background: rgba(244,168,50,0.15); color: var(--gold); }
+    .app-name { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text); }
+    .app-domain { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-bottom: 0.875rem; }
+    .app-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.25rem; }
+    .app-why {
+      font-size: 0.78rem; color: var(--text);
+      border-left: 2px solid var(--accent, var(--red));
+      padding-left: 0.75rem; line-height: 1.55;
+      font-style: italic;
+    }
+    .app-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      margin-top: 1.25rem; font-size: 0.8rem; font-weight: 600;
+      color: var(--accent, var(--red)); text-decoration: none;
+    }
+    .app-link svg { transition: transform 0.15s; }
+    .app-card:hover .app-link svg { transform: translateX(3px); }
+
+    /* ── PRICING ── */
+    .pricing-section {
+      background: var(--dark2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 6rem 2rem;
+    }
+    .pricing-inner { max-width: 1100px; margin: 0 auto; }
+    .pricing-tabs {
+      display: flex; gap: 0.5rem;
+      background: var(--dark3); border-radius: 10px;
+      padding: 0.35rem; width: fit-content;
+      margin: 2rem auto 3.5rem;
+    }
+    .pricing-tab {
+      padding: 0.5rem 1.25rem; border-radius: 7px;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      border: none; background: transparent; color: var(--muted);
+      transition: all 0.2s;
+    }
+    .pricing-tab.active { background: var(--dark); color: var(--text); }
+    .save-badge {
+      background: rgba(34,197,94,0.15); color: #4ade80;
+      font-size: 0.65rem; font-weight: 700;
+      padding: 0.15rem 0.5rem; border-radius: 999px;
+      margin-left: 0.4rem; vertical-align: middle;
+    }
+
+    /* VIP Banner */
+    .vip-banner {
+      background: linear-gradient(135deg, rgba(244,168,50,0.12), rgba(230,57,70,0.08));
+      border: 1px solid rgba(244,168,50,0.3);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin-bottom: 2.5rem;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 2rem;
+    }
+    .vip-left { flex: 1; min-width: 260px; }
+    .vip-crown { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .vip-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem; color: var(--gold); letter-spacing: 0.15em;
+      text-transform: uppercase; margin-bottom: 0.5rem;
+    }
+    .vip-title { font-size: 1.75rem; font-weight: 900; margin-bottom: 0.5rem; }
+    .vip-title span { color: var(--gold); }
+    .vip-desc { color: var(--muted); font-size: 0.9rem; max-width: 480px; line-height: 1.6; }
+    .vip-features {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem;
+    }
+    .vip-feature {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.8rem; color: var(--text);
+    }
+    .vip-feature::before { content: '✓'; color: var(--gold); font-weight: 700; }
+    .vip-right { text-align: center; flex-shrink: 0; }
+    .vip-price-block { margin-bottom: 1rem; }
+    .vip-price-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.25rem; }
+    .vip-price { font-size: 3rem; font-weight: 900; color: var(--gold); font-family: 'JetBrains Mono', monospace; line-height: 1; }
+    .vip-price sup { font-size: 1.5rem; vertical-align: super; }
+    .vip-price-period { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+    .vip-price-annual { font-size: 0.75rem; color: #4ade80; margin-top: 0.25rem; }
+    .btn-vip {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, #f4a832, #e8920a);
+      color: #0a0a0f; padding: 0.9rem 2rem; border-radius: 8px;
+      font-weight: 800; text-decoration: none; font-size: 1rem;
+      transition: transform 0.15s, box-shadow 0.15s; border: none; cursor: pointer;
+      width: 100%;
+      justify-content: center;
+    }
+    .btn-vip:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(244,168,50,0.45); }
+
+    /* Individual app pricing cards */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    .price-card {
+      background: var(--dark3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .price-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+    .price-card-head {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .price-icon { font-size: 1.5rem; }
+    .price-app-name { font-size: 1rem; font-weight: 700; }
+    .price-app-domain { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); }
+    .price-amount {
+      font-size: 2rem; font-weight: 900;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text); margin-bottom: 0.25rem;
+    }
+    .price-amount sup { font-size: 1rem; vertical-align: super; }
+    .price-amount span { font-size: 0.85rem; color: var(--muted); font-family: 'Inter', sans-serif; font-weight: 400; }
+    .price-annual { font-size: 0.75rem; color: #4ade80; margin-bottom: 1rem; }
+    .price-features { list-style: none; margin-bottom: 1.25rem; }
+    .price-features li {
+      font-size: 0.8rem; color: var(--muted);
+      padding: 0.3rem 0; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .price-features li::before { content: '✓'; color: #4ade80; font-weight: 700; flex-shrink: 0; }
+    .btn-subscribe {
+      display: block; text-align: center;
+      padding: 0.65rem 1rem; border-radius: 7px;
+      font-weight: 600; font-size: 0.85rem;
+      text-decoration: none; border: 1px solid;
+      transition: all 0.2s; cursor: pointer;
+      background: transparent;
+    }
+    .price-divider {
+      text-align: center; font-size: 0.75rem; color: var(--muted);
+      margin: 1rem 0; position: relative;
+    }
+    .price-divider::before, .price-divider::after {
+      content: ''; position: absolute; top: 50%;
+      width: 35%; height: 1px; background: var(--border);
+    }
+    .price-divider::before { left: 0; }
+    .price-divider::after { right: 0; }
+
+    /* ── CONTACT ── */
+    .contact-section {
+      max-width: 700px; margin: 0 auto;
+      padding: 5rem 2rem 6rem;
+      text-align: center;
+    }
+    .contact-section h2 { font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 800; margin-bottom: 1rem; }
+    .contact-section p { color: var(--muted); margin-bottom: 2rem; line-height: 1.7; }
+    .contact-links { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
+    .contact-link {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      padding: 0.75rem 1.5rem; border-radius: 8px;
+      border: 1px solid var(--border);
+      color: var(--text); text-decoration: none; font-size: 0.9rem; font-weight: 500;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .contact-link:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+    }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 1.5rem;
+    }
+    .footer-left { font-size: 0.85rem; color: var(--muted); }
+    .footer-left strong { color: var(--text); }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.8rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--dark2); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2rem; max-width: 460px; width: 100%;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 1.25rem; line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .modal p { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+    .modal-plan { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--gold); margin-bottom: 1rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.4rem; }
+    .form-group input {
+      width: 100%; padding: 0.65rem 1rem;
+      background: var(--dark3); border: 1px solid var(--border);
+      border-radius: 7px; color: var(--text); font-size: 0.9rem;
+      outline: none; transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: var(--gold); }
+    .modal-submit {
+      width: 100%; padding: 0.8rem;
+      background: linear-gradient(135deg, #f4a832, #e8920a);
+      color: #0a0a0f; font-weight: 700; font-size: 0.95rem;
+      border: none; border-radius: 8px; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .modal-submit:hover { opacity: 0.9; }
+    .modal-note { text-align: center; font-size: 0.72rem; color: var(--muted); margin-top: 0.75rem; }
+
+    /* ── BILLING TOGGLE ── */
+    .billing-toggle { display: none; }
+    .billing-toggle.monthly .monthly-price { display: block; }
+    .billing-toggle.monthly .annual-price { display: none; }
+    .billing-toggle.annual .monthly-price { display: none; }
+    .billing-toggle.annual .annual-price { display: block; }
+
+    @media(max-width: 480px) {
+      .vip-banner { padding: 1.5rem; }
+      .vip-price { font-size: 2.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="/" class="nav-logo">DON <span>MATTHEWS</span></a>
+  <div class="nav-links">
+    <a href="#story">Story</a>
+    <a href="#apps">Apps</a>
+    <a href="#pricing">Pricing</a>
+    <a href="https://wtpnews.org" target="_blank">WTP News</a>
+    <a href="#pricing" class="nav-cta">Get Access →</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-eyebrow">Marine · Journalist · Developer</div>
+  <h1>Built by the people.<br>For <em>the people.</em></h1>
+  <p class="hero-sub">
+    I didn't wait for the right tools to exist. I built them.
+    <strong>Six apps</strong> — one mission: accountability, press freedom, and civil rights for everyone.
+    Subscribe to one or get <strong>all-access VIP</strong> for one price.
+  </p>
+  <div class="hero-cta">
+    <a href="#pricing" class="btn-gold">🔑 Get All-Access VIP</a>
+    <a href="#apps" class="btn-secondary">Explore the Apps →</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Live Applications</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">1,756+</div>
+      <div class="stat-label">Civil Rights Attorneys Indexed</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">3,500+</div>
+      <div class="stat-label">ChatScream Streamers</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Independent. No Corporate Funding.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STORY ── -->
+<section class="story" id="story">
+  <div class="story-inner">
+    <div class="story-text">
+      <h2>Why I built all of this</h2>
+      <p>
+        <strong>I'm a Marine veteran and civil rights journalist.</strong> I've seen what happens when people don't have access to the right tools — they lose. They lose their rights. They lose their cases. They lose their voice.
+      </p>
+      <p>
+        So I started building. Not because I had funding, not because a VC told me to. Because <strong>the tools the powerful use shouldn't be exclusive to the powerful.</strong>
+      </p>
+      <p>
+        WTP News. Civil Rights Hub. ChatScream. CaseBuddy. BuildMyBot. CodeForge. TubeScribe. Every single one built with one question in mind: <em>"What does the average person actually need?"</em>
+      </p>
+      <div class="story-badges">
+        <span class="badge badge-red">Marine Veteran</span>
+        <span class="badge badge-gold">WTP News Founder</span>
+        <span class="badge badge-blue">Independent Developer</span>
+        <span class="badge badge-red">Civil Rights Journalist</span>
+      </div>
+    </div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div>
+          <div class="tl-date">2020</div>
+          <div class="tl-title">Founded WTP News</div>
+          <div class="tl-desc">Independent news outlet covering civil rights, government accountability, and the stories mainstream media ignores.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div>
+          <div class="tl-date">2023</div>
+          <div class="tl-title">Civil Rights Hub Launched</div>
+          <div class="tl-desc">A full platform: attorney database, incident reporting, officer tracking, and verified activist network.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div>
+          <div class="tl-date">2024</div>
+          <div class="tl-title">ChatScream Goes Live</div>
+          <div class="tl-desc">Zero-bandwidth cloud streaming for field journalists and activists who can't afford a broadcast setup.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+        <div>
+          <div class="tl-date">2025–26</div>
+          <div class="tl-title">The Full Ecosystem</div>
+          <div class="tl-desc">CaseBuddy, BuildMyBot, CodeForge, and TubeScribe — all built and deployed. One unified hub. One mission.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── APPS ── -->
+<section id="apps" class="apps-section">
+  <div class="section-header">
+    <div class="section-eyebrow">// the ecosystem</div>
+    <h2>Six tools. One mission.</h2>
+    <p>Each app solves a real problem. Together, they're a complete platform for journalists, activists, and anyone who refuses to stay quiet.</p>
+  </div>
+
+  <div class="apps-grid">
+
+    <a href="https://civilrightshub.org" target="_blank" class="app-card" style="--accent: #e63946;">
+      <div class="app-card-head">
+        <div class="app-icon">⚖️</div>
+        <span class="app-status status-live">Live</span>
+      </div>
+      <div class="app-name">Civil Rights Hub</div>
+      <div class="app-domain">civilrightshub.org</div>
+      <div class="app-desc">The most complete civil rights platform on the internet. Attorney finder, incident reporting, officer accountability tracking, and an activist network — all in one place.</div>
+      <div class="app-why">"I needed a database of civil rights attorneys that actually worked. I built one with 1,756+ verified lawyers across all 51 jurisdictions."</div>
+      <span class="app-link">Open Civil Rights Hub <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+    </a>
+
+    <a href="https://chatscream.live" target="_blank" class="app-card" style="--accent: #f97316;">
+      <div class="app-card-head">
+        <div class="app-icon">📡</div>
+        <span class="app-status status-live">Live</span>
+      </div>
+      <div class="app-name">ChatScream</div>
+      <div class="app-domain">chatscream.live</div>
+      <div class="app-desc">Stream live from your phone with zero bandwidth usage. Cloud-powered, donation-triggered "Screams," and multi-platform RTMP output. Built for journalists in the field.</div>
+      <div class="app-why">"Field journalists need to go live NOW — not after setting up gear. ChatScream makes that possible from any device."</div>
+      <span class="app-link">Open ChatScream <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+    </a>
+
+    <a href="https://casebuddy.app" target="_blank" class="app-card" style="--accent: #60a5fa;">
+      <div class="app-card-head">
+        <div class="app-icon">📋</div>
+        <span class="app-status status-live">Live</span>
+      </div>
+      <div class="app-name">CaseBuddy</div>
+      <div class="app-domain">casebuddy.app</div>
+      <div class="app-desc">AI-powered legal case organizer. Document your incidents, track evidence, understand your rights, and prepare for court — without paying $400/hr for a consultation every time.</div>
+      <div class="app-why">"People lose cases not because they're wrong — but because they're disorganized. CaseBuddy fixes that."</div>
+      <span class="app-link">Open CaseBuddy <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+    </a>
+
+    <a href="https://buildmybot.app" target="_blank" class="app-card" style="--accent: #a78bfa;">
+      <div class="app-card-head">
+        <div class="app-icon">🤖</div>
+        <span class="app-status status-live">Live</span>
+      </div>
+      <div class="app-name">BuildMyBot</div>
+      <div class="app-domain">buildmybot.app</div>
+      <div class="app-desc">Build and deploy AI chatbots with no code. Custom knowledge bases, branded interfaces, and embed anywhere. Used by activists, news outlets, and small businesses.</div>
+      <div class="app-why">"I needed a way to answer constitutional rights questions at scale — for WTP News, the Civil Rights Hub, and anyone who asked."</div>
+      <span class="app-link">Open BuildMyBot <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+    </a>
+
+    <a href="https://codeforge.dev" target="_blank" class="app-card" style="--accent: #34d399;">
+      <div class="app-card-head">
+        <div class="app-icon">⚡</div>
+        <span class="app-status status-live">Live</span>
+      </div>
+      <div class="app-name">CodeForge</div>
+      <div class="app-domain">codeforge.dev</div>
+      <div class="app-desc">AI-powered code generation and debugging platform. Write code faster, fix bugs instantly, and ship projects without needing a full dev team behind you.</div>
+      <div class="app-why">"I built every single one of these apps solo. CodeForge is the tool I wished existed when I started."</div>
+      <span class="app-link">Open CodeForge <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+    </a>
+
+    <a href="https://tubescribe.app" target="_blank" class="app-card" style="--accent: #f43f5e;">
+      <div class="app-card-head">
+        <div class="app-icon">🎙️</div>
+        <span class="app-status status-building">Beta</span>
+      </div>
+      <div class="app-name">TubeScribe</div>
+      <div class="app-domain">tubescribe.app</div>
+      <div class="app-desc">Automatically transcribe livestreams and videos into polished articles. The stream-to-article pipeline used by WTP News to publish breaking coverage in real time.</div>
+      <div class="app-why">"A 2-hour livestream becomes a fully formatted article in minutes. We use this internally at WTP News every single day."</div>
+      <span class="app-link">Open TubeScribe <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+    </a>
+
+  </div>
+</section>
+
+<!-- ── PRICING ── -->
+<section id="pricing" class="pricing-section">
+  <div class="pricing-inner">
+    <div class="section-header" style="text-align:center; margin-bottom:0;">
+      <div class="section-eyebrow" style="text-align:center;">// access</div>
+      <h2>One subscription. Or all of them.</h2>
+      <p style="max-width:560px; margin: 0.75rem auto 0;">Subscribe to individual apps monthly or yearly — or go <strong style="color:var(--gold)">VIP</strong> and get everything for one price.</p>
+    </div>
+
+    <div class="pricing-tabs">
+      <button class="pricing-tab active" onclick="setBilling('monthly', this)">Monthly</button>
+      <button class="pricing-tab" onclick="setBilling('annual', this)">Annual <span class="save-badge">Save 30%</span></button>
+    </div>
+
+    <!-- VIP ALL-ACCESS -->
+    <div class="vip-banner">
+      <div class="vip-left">
+        <div class="vip-crown">👑</div>
+        <div class="vip-label">// most popular</div>
+        <div class="vip-title">VIP All-Access <span>Pass</span></div>
+        <div class="vip-desc">
+          Every app Don Matthews builds. Every feature. Every update. One monthly or annual price — no juggling subscriptions, no missing out when a new tool drops.
+        </div>
+        <div class="vip-features">
+          <div class="vip-feature">All 6 apps, full access</div>
+          <div class="vip-feature">Priority support</div>
+          <div class="vip-feature">Early access to new apps</div>
+          <div class="vip-feature">VIP-only community channel</div>
+          <div class="vip-feature">Cancel anytime</div>
+        </div>
+      </div>
+      <div class="vip-right">
+        <div class="vip-price-block">
+          <div class="vip-price-label" id="vip-billing-label">Billed monthly</div>
+          <div class="vip-price" id="vip-monthly-price"><sup>$</sup>49</div>
+          <div class="vip-price-period" id="vip-period">per month</div>
+          <div class="vip-price-annual" id="vip-annual-note" style="display:none;">= $34/mo · Save $180/yr</div>
+        </div>
+        <button class="btn-vip" onclick="openModal('VIP All-Access Pass', 'vip')">
+          👑 Get VIP All-Access
+        </button>
+        <div style="font-size:0.7rem; color:var(--muted); margin-top:0.6rem;">vs. $89/mo buying each separately</div>
+      </div>
+    </div>
+
+    <!-- INDIVIDUAL PLANS -->
+    <div class="section-eyebrow" style="margin-bottom:1.25rem;">// or pick just what you need</div>
+    <div class="pricing-grid">
+
+      <div class="price-card">
+        <div class="price-card-head">
+          <div class="price-icon">⚖️</div>
+          <div>
+            <div class="price-app-name">Civil Rights Hub</div>
+            <div class="price-app-domain">civilrightshub.org</div>
+          </div>
+        </div>
+        <div class="price-amount monthly-price"><sup>$</sup>12<span>/mo</span></div>
+        <div class="price-amount annual-price" style="display:none;"><sup>$</sup>8<span>/mo</span></div>
+        <div class="price-annual monthly-price">or $96/year (save $48)</div>
+        <div class="price-annual annual-price" style="display:none;">$96/year · saving $48</div>
+        <ul class="price-features">
+          <li>Full attorney database access</li>
+          <li>Unlimited incident reports</li>
+          <li>Officer tracking alerts</li>
+          <li>Verified activist network</li>
+        </ul>
+        <button class="btn-subscribe" style="color:#e63946; border-color:rgba(230,57,70,0.4);" onclick="openModal('Civil Rights Hub', 'civilrightshub')">
+          Subscribe →
+        </button>
+      </div>
+
+      <div class="price-card">
+        <div class="price-card-head">
+          <div class="price-icon">📡</div>
+          <div>
+            <div class="price-app-name">ChatScream Pro</div>
+            <div class="price-app-domain">chatscream.live</div>
+          </div>
+        </div>
+        <div class="price-amount monthly-price"><sup>$</sup>19<span>/mo</span></div>
+        <div class="price-amount annual-price" style="display:none;"><sup>$</sup>13<span>/mo</span></div>
+        <div class="price-annual monthly-price">or $156/year (save $72)</div>
+        <div class="price-annual annual-price" style="display:none;">$156/year · saving $72</div>
+        <ul class="price-features">
+          <li>Cloud-powered streaming</li>
+          <li>Zero bandwidth usage</li>
+          <li>Donation-triggered Screams</li>
+          <li>Multi-platform RTMP output</li>
+        </ul>
+        <button class="btn-subscribe" style="color:#f97316; border-color:rgba(249,115,22,0.4);" onclick="openModal('ChatScream Pro', 'chatscream')">
+          Subscribe →
+        </button>
+      </div>
+
+      <div class="price-card">
+        <div class="price-card-head">
+          <div class="price-icon">📋</div>
+          <div>
+            <div class="price-app-name">CaseBuddy Pro</div>
+            <div class="price-app-domain">casebuddy.app</div>
+          </div>
+        </div>
+        <div class="price-amount monthly-price"><sup>$</sup>14<span>/mo</span></div>
+        <div class="price-amount annual-price" style="display:none;"><sup>$</sup>10<span>/mo</span></div>
+        <div class="price-annual monthly-price">or $120/year (save $48)</div>
+        <div class="price-annual annual-price" style="display:none;">$120/year · saving $48</div>
+        <ul class="price-features">
+          <li>Unlimited case files</li>
+          <li>AI legal Q&A</li>
+          <li>Evidence vault & timeline</li>
+          <li>Court prep checklists</li>
+        </ul>
+        <button class="btn-subscribe" style="color:#60a5fa; border-color:rgba(96,165,250,0.4);" onclick="openModal('CaseBuddy Pro', 'casebuddy')">
+          Subscribe →
+        </button>
+      </div>
+
+      <div class="price-card">
+        <div class="price-card-head">
+          <div class="price-icon">🤖</div>
+          <div>
+            <div class="price-app-name">BuildMyBot Pro</div>
+            <div class="price-app-domain">buildmybot.app</div>
+          </div>
+        </div>
+        <div class="price-amount monthly-price"><sup>$</sup>17<span>/mo</span></div>
+        <div class="price-amount annual-price" style="display:none;"><sup>$</sup>12<span>/mo</span></div>
+        <div class="price-annual monthly-price">or $144/year (save $60)</div>
+        <div class="price-annual annual-price" style="display:none;">$144/year · saving $60</div>
+        <ul class="price-features">
+          <li>Unlimited bots</li>
+          <li>Custom knowledge bases</li>
+          <li>Branded embed widget</li>
+          <li>Priority AI responses</li>
+        </ul>
+        <button class="btn-subscribe" style="color:#a78bfa; border-color:rgba(167,139,250,0.4);" onclick="openModal('BuildMyBot Pro', 'buildmybot')">
+          Subscribe →
+        </button>
+      </div>
+
+      <div class="price-card">
+        <div class="price-card-head">
+          <div class="price-icon">⚡</div>
+          <div>
+            <div class="price-app-name">CodeForge Pro</div>
+            <div class="price-app-domain">codeforge.dev</div>
+          </div>
+        </div>
+        <div class="price-amount monthly-price"><sup>$</sup>15<span>/mo</span></div>
+        <div class="price-amount annual-price" style="display:none;"><sup>$</sup>11<span>/mo</span></div>
+        <div class="price-annual monthly-price">or $132/year (save $48)</div>
+        <div class="price-annual annual-price" style="display:none;">$132/year · saving $48</div>
+        <ul class="price-features">
+          <li>Unlimited AI code generation</li>
+          <li>Multi-language debugging</li>
+          <li>Project workspace</li>
+          <li>Deploy integrations</li>
+        </ul>
+        <button class="btn-subscribe" style="color:#34d399; border-color:rgba(52,211,153,0.4);" onclick="openModal('CodeForge Pro', 'codeforge')">
+          Subscribe →
+        </button>
+      </div>
+
+      <div class="price-card">
+        <div class="price-card-head">
+          <div class="price-icon">🎙️</div>
+          <div>
+            <div class="price-app-name">TubeScribe Pro</div>
+            <div class="price-app-domain">tubescribe.app</div>
+          </div>
+        </div>
+        <div class="price-amount monthly-price"><sup>$</sup>12<span>/mo</span></div>
+        <div class="price-amount annual-price" style="display:none;"><sup>$</sup>8<span>/mo</span></div>
+        <div class="price-annual monthly-price">or $96/year (save $48)</div>
+        <div class="price-annual annual-price" style="display:none;">$96/year · saving $48</div>
+        <ul class="price-features">
+          <li>Auto-transcribe livestreams</li>
+          <li>AI article generation</li>
+          <li>Publish to your site</li>
+          <li>SEO-optimized output</li>
+        </ul>
+        <button class="btn-subscribe" style="color:#f43f5e; border-color:rgba(244,63,94,0.4);" onclick="openModal('TubeScribe Pro', 'tubescribe')">
+          Subscribe →
+        </button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section id="contact" class="contact-section">
+  <h2>Get in touch</h2>
+  <p>Press inquiries, partnership requests, or just want to say what's up — I actually read these.</p>
+  <div class="contact-links">
+    <a href="https://wtpnews.org" target="_blank" class="contact-link">
+      📰 WTP News
+    </a>
+    <a href="https://civilrightshub.org" target="_blank" class="contact-link">
+      ⚖️ Civil Rights Hub
+    </a>
+    <a href="mailto:don@wtpnews.org" class="contact-link">
+      ✉️ don@wtpnews.org
+    </a>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <strong>Don Matthews</strong> — Marine Veteran · Civil Rights Journalist · Independent Developer<br>
+      <span style="font-size:0.75rem;">© 2026 Don Matthews. All rights reserved.</span>
+    </div>
+    <div class="footer-links">
+      <a href="https://civilrightshub.org" target="_blank">Civil Rights Hub</a>
+      <a href="https://chatscream.live" target="_blank">ChatScream</a>
+      <a href="https://casebuddy.app" target="_blank">CaseBuddy</a>
+      <a href="https://buildmybot.app" target="_blank">BuildMyBot</a>
+      <a href="https://codeforge.dev" target="_blank">CodeForge</a>
+      <a href="https://tubescribe.app" target="_blank">TubeScribe</a>
+      <a href="https://wtpnews.org" target="_blank">WTP News</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ── SUBSCRIBE MODAL ── -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div style="font-size:1.75rem; margin-bottom:0.75rem;" id="modal-icon">👑</div>
+    <h3 id="modal-title">Get Access</h3>
+    <div class="modal-plan" id="modal-plan">VIP All-Access Pass</div>
+    <p id="modal-desc">Enter your email and we'll reach out with your access link and payment setup.</p>
+    <form onsubmit="handleSubscribe(event)">
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" placeholder="Don Matthews" required />
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" placeholder="you@example.com" required id="modal-email" />
+      </div>
+      <button type="submit" class="modal-submit" id="modal-btn">Get Access Now →</button>
+    </form>
+    <div class="modal-note">🔒 No spam. No BS. Just your access link within 24 hours.</div>
+  </div>
+</div>
+
+<script>
+  // Billing toggle
+  let currentBilling = 'monthly';
+
+  function setBilling(mode, btn) {
+    currentBilling = mode;
+    document.querySelectorAll('.pricing-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.monthly-price').forEach(el => {
+      el.style.display = mode === 'monthly' ? 'block' : 'none';
+    });
+    document.querySelectorAll('.annual-price').forEach(el => {
+      el.style.display = mode === 'annual' ? 'block' : 'none';
+    });
+
+    // VIP update
+    const vipPrice = document.getElementById('vip-monthly-price');
+    const vipPeriod = document.getElementById('vip-period');
+    const vipNote = document.getElementById('vip-annual-note');
+    const vipLabel = document.getElementById('vip-billing-label');
+
+    if (mode === 'annual') {
+      vipPrice.innerHTML = '<sup>$</sup>34';
+      vipPeriod.textContent = 'per month, billed annually';
+      vipNote.style.display = 'block';
+      vipLabel.textContent = 'Billed annually ($408/yr)';
+    } else {
+      vipPrice.innerHTML = '<sup>$</sup>49';
+      vipPeriod.textContent = 'per month';
+      vipNote.style.display = 'none';
+      vipLabel.textContent = 'Billed monthly';
+    }
+  }
+
+  // Modal
+  const icons = { vip: '👑', civilrightshub: '⚖️', chatscream: '📡', casebuddy: '📋', buildmybot: '🤖', codeforge: '⚡', tubescribe: '🎙️' };
+
+  function openModal(planName, appKey) {
+    document.getElementById('modal-title').textContent = 'Get Access — ' + planName;
+    document.getElementById('modal-plan').textContent = planName + (currentBilling === 'annual' ? ' · Annual Plan' : ' · Monthly Plan');
+    document.getElementById('modal-icon').textContent = icons[appKey] || '🔑';
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOutside(e) {
+    if (e.target.id === 'modal') closeModal();
+  }
+
+  function handleSubscribe(e) {
+    e.preventDefault();
+    const email = document.getElementById('modal-email').value;
+    const btn = document.getElementById('modal-btn');
+    btn.textContent = '✅ Request sent!';
+    btn.style.background = '#22c55e';
+    btn.style.color = '#fff';
+    setTimeout(() => {
+      closeModal();
+      btn.textContent = 'Get Access Now →';
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 2200);
+  }
+
+  // Smooth scroll for Safari
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+</script>
+</body>
+</html>
