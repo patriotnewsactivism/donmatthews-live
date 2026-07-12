@@ -4,19 +4,23 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Music, Play, ExternalLink } from "lucide-react";
 
+// Order re-referenced against the official BandLab/SoundCloud release order
+// (badactors.online's own canonical MusicAlbum schema), filtered to the
+// tracks currently featured on this page. Do not reorder ad hoc again --
+// always check the source-of-truth listing first.
 const trackList = [
-  "Unbroken",
-  "Scandalous",
-  "Governors Gone Too Far",
-  "The Gaslight Anthem",
   "Silence Ain't Consent",
+  "Unbroken",
   "In the Shadows Tonight (The Reckoning)",
   "Double Dipped (Crowder Exposed)",
   "Morgan County Blues",
+  "The Crowder Files",
   "Eleven Months Too Long",
   "Caught Red Handed",
-  "The Crowder Files",
-  "She Called The State"
+  "She Called The State",
+  "The Gaslight Anthem",
+  "Governors Gone Too Far",
+  "Scandalous"
 ];
 
 const teasers = [
@@ -139,6 +143,27 @@ export default function MusicSection() {
                     <span className="text-sm font-medium text-gray-300">{track}</span>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* In-page player: real SoundCloud playlist, click any track to
+                hear it without ever leaving this page. */}
+            <div>
+              <h4 className="text-sm font-bold text-gold uppercase tracking-wider mb-3 flex items-center gap-2">
+                <Play className="w-3.5 h-3.5" />
+                Listen Right Here
+              </h4>
+              <div className="rounded-xl overflow-hidden border border-white/10 bg-black/40">
+                <iframe
+                  title="Bad Actors: Volume 1 — full album player"
+                  width="100%"
+                  height="400"
+                  scrolling="no"
+                  frameBorder="no"
+                  allow="autoplay; encrypted-media"
+                  loading="lazy"
+                  src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fapi.soundcloud.com%2Fplaylists%2F2162784578&color=%23eab308&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=false"
+                />
               </div>
             </div>
 
