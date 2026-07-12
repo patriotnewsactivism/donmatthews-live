@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Music, Play, ExternalLink, ChevronDown } from "lucide-react";
+import { Music, ExternalLink, ChevronDown } from "lucide-react";
 
 // Verified against the actual BandLab album listing (screenshot confirmed
 // by Don, 2026-07-12) -- "Bad Actors: Volume 1", released Jan 09, 2025,
@@ -19,19 +19,24 @@ const trackList = [
       "One of the album's most pointed indictments of personal betrayal colliding with state-enabled corruption — repeated attempts to \"double dip\" on child support by claiming payments were never received when they'd already been issued, while a state agency let the fraud stand instead of correcting it." },
   { title: "Morgan County Blues", duration: "4:03", story:
       "Steps outside the artist's own battles to spotlight another victim of manufactured criminality: a Utah real estate photographer arrested while lawfully doing his job. The track exposes how fragile freedom becomes when officers choose narrative over truth." },
-  { title: "The Osteen Files – Exhibit L", duration: "3:49", story: null },
-  { title: "A Warrant For A Lie", duration: "3:33", story: null },
+  { title: "The Osteen Files – Exhibit L", duration: "3:49", story:
+      "Exhibit L. Just one letter. One piece of evidence in a mountain of documentation that reveals a pattern of misconduct so extensive, it required its own filing system. This track chronicles the beginning of the Osteen investigation — where the first documents surfaced, where the lies began to unravel, and where the truth started demanding attention. When you need to alphabetize your corruption, you know the reckoning is coming." },
+  { title: "A Warrant For A Lie", duration: "3:33", story:
+      "They swore an oath. They signed their names. They stood before a judge and declared it was the truth. But it wasn't. This is the story of a warrant built on fabrications — a legal document that should represent justice, instead weaponized to destroy an innocent life." },
   { title: "The Crowder Files", duration: "3:32", story:
       "The documentary centerpiece compiling the receipts — the false statements, the manipulated legal filings, the weaponized agencies, and the trail of destruction left behind." },
   { title: "Eleven Months Too Long", duration: "3:47", story:
       "Documents one of the most egregious examples of pretrial detention abuse in the saga — nearly a year of imprisonment endured without conviction, freedom stolen, constitutional rights trampled." },
   { title: "Caught Red Handed", duration: "3:59", story:
       "The receipts track — the moment when all the documentation, all the evidence, all the contradictions come together to prove what was always true: they lied, and they got caught." },
-  { title: "Osteen Lied", duration: "3:35", story: null },
-  { title: "Land of the Free, Unless Its Me", duration: "4:11", story: null },
+  { title: "Osteen Lied", duration: "3:35", story:
+      "Three words. Undeniable truth. Documented proof. Osteen lied. Not once. Not by accident. Not a misunderstanding. A calculated, deliberate, provable lie that destroyed lives and perverted justice." },
+  { title: "Land of the Free, Unless Its Me", duration: "4:11", story:
+      "Confronts the bitter irony at the heart of American justice: the freedoms we celebrate don't apply equally to everyone. This track examines how constitutional protections evaporate when you become a target, how rights become privileges revoked at the discretion of those in power." },
   { title: "She Called The State", duration: "3:54", story:
       "Documents the moment personal conflict became state-sponsored persecution — how a single phone call can activate an entire apparatus of government power against an individual." },
-  { title: "Osteen's Fall", duration: "3:26", story: null },
+  { title: "Osteen's Fall", duration: "3:26", story:
+      "Every corrupt empire eventually crumbles. Every bad actor eventually faces their reckoning. This track chronicles the downfall — when the evidence became overwhelming, when the lies could no longer be sustained, when justice finally began to turn its gaze toward the guilty." },
   { title: "The Gaslight Anthem", duration: "2:28", story:
       "\"You're crazy. That didn't happen. You're misremembering. Nobody will believe you.\" The anthem of the gaslighter — reclaiming reality and documenting the tactics used to make victims question their own truth." },
   { title: "Governors Gone Too Far", duration: "3:21", story:
@@ -65,34 +70,16 @@ export default function MusicSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           {/* Left: Album cover / links */}
           <div className="lg:col-span-5 flex flex-col gap-8">
-            <div className="aspect-square w-full max-w-md mx-auto lg:mx-0 rounded-2xl bg-gradient-to-br from-gold/20 via-[#151515] to-black border-2 border-gold/30 flex flex-col justify-between p-8 relative shadow-2xl overflow-hidden group">
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <a
-                  href="https://www.bandlab.com/badactors/albums/8ea7105d-acc1-f011-8195-6045bd30a4b0"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-4 bg-gold rounded-full text-black hover:scale-110 transition-transform"
-                >
-                  <Play className="w-8 h-8 fill-black" />
-                </a>
-              </div>
-              <div className="flex justify-between items-start">
-                <span className="text-xs font-bold tracking-widest text-gold bg-gold/10 px-2.5 py-1 rounded">
-                  ALBUM VOLUME 1 (2025)
-                </span>
-                <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
-                  badactors.online
-                </span>
-              </div>
-              <div className="my-auto py-8">
-                <h3 className="text-4xl sm:text-5xl font-black text-white tracking-tighter mb-2">
-                  BAD ACTORS
-                </h3>
-                <p className="text-gold font-semibold text-lg sm:text-xl tracking-wider">
-                  VOLUME 1
-                </p>
-              </div>
-              <div className="flex items-end justify-between border-t border-white/10 pt-4">
+            <div className="w-full max-w-md mx-auto lg:mx-0 rounded-2xl border-2 border-gold/30 shadow-2xl overflow-hidden bg-[#151515]">
+              <iframe
+                width="100%"
+                height="200"
+                src="https://www.bandlab.com/embed/shout/?id=4d64abf2-acc1-f011-8196-000d3a96100f"
+                allowFullScreen
+                title="Bad Actors: Volume 1 - Full Album Player"
+                className="block w-full"
+              />
+              <div className="flex items-center justify-between px-4 py-3 border-t border-white/10">
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Artist</p>
                   <p className="text-sm font-semibold text-white">Don Matthews</p>
