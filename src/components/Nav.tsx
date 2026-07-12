@@ -67,7 +67,7 @@ export default function Nav() {
             onClick={(e) => handleClick(e, "#hero")}
             className="text-lg font-bold text-white tracking-widest hover:text-gold transition-colors"
           >
-            MATTHEW REARDON <span className="text-gold font-light text-xs ml-1 font-mono uppercase">Don Matthews</span>
+            DON MATTHEWS
           </a>
 
           {/* Desktop Nav */}
