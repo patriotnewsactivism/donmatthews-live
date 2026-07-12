@@ -35,10 +35,14 @@ export default function Press() {
           <div className="md:col-span-7 space-y-6">
             <h3 className="text-2xl font-bold text-white">Press Bio</h3>
             <p className="text-gray-300 font-light leading-relaxed">
-              Matthew Reardon, publishing under the pen name Don Matthews, is an entrepreneur, AI systems architect, songwriter, and tireless civil rights advocate. Combining a deep expertise in cutting-edge software development with an active pro se litigation background, Matthew directly challenges systemic civil rights issues and constitutional infractions.
+              Don Matthews is an entrepreneur, AI systems architect, songwriter, and tireless civil rights advocate.
+              Combining deep expertise in cutting-edge software development with an active pro se litigation background,
+              Don directly challenges systemic civil rights issues and constitutional infractions.
             </p>
             <p className="text-gray-400 font-light leading-relaxed">
-              As director of independent journalism site We The People News, Matthew champions government transparency and first amendment audits, bringing real-world legal action and investigative research together with music production to highlight human stories.
+              As director of independent journalism site We The People News, Don champions government transparency
+              and First Amendment audits — bringing real-world legal action and investigative research together
+              with music production to highlight human stories.
             </p>
             <div className="flex flex-wrap gap-2 pt-2">
               {roles.map((role) => (

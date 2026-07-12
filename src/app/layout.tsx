@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Matthew Reardon (Don Matthews) | AI Builder, Journalist, Litigator, Artist, Author",
-  description: "Official portfolio of Matthew Reardon (pen name: Don Matthews). Software developer, AI architect, investigative journalist, civil rights litigator, and songwriter.",
+  title: "Don Matthews | AI Builder, Journalist, Litigator, Artist, Author",
+  description: "Official portfolio of Don Matthews — software developer, AI architect, investigative journalist, civil rights litigator, and songwriter.",
 };
 
 export default function RootLayout({

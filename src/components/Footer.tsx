@@ -10,10 +10,10 @@ export default function Footer() {
         {/* Left Side: Brand info and Advocacy */}
         <div className="text-center md:text-left space-y-3">
           <p className="text-sm font-semibold text-white">
-            Matthew Reardon <span className="text-gold font-light">/ Don Matthews</span>
+            Don Matthews
           </p>
           <p className="text-xs text-gray-500 max-w-sm">
-            © 2026 Matthew Reardon / Don Matthews. All rights reserved.
+            © 2026 Don Matthews. All rights reserved.
           </p>
           {/* Legal / Cannabis disclaimer */}
           <div className="inline-flex items-center gap-1.5 text-xs text-gold/80 bg-gold/5 px-2.5 py-1 rounded">

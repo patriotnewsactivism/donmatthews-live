@@ -52,7 +52,7 @@ export default function Book() {
               American Injustice
             </h2>
             <p className="text-sm font-mono text-gold-light uppercase tracking-wider">
-              By Matthew Reardon (Don Matthews)
+              By Don Matthews
             </p>
             <p className="text-gray-400 font-light leading-relaxed">
               A firsthand account of constitutional violations, judicial misconduct, and the relentless fight for civil rights in modern America. Explore the depths of the legal machinery, systemic errors, and personal perseverance.

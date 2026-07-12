@@ -42,17 +42,17 @@ export default function Hero() {
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/30 bg-gold/5 text-gold text-xs sm:text-sm font-medium tracking-wide mb-8"
         >
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Don Matthews Live — Portfolio & Access Hub</span>
+          <span>donmatthews.live — Portfolio & Access Hub</span>
         </motion.div>
 
-        {/* Main Headline */}
+        {/* Main Headline — Don Matthews only */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
           className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight text-white mb-6"
         >
-          Matthew Reardon
+          Don Matthews
         </motion.h1>
 
         {/* Cycling Subtitle */}
