@@ -20,16 +20,14 @@
 - An empty, zero-deployment "web" Railway service was deleted from this
   project (cleanup, not a functional loss).
 
-## Known open gap — flagged, not yet fixed
-**Lead capture is a data black hole.** The waitlist/notify API routes write
-JSON to `/tmp`, which Railway wipes on every restart or redeploy. There is
-no database, no email notification, and no connection to BuildMyBot. This
-means the site's entire lead-generation function currently produces
-nothing durable — every visitor who submits the form is lost. This is a
-real, live bug, not a hypothetical one. Recommended fix: POST captures
-straight into BuildMyBot's `/api/leads` endpoint (or directly into
-Supabase's `leads` table with a service-role key), so BuildMyBot's AI Team
-lead-followup worker can nurture them automatically. This is the
-single highest-leverage fix available on this repo — treat it as priority
-one, ahead of any new page/feature work, once Don approves the infra
-change (it touches env vars / a new outbound API call).
+## Lead capture — FIXED and verified live (2026-07-12)
+Was flagged as a data black hole (`/tmp` writes, ephemeral, all leads
+lost). Turned out the forwarding code (`src/lib/portfolio.ts`) already
+existed but was non-functional: `PORTFOLIO_INTAKE_SECRET` unset here, and
+BuildMyBot's `PORTFOLIO_OWNER_EMAIL` defaulted to a non-existent placeholder
+account, so every real submission was actually returning a live 503 error
+to visitors. Fixed: fresh shared secret set identically on this Railway
+service and the BuildMyBot Vercel project, `PORTFOLIO_OWNER_EMAIL` pointed
+at Don's real account, both redeployed, verified end-to-end with a real
+Supabase `leads` row (then cleaned up the test row). If this ever breaks
+again, check both env vars first — the code path itself is solid.
