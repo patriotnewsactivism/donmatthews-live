@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
+import Image from "next/image";
 
 const titles = [
   "AI Builder.",
@@ -32,6 +33,26 @@ export default function Hero() {
 
       {/* Radial Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-gold/10 rounded-full blur-[100px] pointer-events-none" />
+
+      {/* Wanted Poster — decorative accent, right side on large screens */}
+      <motion.div
+        initial={{ opacity: 0, x: 40, rotate: 6 }}
+        animate={{ opacity: 1, x: 0, rotate: 3 }}
+        transition={{ duration: 1, delay: 0.4 }}
+        className="hidden lg:block absolute right-8 xl:right-20 top-1/2 -translate-y-1/2 w-[260px] xl:w-[320px] pointer-events-none z-0"
+      >
+        <div className="relative rounded-sm overflow-hidden border border-white/10 shadow-2xl shadow-black/60">
+          <Image
+            src="/images/wanted-poster.jpg"
+            alt="Wanted by the State and Federal Government for Possession of a Camera with Intent to Expose — Don Matthews, We The People News"
+            width={1024}
+            height={1024}
+            className="w-full h-auto opacity-90"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+        </div>
+      </motion.div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
         {/* Subtle Badge */}

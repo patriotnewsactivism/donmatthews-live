@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Mail, Shield } from "lucide-react";
+import Image from "next/image";
 
 export default function Press() {
   const roles = [
@@ -31,8 +32,20 @@ export default function Press() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+          {/* Portrait */}
+          <div className="md:col-span-5 md:order-2">
+            <div className="relative w-full max-w-sm mx-auto aspect-square rounded-xl overflow-hidden border border-white/10 shadow-2xl shadow-black/60">
+              <Image
+                src="/images/portrait-bw.jpg"
+                alt="Don Matthews — Matthew Reardon"
+                fill
+                className="object-cover grayscale"
+              />
+            </div>
+          </div>
+
           {/* Bio Info */}
-          <div className="md:col-span-7 space-y-6">
+          <div className="md:col-span-7 md:order-1 space-y-6">
             <h3 className="text-2xl font-bold text-white">Press Bio</h3>
             <p className="text-gray-300 font-light leading-relaxed">
               Don Matthews is an entrepreneur, AI systems architect, songwriter, and tireless civil rights advocate.
@@ -54,7 +67,7 @@ export default function Press() {
           </div>
 
           {/* Contact Cards */}
-          <div className="md:col-span-5 p-8 rounded-xl border border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent text-center space-y-6">
+          <div className="md:col-span-12 md:order-3 p-8 rounded-xl border border-white/5 bg-gradient-to-br from-white/[0.02] to-transparent text-center space-y-6 max-w-xl mx-auto">
             <div className="p-4 bg-gold/10 rounded-full w-fit mx-auto text-gold">
               <Mail className="w-8 h-8" />
             </div>

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Code, Eye, ShieldCheck, Scale, Music, Leaf, BookOpen } from "lucide-react";
 
 interface Talent {
@@ -73,17 +74,28 @@ export default function Talents() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: idx * 0.05 }}
-              className={`flex flex-col p-8 rounded-xl border border-white/5 bg-gradient-to-br from-white/[0.01] to-transparent hover:border-gold/20 hover:from-white/[0.03] transition-all duration-300 ${
+              className={`relative flex flex-col p-8 rounded-xl border border-white/5 bg-gradient-to-br from-white/[0.01] to-transparent hover:border-gold/20 hover:from-white/[0.03] transition-all duration-300 overflow-hidden ${
                 idx === 6 ? "md:col-span-2 lg:col-span-1 md:max-w-md md:mx-auto lg:max-w-none lg:mx-0 w-full" : ""
               }`}
             >
-              <div className="p-3 bg-gold/10 rounded-lg w-fit mb-6">
+              {idx === 1 && (
+                <>
+                  <Image
+                    src="/images/field-journalist.jpg"
+                    alt="Don Matthews reporting in the field for We The People News"
+                    fill
+                    className="object-cover opacity-20"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/40" />
+                </>
+              )}
+              <div className="relative z-10 p-3 bg-gold/10 rounded-lg w-fit mb-6">
                 {talent.icon}
               </div>
-              <h3 className="text-xl font-bold text-white mb-3 tracking-wide">
+              <h3 className="relative z-10 text-xl font-bold text-white mb-3 tracking-wide">
                 {talent.title}
               </h3>
-              <p className="text-gray-400 text-sm leading-relaxed font-light">
+              <p className="relative z-10 text-gray-400 text-sm leading-relaxed font-light">
                 {talent.description}
               </p>
             </motion.div>
