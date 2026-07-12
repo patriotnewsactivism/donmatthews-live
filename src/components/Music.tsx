@@ -1,26 +1,74 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Music, Play, ExternalLink } from "lucide-react";
+import { Music, Play, ExternalLink, ChevronDown } from "lucide-react";
 
 // Order re-referenced against the official BandLab/SoundCloud release order
 // (badactors.online's own canonical MusicAlbum schema), filtered to the
 // tracks currently featured on this page. Do not reorder ad hoc again --
 // always check the source-of-truth listing first.
 const trackList = [
-  "Silence Ain't Consent",
-  "Unbroken",
-  "In the Shadows Tonight (The Reckoning)",
-  "Double Dipped (Crowder Exposed)",
-  "Morgan County Blues",
-  "The Crowder Files",
-  "Eleven Months Too Long",
-  "Caught Red Handed",
-  "She Called The State",
-  "The Gaslight Anthem",
-  "Governors Gone Too Far",
-  "Scandalous"
+  {
+    title: "Silence Ain't Consent",
+    story:
+      "This opening track sets the tone for everything that follows. When communities stay silent in the face of corruption, that silence is often mistaken for consent. But make no mistake — silence is not agreement. It's often fear, exhaustion, or learned helplessness. This is North Mississippi's warning: we're not staying silent anymore."
+  },
+  {
+    title: "Unbroken",
+    story:
+      "The heartbeat of the album — the moment the storytelling stops whispering and starts roaring. Every verse is pulled from the wreckage of real events: corrupt cops filing false reports, officials crossing state lines to retaliate, a system that chose power over truth. \"Unbroken\" is the declaration that no matter how many times they tried to disappear your voice, you walked out stronger."
+  },
+  {
+    title: "In the Shadows Tonight (The Reckoning)",
+    story:
+      "One of the most confrontational and revealing tracks on the album. Rather than focusing solely on systemic actors, this song turns its gaze toward a more intimate origin of destruction — false accusations and manipulative actions that set in motion many of the legal battles and human-rights violations that followed."
+  },
+  {
+    title: "Double Dipped (Crowder Exposed)",
+    story:
+      "One of the album's most pointed indictments of personal betrayal colliding with state-enabled corruption — repeated attempts to \"double dip\" on child support by claiming payments were never received when they'd already been issued, while a state agency let the fraud stand instead of correcting it."
+  },
+  {
+    title: "Morgan County Blues",
+    story:
+      "Steps outside the artist's own battles to spotlight another victim of manufactured criminality: a Utah real estate photographer arrested while lawfully doing his job. The track exposes how fragile freedom becomes when officers choose narrative over truth."
+  },
+  {
+    title: "The Crowder Files",
+    story:
+      "The documentary centerpiece compiling the receipts — the false statements, the manipulated legal filings, the weaponized agencies, and the trail of destruction left behind."
+  },
+  {
+    title: "Eleven Months Too Long",
+    story:
+      "Documents one of the most egregious examples of pretrial detention abuse in the saga — nearly a year of imprisonment endured without conviction, freedom stolen, constitutional rights trampled."
+  },
+  {
+    title: "Caught Red Handed",
+    story:
+      "The receipts track — the moment when all the documentation, all the evidence, all the contradictions come together to prove what was always true: they lied, and they got caught."
+  },
+  {
+    title: "She Called The State",
+    story:
+      "Documents the moment personal conflict became state-sponsored persecution — how a single phone call can activate an entire apparatus of government power against an individual."
+  },
+  {
+    title: "The Gaslight Anthem",
+    story:
+      "\"You're crazy. That didn't happen. You're misremembering. Nobody will believe you.\" The anthem of the gaslighter — reclaiming reality and documenting the tactics used to make victims question their own truth."
+  },
+  {
+    title: "Governors Gone Too Far",
+    story:
+      "When corruption reaches the highest levels of state government, when the governor's office itself becomes complicit in covering up injustice, someone has to say it out loud."
+  },
+  {
+    title: "Scandalous",
+    story:
+      "Closes the album with the most personal betrayal of all — the scandalous acts committed by the woman he married and had three children with. This track documents the calculated destruction that came from within his own home."
+  }
 ];
 
 const teasers = [
@@ -30,6 +78,8 @@ const teasers = [
 ];
 
 export default function MusicSection() {
+  const [openTrack, setOpenTrack] = useState<string | null>(null);
+
   return (
     <section id="music" className="py-24 relative overflow-hidden bg-[#0c0c0c]">
       {/* Background glow */}
@@ -131,18 +181,38 @@ export default function MusicSection() {
                 <span className="w-2 h-2 rounded-full bg-gold" />
                 Volume 1 Official Track List
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {trackList.map((track, index) => (
-                  <div
-                    key={track}
-                    className="flex items-center gap-4 p-3 rounded-lg border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors"
-                  >
-                    <span className="text-xs font-mono text-gold font-bold w-5">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-sm font-medium text-gray-300">{track}</span>
-                  </div>
-                ))}
+              <p className="text-xs text-gray-500 mb-4">
+                Every track is an affidavit. Click a track to read the story behind it.
+              </p>
+              <div className="flex flex-col gap-3">
+                {trackList.map((track, index) => {
+                  const isOpen = openTrack === track.title;
+                  return (
+                    <div
+                      key={track.title}
+                      className="rounded-lg border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors overflow-hidden"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setOpenTrack(isOpen ? null : track.title)}
+                        className="w-full flex items-center gap-4 p-3 text-left"
+                      >
+                        <span className="text-xs font-mono text-gold font-bold w-5 shrink-0">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <span className="text-sm font-medium text-gray-300 flex-1">{track.title}</span>
+                        <ChevronDown
+                          className={`w-4 h-4 text-gold/70 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                        />
+                      </button>
+                      {isOpen && (
+                        <div className="px-3 pb-4 pl-12">
+                          <p className="text-xs text-gray-400 leading-relaxed">{track.story}</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
