@@ -3,6 +3,7 @@
 import React from "react";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
+import VideoSpotlight from "@/components/VideoSpotlight";
 import Projects from "@/components/Projects";
 import Talents from "@/components/Talents";
 import Music from "@/components/Music";
@@ -17,6 +18,7 @@ export default function Home() {
       <Nav />
       <main className="relative min-h-screen">
         <Hero />
+        <VideoSpotlight />
         <Projects />
         <Talents />
         <Music />
