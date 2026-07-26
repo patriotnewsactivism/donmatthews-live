@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Music, ExternalLink, ChevronDown, Play, Pause } from "lucide-react";
+import { Music, ExternalLink, ChevronDown, Play, Pause, Download, Loader2, CheckCircle } from "lucide-react";
 
 // Verified against the actual BandLab album listing (screenshot confirmed
 // by Don, 2026-07-12) -- "Bad Actors: Volume 1", released Jan 09, 2025,
@@ -49,6 +49,28 @@ export default function MusicSection() {
   const [openTrack, setOpenTrack] = useState<string | null>(null);
   const [playingTitle, setPlayingTitle] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [downloadEmail, setDownloadEmail] = useState("");
+  const [downloadState, setDownloadState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+
+  const handleDownloadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!downloadEmail) return;
+    setDownloadState("loading");
+    try {
+      const res = await fetch("/api/album-download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: downloadEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      setDownloadUrl(data.downloadUrl);
+      setDownloadState("success");
+    } catch {
+      setDownloadState("error");
+    }
+  };
 
   const handlePlayToggle = (track: (typeof trackList)[number]) => {
     const audio = audioRef.current;
@@ -112,6 +134,49 @@ export default function MusicSection() {
                 </div>
                 <p className="text-xs text-gold/80 font-mono">17 TRACKS</p>
               </div>
+            </div>
+
+            {/* Free Download Block */}
+            <div className="max-w-md mx-auto lg:mx-0 w-full rounded-lg border border-gold/20 bg-white/[0.02] p-4">
+              <h4 className="text-xs font-bold text-gold uppercase tracking-widest mb-2 flex items-center gap-2">
+                <Download className="w-3.5 h-3.5" />
+                Free Album Download
+              </h4>
+              {downloadState === "success" && downloadUrl ? (
+                <div className="flex items-center gap-2 text-sm text-gray-300">
+                  <CheckCircle className="w-4 h-4 text-gold shrink-0" />
+                  <span>
+                    Check your email — or{" "}
+                    <a href={downloadUrl} className="text-gold underline">
+                      grab it directly here
+                    </a>
+                    .
+                  </span>
+                </div>
+              ) : (
+                <form onSubmit={handleDownloadSubmit} className="flex gap-2">
+                  <input
+                    type="email"
+                    required
+                    value={downloadEmail}
+                    onChange={(e) => setDownloadEmail(e.target.value)}
+                    placeholder="you@email.com"
+                    className="flex-1 min-w-0 bg-white/[0.03] border border-white/10 rounded-md px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-gold/50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={downloadState === "loading"}
+                    className="shrink-0 flex items-center gap-1.5 px-3 py-2 bg-gold/10 border border-gold/30 text-gold text-sm font-semibold rounded-md hover:bg-gold/20 transition-colors disabled:opacity-60"
+                  >
+                    {downloadState === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                    Get It
+                  </button>
+                </form>
+              )}
+              {downloadState === "error" && (
+                <p className="text-xs text-red-400 mt-2">Something went wrong — please try again.</p>
+              )}
+              <p className="text-[10px] text-gray-600 mt-2">All 17 tracks, in order. No spam, just the album.</p>
             </div>
 
             {/* Links Block */}
