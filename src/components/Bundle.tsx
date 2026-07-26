@@ -50,7 +50,7 @@ export default function Bundle() {
             One Price. Everything.
           </h2>
           <p className="max-w-2xl mx-auto text-gray-400 font-light">
-            Get unlimited access to CodeForge, TubeScribe, and every consumer app Don Matthews ships next — plus free music, books, and exclusive behind-the-scenes access — for one flat monthly or annual fee.
+            Get VIP access to ChatScream, CodeForge, and TubeScribe — plus the latest music and a free book — for one flat monthly or annual fee.
           </p>
         </div>
 
@@ -65,7 +65,7 @@ export default function Bundle() {
                 <span className="text-gray-400 text-sm">/ month</span>
               </div>
               <ul className="space-y-3 mb-8">
-                {["CodeForge Access", "TubeScribe Summations", "Bad Actors Music + American Injustice Book", "All Future App Launches"].map((item) => (
+                {["ChatScream, CodeForge & TubeScribe Access", "VIP All-Access Pass", "Latest Music — Free", "Free Book: American Injustice"].map((item) => (
                   <li key={item} className="flex items-center gap-2.5 text-sm text-gray-300">
                     <Check className="w-4 h-4 text-gold flex-shrink-0" />
                     <span>{item}</span>
@@ -90,7 +90,7 @@ export default function Bundle() {
                 <span className="text-gray-400 text-sm">/ year</span>
               </div>
               <ul className="space-y-3 mb-8">
-                {["Full Year CodeForge", "Full Year TubeScribe", "Bad Actors Music + American Injustice Book", "Priority Beta Access", "Dedicated Tech Support"].map((item) => (
+                {["Full Year ChatScream, CodeForge & TubeScribe", "VIP All-Access Pass", "Latest Music — Free", "Free Book: American Injustice", "Priority Beta Access"].map((item) => (
                   <li key={item} className="flex items-center gap-2.5 text-sm text-gray-300">
                     <Check className="w-4 h-4 text-gold flex-shrink-0" />
                     <span>{item}</span>
