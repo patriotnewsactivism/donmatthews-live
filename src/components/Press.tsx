@@ -37,7 +37,7 @@ export default function Press() {
             <div className="relative w-full max-w-sm mx-auto aspect-square rounded-xl overflow-hidden border border-white/10 shadow-2xl shadow-black/60">
               <Image
                 src="/images/portrait-bw.jpg"
-                alt="Don Matthews — Matthew Reardon"
+                alt="Don Matthews"
                 fill
                 className="object-cover grayscale"
               />
