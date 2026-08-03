@@ -36,6 +36,15 @@ export default function Footer() {
           <a href="https://badactors.online" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
             badactors.online
           </a>
+          <a href="/terms" className="hover:text-gold transition-colors">
+            Terms of Service
+          </a>
+          <a href="/privacy-policy" className="hover:text-gold transition-colors">
+            Privacy Policy
+          </a>
+          <a href="/refund-policy" className="hover:text-gold transition-colors">
+            Refund Policy
+          </a>
         </div>
 
         {/* Right: Social icons */}
