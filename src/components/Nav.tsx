@@ -7,10 +7,11 @@ import { Menu, X } from "lucide-react";
 const links = [
   { label: "Home", href: "#hero" },
   { label: "Projects", href: "#projects" },
-  { label: "Talents", href: "#talents" },
+  { label: "Stack", href: "#stack" },
   { label: "Music", href: "#music" },
   { label: "Book", href: "#book" },
   { label: "Bundle", href: "#bundle" },
+  { label: "FAQ", href: "#faq" },
   { label: "Press", href: "#press" },
 ];
 

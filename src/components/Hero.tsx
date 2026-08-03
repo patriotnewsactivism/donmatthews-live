@@ -97,10 +97,20 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="max-w-2xl mx-auto text-gray-400 text-base sm:text-xl leading-relaxed mb-12 font-light"
+          className="max-w-2xl mx-auto text-gray-400 text-base sm:text-xl leading-relaxed mb-6 font-light"
         >
           Entrepreneur, software developer, AI architect, and songwriter.
           Building the future — one line of code, one song, and one lawsuit at a time.
+        </motion.p>
+
+        {/* Social proof line */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.25 }}
+          className="max-w-lg mx-auto text-gray-500 text-sm leading-relaxed mb-12"
+        >
+          100+ apps built &bull; 8 live platforms &bull; Federal civil rights litigant &bull; 17-track documentary album
         </motion.p>
 
         {/* Actions */}
