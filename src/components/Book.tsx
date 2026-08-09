@@ -54,8 +54,11 @@ export default function Book() {
             <p className="text-sm font-mono text-gold-light uppercase tracking-wider">
               By Don Matthews
             </p>
+            <blockquote className="border-l-2 border-gold/40 pl-4 text-gray-300 font-light italic leading-relaxed">
+              "On May 20, 2017, I bought a rifle. There is a bill of sale. Six days later, four senior law enforcement officers arrived to arrest me for threatening a couple with that same rifle &mdash; twelve days before it existed."
+            </blockquote>
             <p className="text-gray-400 font-light leading-relaxed">
-              A firsthand account of constitutional violations, judicial misconduct, and the relentless fight for civil rights in modern America. Explore the depths of the legal machinery, systemic errors, and personal perseverance.
+              A first-person account of a decade-long collision with local and federal power &mdash; a duress-signed order that became a felony conviction five years later, a sheriff who told two courts two different things about the same missing video, a federal magistrate who found an officer lied under oath. Told with the same honesty turned on the author's own conduct: the tripod, the crude remarks, the choices that weren't always sound. Two ledgers, kept open at once.
             </p>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded text-xs text-gray-300">
               <span>Publishing on Amazon</span>
