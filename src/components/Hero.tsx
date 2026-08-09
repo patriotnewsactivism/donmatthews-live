@@ -137,6 +137,26 @@ export default function Hero() {
             </span>
           </a>
         </motion.div>
+
+        {/* Story CTA — the most important link on this page. Off-site to
+            help.donmatthews.live, distinct visual weight from the two
+            in-page actions above so it doesn't get lost. */}
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="mt-6 flex justify-center"
+        >
+          <a
+            href="https://help.donmatthews.live"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-gold-light hover:text-gold text-sm sm:text-base font-semibold underline underline-offset-4 decoration-gold/40 hover:decoration-gold transition-colors"
+          >
+            Read my full story &amp; how you can help
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </motion.div>
       </div>
 
       {/* Decorative Bottom Fade */}

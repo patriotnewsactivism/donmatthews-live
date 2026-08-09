@@ -8,14 +8,22 @@ import { Video } from "lucide-react";
 // video/reel URL or a /share/v/... share link directly as `href`, no need
 // to resolve it first. Fixed-size 476x476 per Facebook's plugin (no
 // responsive embed option), so we cap the wrapper at that width and center.
+//
+// NOTE 2026-08-09: the second video that used to live here
+// (facebook.com/share/v/1C8kc2L4tx/, "Music video") is confirmed dead --
+// Facebook's own plugin returns "Video Unavailable: this video may no
+// longer exist, or you don't have permission to view it." This is the
+// SECOND time a share link for this same video has died (see git blame:
+// it was already replaced once before, commit 76a32eb). Share links are
+// fragile -- they rot if the source post is deleted/reposted/set private.
+// Removed rather than shipping a broken embed. To bring this back: get a
+// fresh public reel/video URL (not a /share/ link if avoidable), or better,
+// have Don upload the actual video file to public/videos/ so it's
+// self-hosted and immune to Facebook link rot.
 const videos = [
   {
     href: "https://www.facebook.com/reel/3359834177517605/",
     title: "Featured video",
-  },
-  {
-    href: "https://www.facebook.com/share/v/1C8kc2L4tx/",
-    title: "Music video",
   },
 ];
 

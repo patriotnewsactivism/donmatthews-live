@@ -11,6 +11,8 @@ import Talents from "@/components/Talents";
 import Music from "@/components/Music";
 import Testimonials from "@/components/Testimonials";
 import Book from "@/components/Book";
+import BookExcerpt from "@/components/BookExcerpt";
+import Timeline from "@/components/Timeline";
 import Bundle from "@/components/Bundle";
 import FAQ from "@/components/FAQ";
 import Press from "@/components/Press";
@@ -30,6 +32,8 @@ export default function Home() {
         <Music />
         <Testimonials />
         <Book />
+        <BookExcerpt />
+        <Timeline />
         <Bundle />
         <FAQ />
         <Press />

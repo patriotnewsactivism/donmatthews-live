@@ -15,6 +15,10 @@ const links = [
   { label: "Press", href: "#press" },
 ];
 
+// External — takes you off-site to help.donmatthews.live, so it's rendered
+// separately from the smooth-scroll `links` above (no anchor, no scroll logic).
+const HELP_URL = "https://help.donmatthews.live";
+
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("#hero");
@@ -86,6 +90,14 @@ export default function Nav() {
                 {link.label}
               </a>
             ))}
+            <a
+              href={HELP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full bg-gold hover:bg-gold-light text-black transition-colors"
+            >
+              My Story
+            </a>
           </nav>
 
           {/* Mobile menu trigger */}
@@ -115,6 +127,15 @@ export default function Nav() {
               {link.label}
             </a>
           ))}
+          <a
+            href={HELP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMobileOpen(false)}
+            className="mt-2 text-lg font-bold uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-black"
+          >
+            My Story
+          </a>
         </div>
       )}
     </>
