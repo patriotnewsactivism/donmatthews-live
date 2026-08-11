@@ -2,6 +2,7 @@
 
 import React from "react";
 import Nav from "@/components/Nav";
+import BreakingUpdate from "@/components/BreakingUpdate";
 import Hero from "@/components/Hero";
 import StatsBar from "@/components/StatsBar";
 import VideoSpotlight from "@/components/VideoSpotlight";
@@ -22,6 +23,7 @@ export default function Home() {
   return (
     <>
       <Nav />
+      <BreakingUpdate />
       <main className="relative min-h-screen">
         <Hero />
         <StatsBar />
