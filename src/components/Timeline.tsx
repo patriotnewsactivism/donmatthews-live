@@ -50,9 +50,14 @@ const events = [
     body: "Time served (~13 days) plus two years unsupervised probation \u2014 no fine. Barred from Louisiana federal courthouses without 2 days' notice for \u201clegitimate business,\u201d an objection the defense placed on the record. A federal magistrate had already recused herself months earlier, citing the appearance of bias from the Marshals' pre-charge communications.",
   },
   {
+    year: "Aug 10, 2026",
+    title: "Galveston Dismissed \u2014 Without a Judgment",
+    body: "Reardon v. Osteen, the federal civil rights case over the fabricated Galveston DWI arrest, is dismissed in its entirety over his written objections to the magistrate's recommendation. As of publication, the court still hasn't served him the district judge's actual order explaining the ruling on any of his nine objections.",
+  },
+  {
     year: "Now",
     title: "The Appeal",
-    body: "The 14-day appeal window is running. The fight isn't over \u2014 it's moving to the next court.",
+    body: "The 14-day appeal window in the federal courthouse case is running. The fight isn't over \u2014 it's moving to the next court, on two fronts at once.",
   },
 ];
 
