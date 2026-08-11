@@ -24,7 +24,7 @@ const talents: Talent[] = [
   },
   {
     title: "Civil Rights Litigator",
-    description: "Pro se plaintiff. Reardon v. Osteen (S.D. Texas). Fighting § 1983 violations head-on.",
+    description: "Pro se plaintiff. Reardon v. Osteen (S.D. Texas) dismissed Aug. 2026 over his express objections \u2014 now headed to appeal.",
     icon: <Scale className="w-6 h-6 text-gold" />,
   },
   {

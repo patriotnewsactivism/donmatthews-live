@@ -47,7 +47,7 @@ const events = [
   {
     year: "Aug 7, 2026",
     title: "Sentencing",
-    body: "Time served (~13 days) plus two years unsupervised probation \u2014 no fine. Barred from Louisiana federal courthouses without 2 days' notice for \u201clegitimate business,\u201d an objection the defense placed on the record. A federal magistrate had already recused herself months earlier, citing the appearance of bias from the Marshals' pre-charge communications.",
+    body: "Time served (~13 days) plus two years unsupervised probation \u2014 no fine. Barred from Louisiana federal courthouses without 2 days' notice for \u201clegitimate business,\u201d an objection the defense placed on the record. A federal magistrate had already recused herself months earlier, citing the appearance of bias from the Marshals' pre-charge communications. Reardon published the full hearing on Zoom himself \u2014 win or lose, the record is public.",
   },
   {
     year: "Aug 10, 2026",
