@@ -16,8 +16,8 @@ const options = [
   },
   {
     label: "Cash App",
-    detail: "$Aaudit",
-    href: "https://cash.app/$Aaudit",
+    detail: "$1Aaudit",
+    href: "https://cash.app/$1Aaudit",
   },
 ];
 
