@@ -14,6 +14,7 @@ import Testimonials from "@/components/Testimonials";
 import Book from "@/components/Book";
 import BookExcerpt from "@/components/BookExcerpt";
 import Timeline from "@/components/Timeline";
+import Support from "@/components/Support";
 import Bundle from "@/components/Bundle";
 import FAQ from "@/components/FAQ";
 import Press from "@/components/Press";
@@ -36,6 +37,7 @@ export default function Home() {
         <Book />
         <BookExcerpt />
         <Timeline />
+        <Support />
         <Bundle />
         <FAQ />
         <Press />

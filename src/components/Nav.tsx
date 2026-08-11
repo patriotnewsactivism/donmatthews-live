@@ -11,6 +11,7 @@ const links = [
   { label: "Music", href: "#music" },
   { label: "Book", href: "#book" },
   { label: "Bundle", href: "#bundle" },
+  { label: "Support", href: "#support" },
   { label: "FAQ", href: "#faq" },
   { label: "Press", href: "#press" },
 ];
