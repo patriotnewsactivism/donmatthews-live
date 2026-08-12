@@ -9,14 +9,22 @@ import { Video } from "lucide-react";
 // to resolve it first. Reels render portrait — no responsive embed option,
 // so each wrapper is capped at its own width/height and centered.
 //
-// NOTE 2026-08-12: replaced the previous dead reel (3359834177517605,
-// "Video Unavailable" in the live browser) with a fresh one Don supplied
-// (reel/2102941800271906), then added a second fresh reel
-// (reel/1025978140247388, with caption text shown). Facebook share/reel
-// links are fragile — they rot if the source post is deleted/reposted/set
-// private. If any of these die too, the durable fix is self-hosting:
-// upload the actual video file to public/videos/ so it's immune to
-// Facebook link rot.
+// NOTE 2026-08-12: the ORIGINAL featured reel (3359834177517605, the
+// cowboy-hat clip) had previously shown "Video Unavailable" in a live
+// browser check and was pulled — re-tested today and it renders fine again
+// (Facebook reels/share-links flap between available/unavailable
+// unpredictably; this is NOT the durable fix, just today's status). Restored
+// it as the hero/most-prominent video per Don, above the other two. If this
+// one goes dark again, the durable fix is self-hosting: upload the actual
+// video file to public/videos/ so it's immune to Facebook link rot.
+const heroVideo = {
+  href: "https://www.facebook.com/reel/3359834177517605/",
+  title: "Featured video — hero",
+  width: 380,
+  height: 677,
+  showText: false,
+};
+
 const videos = [
   {
     href: "https://www.facebook.com/reel/2102941800271906/",
@@ -27,12 +35,32 @@ const videos = [
   },
   {
     href: "https://www.facebook.com/reel/1025978140247388/",
-    title: "Featured video 2",
+    title: "Sentencing hearing — allocution speech",
     width: 476,
-    height: 591,
+    // Bumped from 591 -> 700 so the like/comment/share stats row under the
+    // caption isn't clipped (was cut off at the bottom on mobile).
+    height: 700,
     showText: true,
   },
 ];
+
+function VideoFrame({ v }: { v: typeof heroVideo }) {
+  return (
+    <iframe
+      src={`https://www.facebook.com/plugins/video.php?height=${v.height}&href=${encodeURIComponent(
+        v.href
+      )}&show_text=${v.showText}&width=${v.width}&t=0`}
+      width={v.width}
+      height={v.height}
+      style={{ border: "none", overflow: "hidden", display: "block", maxWidth: "100%" }}
+      scrolling="no"
+      frameBorder="0"
+      allowFullScreen
+      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+      title={v.title}
+    />
+  );
+}
 
 export default function VideoSpotlight() {
   return (
@@ -49,6 +77,19 @@ export default function VideoSpotlight() {
         </h2>
         <div className="w-20 h-1 bg-gold mx-auto rounded mb-10" />
 
+        {/* Hero video — most prominent, on top, alone */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="rounded-2xl border-2 border-gold shadow-[0_0_40px_-10px_rgba(212,175,55,0.4)] overflow-hidden bg-[#151515] mx-auto mb-8"
+          style={{ width: heroVideo.width, maxWidth: "100%" }}
+        >
+          <VideoFrame v={heroVideo} />
+        </motion.div>
+
+        {/* Secondary videos, below the hero */}
         <div className="flex flex-wrap justify-center items-start gap-8">
           {videos.map((v) => (
             <motion.div
@@ -61,19 +102,7 @@ export default function VideoSpotlight() {
               style={{ width: v.width, maxWidth: "100%" }}
             >
               {/* Kept in-page per standing rule — never link out to open the video elsewhere. */}
-              <iframe
-                src={`https://www.facebook.com/plugins/video.php?height=${v.height}&href=${encodeURIComponent(
-                  v.href
-                )}&show_text=${v.showText}&width=${v.width}&t=0`}
-                width={v.width}
-                height={v.height}
-                style={{ border: "none", overflow: "hidden", display: "block", maxWidth: "100%" }}
-                scrolling="no"
-                frameBorder="0"
-                allowFullScreen
-                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                title={v.title}
-              />
+              <VideoFrame v={v} />
             </motion.div>
           ))}
         </div>
