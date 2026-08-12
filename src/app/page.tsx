@@ -5,6 +5,7 @@ import Nav from "@/components/Nav";
 import BreakingUpdate from "@/components/BreakingUpdate";
 import Hero from "@/components/Hero";
 import StatsBar from "@/components/StatsBar";
+import VideoSpotlight from "@/components/VideoSpotlight";
 import Projects from "@/components/Projects";
 import TechStack from "@/components/TechStack";
 import Talents from "@/components/Talents";
@@ -27,6 +28,7 @@ export default function Home() {
       <main className="relative min-h-screen">
         <Hero />
         <StatsBar />
+        <VideoSpotlight />
         <Projects />
         <TechStack />
         <Talents />
