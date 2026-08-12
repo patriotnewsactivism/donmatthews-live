@@ -1,5 +1,5 @@
 # Install dependencies
-FROM node:20-alpine AS deps
+FROM public.ecr.aws/docker/library/node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY package.json ./
 RUN npm install
 
 # Rebuild the source code only when needed
-FROM node:20-alpine AS builder
+FROM public.ecr.aws/docker/library/node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -21,7 +21,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # Production image, copy all the files and run next
-FROM node:20-alpine AS runner
+FROM public.ecr.aws/docker/library/node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
