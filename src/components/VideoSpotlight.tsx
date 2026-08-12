@@ -6,22 +6,31 @@ import { Video } from "lucide-react";
 
 // Add new videos here — Facebook's plugin iframe accepts either a canonical
 // video/reel URL or a /share/v/... share link directly as `href`, no need
-// to resolve it first. Reels render portrait (267x476 per Facebook's own
-// plugin markup for this one) — no responsive embed option, so the wrapper
-// is capped at that width and centered.
+// to resolve it first. Reels render portrait — no responsive embed option,
+// so each wrapper is capped at its own width/height and centered.
 //
 // NOTE 2026-08-12: replaced the previous dead reel (3359834177517605,
 // "Video Unavailable" in the live browser) with a fresh one Don supplied
-// (reel/2102941800271906). Facebook share/reel links are fragile — they rot
-// if the source post is deleted/reposted/set private. If this one dies too,
-// the durable fix is self-hosting: upload the actual video file to
-// public/videos/ so it's immune to Facebook link rot.
+// (reel/2102941800271906), then added a second fresh reel
+// (reel/1025978140247388, with caption text shown). Facebook share/reel
+// links are fragile — they rot if the source post is deleted/reposted/set
+// private. If any of these die too, the durable fix is self-hosting:
+// upload the actual video file to public/videos/ so it's immune to
+// Facebook link rot.
 const videos = [
   {
     href: "https://www.facebook.com/reel/2102941800271906/",
     title: "Featured video",
     width: 267,
     height: 476,
+    showText: false,
+  },
+  {
+    href: "https://www.facebook.com/reel/1025978140247388/",
+    title: "Featured video 2",
+    width: 476,
+    height: 591,
+    showText: true,
   },
 ];
 
@@ -40,7 +49,7 @@ export default function VideoSpotlight() {
         </h2>
         <div className="w-20 h-1 bg-gold mx-auto rounded mb-10" />
 
-        <div className="flex flex-wrap justify-center gap-8">
+        <div className="flex flex-wrap justify-center items-start gap-8">
           {videos.map((v) => (
             <motion.div
               key={v.href}
@@ -55,7 +64,7 @@ export default function VideoSpotlight() {
               <iframe
                 src={`https://www.facebook.com/plugins/video.php?height=${v.height}&href=${encodeURIComponent(
                   v.href
-                )}&show_text=false&width=${v.width}&t=0`}
+                )}&show_text=${v.showText}&width=${v.width}&t=0`}
                 width={v.width}
                 height={v.height}
                 style={{ border: "none", overflow: "hidden", display: "block", maxWidth: "100%" }}
