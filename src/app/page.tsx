@@ -10,6 +10,7 @@ import Projects from "@/components/Projects";
 import TechStack from "@/components/TechStack";
 import Talents from "@/components/Talents";
 import Music from "@/components/Music";
+import SingleReleasePromo from "@/components/SingleReleasePromo";
 import Testimonials from "@/components/Testimonials";
 import Book from "@/components/Book";
 import BookExcerpt from "@/components/BookExcerpt";
@@ -32,6 +33,7 @@ export default function Home() {
         <Projects />
         <TechStack />
         <Talents />
+        <SingleReleasePromo />
         <Music />
         <Testimonials />
         <Book />
