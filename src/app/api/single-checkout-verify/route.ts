@@ -31,6 +31,26 @@ async function sendResend(to: string, subject: string, html: string) {
   }
 }
 
+const RESEND_AUDIENCE_ID = "84a4fdbe-9ac9-46bd-94b0-f6364742f44d";
+
+async function upsertResendAudience(email: string) {
+  const apiKey = process.env.RESEND_AUDIENCE_API_KEY;
+  if (!apiKey) return;
+  try {
+    const res = await fetch(`https://api.resend.com/audiences/${RESEND_AUDIENCE_ID}/contacts`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ email, unsubscribed: false }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok && res.status !== 409) {
+      console.error("[Resend audience] upsert failed:", await res.text());
+    }
+  } catch (err) {
+    console.error("[Resend audience] upsert error:", err);
+  }
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const sessionId = searchParams.get("session_id");
@@ -83,6 +103,7 @@ export async function GET(request: Request) {
 
     if (insertRes.ok && email) {
       void forwardLeadToBuildMyBot(email, "donmatthews.live/happy-fuck-the-cops-day-purchase");
+      void upsertResendAudience(email);
       void sendResend(
         email,
         `Your purchase: ${trackInfo.title}`,
