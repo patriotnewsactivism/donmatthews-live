@@ -32,6 +32,30 @@ async function sendResend(to: string, subject: string, html: string) {
   return { ok: true };
 }
 
+const RESEND_AUDIENCE_ID = "84a4fdbe-9ac9-46bd-94b0-f6364742f44d";
+
+// Upserts the contact into our one Resend audience so we always have a
+// remarketable list going forward -- the earlier album-subscriber list was
+// lost when its Supabase project got deleted, because nothing was ever
+// mirrored into an audience. This closes that gap for every future signup.
+async function upsertResendAudience(email: string, firstName?: string) {
+  const apiKey = process.env.RESEND_AUDIENCE_API_KEY;
+  if (!apiKey) return;
+  try {
+    const res = await fetch(`https://api.resend.com/audiences/${RESEND_AUDIENCE_ID}/contacts`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ email, first_name: firstName || undefined, unsubscribed: false }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok && res.status !== 409) {
+      console.error("[Resend audience] upsert failed:", await res.text());
+    }
+  } catch (err) {
+    console.error("[Resend audience] upsert error:", err);
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const { email, name, track } = await request.json();
@@ -83,6 +107,7 @@ export async function POST(request: Request) {
     }
 
     void forwardLeadToBuildMyBot(cleanEmail, "donmatthews.live/happy-fuck-the-cops-day", name);
+    void upsertResendAudience(cleanEmail, name);
 
     const fanEmail = await sendResend(
       cleanEmail,
