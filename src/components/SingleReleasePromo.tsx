@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Play, Pause, Download, Loader2, CheckCircle, Flame } from "lucide-react";
+import { Play, Pause, Download, Loader2, CheckCircle, Flame, CreditCard } from "lucide-react";
 
 // Standalone single promo — separate from the Volume 1 album in Music.tsx.
-// Free download capped at `cap` claims via the singles-download API, which
-// enforces the cap atomically server-side (Supabase RPC advisory lock), so
-// this component only needs to reflect state, not enforce the cap itself.
+// Free download capped at `cap` claims (enforced atomically server-side via
+// a Supabase RPC advisory lock). Once claimed out, switches to a $1.99
+// Stripe Checkout purchase flow. Payment is verified server-side on return
+// from Stripe — this component never trusts client state for delivery.
 
 const TRACK_SLUG = "happy-fuck-the-cops-day";
 const TITLE = "Happy Fuck The Cops Day";
 const AUDIO_SRC = "/audio/happy-fuck-the-cops-day.mp3";
 const CAP = 100;
+const PRICE = "$1.99";
 
 export default function SingleReleasePromo() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -19,9 +21,10 @@ export default function SingleReleasePromo() {
   const [remaining, setRemaining] = useState<number | null>(null);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "checking-out">("idle");
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [alreadyClaimed, setAlreadyClaimed] = useState(false);
+  const [isPaidPurchase, setIsPaidPurchase] = useState(false);
 
   useEffect(() => {
     fetch(`/api/single-download-count?track=${TRACK_SLUG}`)
@@ -30,6 +33,24 @@ export default function SingleReleasePromo() {
         if (typeof d.remaining === "number") setRemaining(d.remaining);
       })
       .catch(() => {});
+
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("single_checkout_session_id");
+    if (sessionId) {
+      setStatus("loading");
+      fetch(`/api/single-checkout-verify?session_id=${sessionId}`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.paid && d.downloadUrl) {
+            setDownloadUrl(d.downloadUrl);
+            setIsPaidPurchase(true);
+            setStatus("success");
+          } else {
+            setStatus("idle");
+          }
+        })
+        .catch(() => setStatus("idle"));
+    }
   }, []);
 
   const togglePlay = () => {
@@ -41,7 +62,7 @@ export default function SingleReleasePromo() {
 
   const soldOut = remaining !== null && remaining <= 0;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFreeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || soldOut) return;
     setStatus("loading");
@@ -54,12 +75,13 @@ export default function SingleReleasePromo() {
       const data = await res.json();
       if (data.soldOut) {
         setRemaining(0);
-        setStatus("error");
+        setStatus("idle");
         return;
       }
       if (!res.ok || !data.success) throw new Error(data.error || "Failed");
       setDownloadUrl(data.downloadUrl);
       setAlreadyClaimed(!!data.alreadyClaimed);
+      setIsPaidPurchase(false);
       if (typeof data.remaining === "number") setRemaining(data.remaining);
       setStatus("success");
     } catch {
@@ -67,8 +89,24 @@ export default function SingleReleasePromo() {
     }
   };
 
+  const handleBuyClick = async () => {
+    setStatus("checking-out");
+    try {
+      const res = await fetch("/api/single-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email || undefined, track: TRACK_SLUG }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.error || "Failed");
+      window.location.href = data.url;
+    } catch {
+      setStatus("error");
+    }
+  };
+
   return (
-    <section className="py-20 relative overflow-hidden bg-[#0c0c0c] border-y border-gold/10">
+    <section id="single-release" className="py-20 relative overflow-hidden bg-[#0c0c0c] border-y border-gold/10">
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[400px] bg-gold/5 rounded-full blur-[150px] pointer-events-none" />
 
       <div className="max-w-3xl mx-auto px-6 relative z-10">
@@ -84,7 +122,7 @@ export default function SingleReleasePromo() {
           {TITLE}
         </h2>
         <p className="text-center text-gray-400 font-light mb-10">
-          Free digital download — first {CAP} only
+          {PRICE} digital download — first {CAP} free
         </p>
 
         <audio
@@ -115,7 +153,7 @@ export default function SingleReleasePromo() {
               <p className="text-gray-600 text-xs uppercase tracking-widest">Checking availability&hellip;</p>
             ) : soldOut ? (
               <p className="text-red-400 font-semibold text-sm uppercase tracking-widest">
-                All {CAP} free downloads claimed
+                All {CAP} free downloads claimed — now {PRICE}
               </p>
             ) : (
               <p className="text-gold font-semibold text-sm uppercase tracking-widest">
@@ -128,7 +166,11 @@ export default function SingleReleasePromo() {
             <div className="flex flex-col items-center gap-4 py-2">
               <CheckCircle className="w-10 h-10 text-gold" />
               <p className="text-white font-medium text-center">
-                {alreadyClaimed ? "Here's your download again" : "You're in — check your email"}
+                {isPaidPurchase
+                  ? "Thanks for your purchase — check your email"
+                  : alreadyClaimed
+                  ? "Here's your download again"
+                  : "You're in — check your email"}
               </p>
               {downloadUrl && (
                 <a
@@ -141,18 +183,32 @@ export default function SingleReleasePromo() {
               )}
             </div>
           ) : soldOut ? (
-            <div className="text-center">
-              <a
-                href="https://suno.com/@badactors"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block px-6 py-3 border border-gold/40 text-gold rounded-lg hover:bg-gold/10 transition-colors font-semibold"
+            <div className="flex flex-col gap-3">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@email.com (for your receipt)"
+                className="bg-white/[0.03] border border-white/10 rounded-md px-3 py-2.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-gold/50"
+              />
+              <button
+                onClick={handleBuyClick}
+                disabled={status === "checking-out" || status === "loading"}
+                className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-gold text-black text-sm font-semibold rounded-md hover:bg-gold/90 transition-colors disabled:opacity-60"
               >
-                Stream It Instead
-              </a>
+                {status === "checking-out" ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <CreditCard className="w-4 h-4" />
+                )}
+                Buy for {PRICE}
+              </button>
+              {status === "error" && (
+                <p className="text-xs text-red-400 text-center">Something went wrong — please try again.</p>
+              )}
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <form onSubmit={handleFreeSubmit} className="flex flex-col gap-3">
               <input
                 type="email"
                 required
@@ -176,10 +232,10 @@ export default function SingleReleasePromo() {
                 {status === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                 Get Free Download
               </button>
-              {status === "error" && !soldOut && (
+              {status === "error" && (
                 <p className="text-xs text-red-400 text-center">Something went wrong — please try again.</p>
               )}
-              <p className="text-[10px] text-gray-600 text-center">No spam, ever.</p>
+              <p className="text-[10px] text-gray-600 text-center">No spam, ever. {PRICE} after the first {CAP} claims.</p>
             </form>
           )}
         </div>
