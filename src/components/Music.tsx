@@ -58,10 +58,10 @@ export default function MusicSection() {
     if (!downloadEmail) return;
     setDownloadState("loading");
     try {
-      const res = await fetch("/api/album-download", {
+      const res = await fetch("https://badactors.online/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: downloadEmail }),
+        body: JSON.stringify({ email: downloadEmail, source: "donmatthews.live" }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
