@@ -28,12 +28,12 @@ export default function Home() {
       <BreakingUpdate />
       <main className="relative min-h-screen">
         <Hero />
+        <SingleReleasePromo />
         <StatsBar />
         <VideoSpotlight />
         <Projects />
         <TechStack />
         <Talents />
-        <SingleReleasePromo />
         <Music />
         <Testimonials />
         <Book />
