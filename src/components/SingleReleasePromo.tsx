@@ -12,6 +12,7 @@ import { Play, Pause, Download, Loader2, CheckCircle, Flame, CreditCard } from "
 const TRACK_SLUG = "happy-fuck-the-cops-day";
 const TITLE = "Happy Fuck The Cops Day";
 const AUDIO_SRC = "/audio/happy-fuck-the-cops-day.mp3";
+const COVER_IMG = "/images/happy-fuck-the-cops-day-cover.jpg";
 const CAP = 100;
 const PRICE = "$1.99";
 
@@ -124,6 +125,15 @@ export default function SingleReleasePromo() {
         <p className="text-center text-gray-400 font-light mb-10">
           {PRICE} digital download — first {CAP} free
         </p>
+
+        <div className="max-w-sm mx-auto mb-8 rounded-2xl overflow-hidden border-2 border-gold/30 shadow-2xl">
+          <img
+            src={COVER_IMG}
+            alt="Happy Fuck The Cops Day — free download, first 100 only"
+            className="w-full aspect-square object-cover"
+            loading="eager"
+          />
+        </div>
 
         <audio
           ref={audioRef}
