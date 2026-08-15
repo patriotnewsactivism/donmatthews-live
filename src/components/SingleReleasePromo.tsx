@@ -27,7 +27,7 @@ export default function SingleReleasePromo() {
   const [isPaidPurchase, setIsPaidPurchase] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/single-download-count?track=${TRACK_SLUG}`)
+    fetch(`https://badactors.online/api/single-download-count?track=${TRACK_SLUG}`)
       .then((r) => r.json())
       .then((d) => {
         if (typeof d.remaining === "number") setRemaining(d.remaining);
@@ -38,7 +38,7 @@ export default function SingleReleasePromo() {
     const sessionId = params.get("single_checkout_session_id");
     if (sessionId) {
       setStatus("loading");
-      fetch(`/api/single-checkout-verify?session_id=${sessionId}`)
+      fetch(`https://badactors.online/api/single-checkout-verify?session_id=${sessionId}`)
         .then((r) => r.json())
         .then((d) => {
           if (d.paid && d.downloadUrl) {
@@ -67,7 +67,7 @@ export default function SingleReleasePromo() {
     if (!email || soldOut) return;
     setStatus("loading");
     try {
-      const res = await fetch("/api/single-download", {
+      const res = await fetch("https://badactors.online/api/single-download", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, name, track: TRACK_SLUG }),
@@ -92,7 +92,7 @@ export default function SingleReleasePromo() {
   const handleBuyClick = async () => {
     setStatus("checking-out");
     try {
-      const res = await fetch("/api/single-checkout", {
+      const res = await fetch("https://badactors.online/api/single-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email || undefined, track: TRACK_SLUG }),
