@@ -54,6 +54,11 @@ const projects: Project[] = [
     link: "https://tubescribe.donmatthews.live",
   },
   {
+    name: "ARIA",
+    description: "AI coworker. Dashboard, real shell, memory, and workflows in one agent.",
+    status: "IN DEVELOPMENT",
+  },
+  {
     name: "APEX",
     description: "Autonomous AI workforce framework. Multi-agent orchestration at scale.",
     status: "IN DEVELOPMENT",
