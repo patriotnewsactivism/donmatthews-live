@@ -4,9 +4,9 @@ import React from "react";
 import { motion } from "framer-motion";
 import { BookOpen, ArrowRight } from "lucide-react";
 
-// Real prologue text from American Injustice (full-rewrite/00_prologue.md),
-// trimmed to a sampling -- not the whole chapter. Keep in sync if the
-// manuscript's opening is revised.
+// Prologue text from American Injustice (full-rewrite/00_prologue.md), trimmed to a
+// sample -- not the whole chapter. Updated 2026-08-18 after the prologue was rewritten
+// to open at Camp Devil Dog. Keep in sync if the manuscript's opening changes again.
 export default function BookExcerpt() {
   return (
     <section id="excerpt" className="py-24 bg-[#0a0a0a] relative overflow-hidden">
@@ -40,34 +40,48 @@ export default function BookExcerpt() {
           className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.03] to-transparent p-8 sm:p-12 space-y-6"
         >
           <p className="text-xl sm:text-2xl text-white font-light leading-relaxed italic">
-            &ldquo;The video is eleven seconds long, and it is the only ten years of the
-            rest of my life needed to turn on.&rdquo;
+            &ldquo;Nobody writes a policy change like that in response to a &lsquo;training
+            accident.&rsquo; You write it in response to a suicide you don&rsquo;t want to
+            happen again.&rdquo;
           </p>
 
           <p className="text-gray-300 font-light leading-relaxed">
-            I stand on a public sidewalk in Oxford, Mississippi, holding a video camera
-            at chest height, the way people hold cameras when they have already learned
-            that lowering the camera is the first thing an officer will ask for. I am
-            not shouting. I am not blocking a door. I am filming a public building from
-            a public sidewalk, which is a thing the Constitution of the United States
-            says I am allowed to do &mdash; and which, on this particular afternoon, is
-            about to get me arrested anyway.
+            Before Oxford. Before the flag. Before any of the names in this book had reason
+            to know mine, there was Parris Island. I graduated a Marine at the end of March
+            2008. I was proud of it. I am still proud of it. Nothing that follows in this
+            book changes that.
           </p>
 
           <p className="text-gray-300 font-light leading-relaxed">
-            Here is what is true, and provably so, independent of anything I say about
-            myself: on May 20, 2017, I bought a rifle. There is a bill of sale. Six days
-            later, four senior law enforcement officers arrived to arrest me for
-            threatening a local couple with that same rifle &mdash; on an allegation
-            dated twelve days before the rifle existed. That is not a matter of my word
-            against the state's. That is a receipt against a police report, and the
-            receipt wins.
+            The Marine assigned to Armory Watch that night was Private First Class Bradley
+            Foust. I did not know him. I want to be exact about that, because it would be
+            easy to write this the other way &mdash; to make him a friend, to give the night
+            a closeness it did not have &mdash; and it would be a lie on the first page of a
+            book about lies in the record.
+          </p>
+
+          <p className="text-gray-300 font-light leading-relaxed">
+            By the time the paperwork was finished, it said &ldquo;training accident.&rdquo;
+            A suicide could mean a family loses death benefits; a training accident preserves
+            them. But in choosing that label, the Marine Corps didn&rsquo;t just spare a
+            family a hard conversation. It rewrote what had happened, in the actual permanent
+            record, before Foust&rsquo;s body had even been removed from the armory.
+          </p>
+
+          <p className="text-gray-300 font-light leading-relaxed">
+            Nine years later I filed a FOIA request with the Marine Corps. Buried in the
+            pages they sent back was a quiet, unadvertised change to the Corps&rsquo; own
+            standard operating procedures &mdash; made that same month, in May 2008,
+            disallowing live ammunition at Armory Watch posts going forward. The document
+            didn&rsquo;t say the word. It didn&rsquo;t have to. The policy change was the
+            institution telling on itself.
           </p>
 
           <p className="text-gray-400 font-light leading-relaxed text-sm border-l-2 border-gold/40 pl-4">
-            Both a difficult man and a genuine cover-up can be true at once. That tension
-            isn't resolved here by picking a side &mdash; it's resolved by refusing to
-            pretend the tension isn't there. Two honest ledgers, kept open at once.
+            His death &mdash; sanitized, reframed, filed away as an accident by an institution
+            that knew better &mdash; is the first time I watched official truth and actual
+            truth get separated on purpose, and it would not be the last. This book, in more
+            ways than one, is the record he was denied.
           </p>
 
           <div className="pt-4 flex justify-center">
