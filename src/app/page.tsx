@@ -13,8 +13,8 @@ const pillars = [
   {
     title: "Technology & AI",
     text: "AI systems, software products, autonomous workforces, and tools built for real-world use.",
-    href: "/projects",
-    cta: "Explore Projects",
+    href: "/technology",
+    cta: "Explore Technology",
   },
   {
     title: "American Injustice",
@@ -83,11 +83,24 @@ export default function Home() {
 
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-24 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
         <div><p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">THE BOOK</p><h2 className="mt-3 text-5xl font-black sm:text-6xl">American Injustice</h2></div>
-        <div><p className="text-xl leading-9 text-white/65">A factual, first-person legal-thriller memoir built from lived experience, court records, recordings, public documents, and the collision between one citizen and government power.</p><p className="mt-5 leading-8 text-white/45">Explore the story, source material, chronology, excerpts, and ongoing updates behind <em>American Injustice</em>.</p><Link href="/american-injustice" className="mt-7 inline-flex rounded-md border border-[#c9a84c]/50 px-5 py-3 font-bold text-[#c9a84c] hover:bg-[#c9a84c]/10">Explore American Injustice</Link></div>
+        <div><p className="text-xl leading-9 text-white/65">A factual, first-person legal-thriller memoir built from lived experience, court records, recordings, public documents, and the collision between one citizen and government power.</p><p className="mt-5 leading-8 text-white/45">The current publication build spans 39 chapters and pairs the narrative with an organized public source archive.</p><Link href="/american-injustice" className="mt-7 inline-flex rounded-md border border-[#c9a84c]/50 px-5 py-3 font-bold text-[#c9a84c] hover:bg-[#c9a84c]/10">Explore American Injustice</Link></div>
       </section>
 
       <section className="border-y border-white/10 bg-[#101010]">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-2"><div><p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">THE RECORD</p><h2 className="mt-3 text-4xl font-black sm:text-5xl">Cases, filings, evidence, developments.</h2></div><div className="space-y-4 text-lg leading-8 text-white/60"><p>A date-driven public record of significant cases, hearings, filings, evidence, and major developments.</p><Link href="/record" className="inline-block font-bold text-[#c9a84c]">Open The Record →</Link></div></div>
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-2"><div><p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">THE RECORD</p><h2 className="mt-3 text-4xl font-black sm:text-5xl">Cases, filings, evidence, conflicts.</h2></div><div className="space-y-4 text-lg leading-8 text-white/60"><p>A source-first public archive that distinguishes documents, allegations, court findings, unresolved conflicts, and editorial corrections.</p><Link href="/record" className="inline-block font-bold text-[#c9a84c]">Open The Record →</Link></div></div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 py-20">
+        <div className="rounded-2xl border border-[#c9a84c]/25 bg-[#c9a84c]/[0.045] p-8 sm:p-10">
+          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">LATEST UPDATE · AUGUST 22, 2026</p>
+              <h2 className="mt-3 text-3xl font-black sm:text-4xl">The manuscript and source record just completed another prepublication integration pass.</h2>
+              <p className="mt-4 max-w-3xl text-lg leading-8 text-white/55">The latest source packet records new documents, corrections, preserved record conflicts, and a publication build of approximately 78,920 words and 291 pages.</p>
+            </div>
+            <Link href="/updates" className="rounded-md bg-[#c9a84c] px-5 py-3 text-center font-bold text-black hover:bg-[#d9bb64]">View Updates</Link>
+          </div>
+        </div>
       </section>
 
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[1fr_.8fr] lg:items-center">
@@ -96,7 +109,7 @@ export default function Home() {
       </section>
 
       <section className="border-t border-white/10 bg-[linear-gradient(180deg,#101010,#0a0a0a)]">
-        <div className="mx-auto max-w-5xl px-5 py-20"><p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">STAY CONNECTED</p><h2 className="mt-3 text-4xl font-black sm:text-5xl">Book, project, music, and case updates.</h2><p className="mt-4 max-w-2xl text-lg leading-8 text-white/55">Join the update list for new investigations, product launches, American Injustice updates, music releases, and major developments from The Record.</p><FlagshipLeadForm /><div className="mt-8 flex flex-wrap gap-4 text-sm"><Link href="/press" className="font-bold text-[#c9a84c]">Press & Media →</Link><Link href="/support" className="font-bold text-[#c9a84c]">Support →</Link><Link href="/contact" className="font-bold text-[#c9a84c]">Contact →</Link></div></div>
+        <div className="mx-auto max-w-5xl px-5 py-20"><p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">STAY CONNECTED</p><h2 className="mt-3 text-4xl font-black sm:text-5xl">Book, project, music, and case updates.</h2><p className="mt-4 max-w-2xl text-lg leading-8 text-white/55">Join the update list for new investigations, product launches, American Injustice updates, music releases, and major developments from The Record.</p><FlagshipLeadForm /><div className="mt-8 flex flex-wrap gap-4 text-sm"><Link href="/updates" className="font-bold text-[#c9a84c]">Updates →</Link><Link href="/press" className="font-bold text-[#c9a84c]">Press & Media →</Link><Link href="/support" className="font-bold text-[#c9a84c]">Support →</Link><Link href="/contact" className="font-bold text-[#c9a84c]">Contact →</Link></div></div>
       </section>
 
       <SiteFooter />
