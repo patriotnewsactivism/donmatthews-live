@@ -4,10 +4,12 @@ import type { ReactNode } from "react";
 const nav = [
   ["About", "/about"],
   ["Projects", "/projects"],
+  ["Technology", "/technology"],
   ["American Injustice", "/american-injustice"],
   ["The Record", "/record"],
   ["Music", "/music"],
   ["Press", "/press"],
+  ["Updates", "/updates"],
   ["Support", "/support"],
   ["Contact", "/contact"],
 ] as const;
@@ -18,7 +20,7 @@ export function SiteHeader() {
       <div className="mx-auto max-w-7xl px-5">
         <div className="flex items-center justify-between gap-6 py-4">
           <Link href="/" className="shrink-0 font-black tracking-[0.18em] text-[#c9a84c]">DON MATTHEWS</Link>
-          <nav className="hidden flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm text-white/60 lg:flex">
+          <nav className="hidden flex-wrap items-center justify-end gap-x-4 gap-y-2 text-[13px] text-white/60 lg:flex">
             {nav.map(([label, href]) => <Link key={href} href={href} className="transition hover:text-white">{label}</Link>)}
           </nav>
           <Link href="/contact" className="rounded-md border border-[#c9a84c]/40 px-3 py-2 text-xs font-bold text-[#c9a84c] lg:hidden">Contact</Link>
@@ -40,6 +42,7 @@ export function SiteFooter() {
           <p className="mt-3 max-w-xl text-sm leading-6 text-white/45">Journalism, technology, American Injustice, documentary music, and the public record.</p>
         </div>
         <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/45">
+          <Link href="/updates" className="hover:text-white">Updates</Link>
           <Link href="/privacy-policy" className="hover:text-white">Privacy</Link>
           <Link href="/terms" className="hover:text-white">Terms</Link>
           <Link href="/contact" className="hover:text-white">Contact</Link>
