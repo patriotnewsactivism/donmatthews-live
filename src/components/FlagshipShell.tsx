@@ -15,12 +15,17 @@ const nav = [
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0a0a]/92 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-4">
-        <Link href="/" className="shrink-0 font-black tracking-[0.18em] text-[#c9a84c]">DON MATTHEWS</Link>
-        <nav className="hidden flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm text-white/60 lg:flex">
-          {nav.map(([label, href]) => <Link key={href} href={href} className="transition hover:text-white">{label}</Link>)}
+      <div className="mx-auto max-w-7xl px-5">
+        <div className="flex items-center justify-between gap-6 py-4">
+          <Link href="/" className="shrink-0 font-black tracking-[0.18em] text-[#c9a84c]">DON MATTHEWS</Link>
+          <nav className="hidden flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm text-white/60 lg:flex">
+            {nav.map(([label, href]) => <Link key={href} href={href} className="transition hover:text-white">{label}</Link>)}
+          </nav>
+          <Link href="/contact" className="rounded-md border border-[#c9a84c]/40 px-3 py-2 text-xs font-bold text-[#c9a84c] lg:hidden">Contact</Link>
+        </div>
+        <nav className="-mx-1 flex gap-5 overflow-x-auto whitespace-nowrap border-t border-white/5 px-1 py-3 text-xs text-white/55 [scrollbar-width:none] lg:hidden">
+          {nav.slice(0, -1).map(([label, href]) => <Link key={href} href={href} className="shrink-0 transition hover:text-white">{label}</Link>)}
         </nav>
-        <Link href="/contact" className="rounded-md border border-[#c9a84c]/40 px-3 py-2 text-xs font-bold text-[#c9a84c] lg:hidden">Contact</Link>
       </div>
     </header>
   );
