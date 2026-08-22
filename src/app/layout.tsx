@@ -5,13 +5,20 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
+const title = "Don Matthews | Journalist, Builder, Author & Artist";
+const description =
+  "Official site of Don Matthews — investigative journalist, AI builder, civil-rights advocate, songwriter, and author of American Injustice.";
+
 export const metadata: Metadata = {
-  title: "Don Matthews | AI Builder, Journalist, Litigator, Artist, Author",
-  description: "Official portfolio of Don Matthews — software developer, AI architect, investigative journalist, civil rights litigator, and songwriter. New single \"Happy Fuck The Cops Day\" — first 100 downloads free.",
+  title,
+  description,
   metadataBase: new URL("https://donmatthews.live"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Don Matthews | AI Builder, Journalist, Litigator, Artist, Author",
-    description: "Software developer, AI architect, investigative journalist, civil rights litigator, and songwriter. New single \"Happy Fuck The Cops Day\" — first 100 downloads free.",
+    title,
+    description,
     url: "https://donmatthews.live",
     siteName: "Don Matthews",
     images: [
@@ -26,10 +33,32 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Don Matthews | AI Builder, Journalist, Litigator, Artist, Author",
-    description: "Software developer, AI architect, investigative journalist, civil rights litigator, and songwriter. New single \"Happy Fuck The Cops Day\" — first 100 downloads free.",
+    title,
+    description,
     images: ["/images/portrait-bw.jpg"],
   },
+};
+
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Don Matthews",
+  url: "https://donmatthews.live",
+  image: "https://donmatthews.live/images/portrait-bw.jpg",
+  description,
+  knowsAbout: [
+    "Investigative journalism",
+    "Artificial intelligence",
+    "Software development",
+    "Civil rights advocacy",
+    "Music production",
+    "American Injustice",
+  ],
+  sameAs: [
+    "https://wtpnews.org",
+    "https://badactors.online",
+    "https://github.com/patriotnewsactivism",
+  ],
 };
 
 export default function RootLayout({
@@ -46,9 +75,12 @@ export default function RootLayout({
           crossOrigin="anonymous"
           strategy="beforeInteractive"
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+        />
         {children}
       </body>
     </html>
   );
 }
-// deploy-sync 1785483318
