@@ -1,36 +1,44 @@
 # donmatthews.live
 
-Personal brand flagship site for Matthew Reardon (pen name **Don Matthews**)
-— USMC veteran, entrepreneur, AI builder, investigative journalist, civil
-rights litigant, and songwriter (**Bad Actors** music project).
+Personal brand flagship site for Don Matthews — entrepreneur, AI builder,
+investigative journalist, civil-rights litigant, author, and songwriter.
 
-## Stack
+## Current delivery
 - Next.js (`src/app` — App Router), TypeScript, Tailwind CSS
-- Deployed on Railway (`railway.toml`, Dockerfile)
+- Production and preview deployments run on Vercel via Git integration
+- Railway is no longer part of the deployment architecture
+
+## Permanent platform direction
+The site is being rebuilt as a custom WordPress flagship under
+`wordpress-rebuild/`. WordPress will own content, structured archives, SEO,
+and lead capture. Vercel remains the temporary delivery layer for the
+existing Next.js site and migration previews until the WordPress cutover.
+
+## Lead retention
+The old `/tmp` lead-storage approach is retired. The current Next.js forms
+forward leads into the BuildMyBot CRM, which persists them in Supabase, with
+Discord as a redundant human-visible fallback. The WordPress replacement goes
+one step further: `don-matthews-core` stores every signup directly in a
+WordPress database table and exposes an administrator CSV export. Notification
+email is secondary; the database row is the source of truth.
 
 ## What's on the site
-- Personal/brand landing page
-- **Bad Actors** — music section: full 17-track canonical album order,
-  BandLab embed for in-page playback (never navigates away from the page)
-- Lead capture / waitlist / notify endpoints (`src/app/api`)
-- GitHub App webhook receiver (`/api/webhooks`) for deploy/CI event
-  notifications
-
-## Known gap — read before touching lead capture
-The waitlist/notify API routes currently write to `/tmp`, which is
-**ephemeral on Railway** (wiped on every restart/redeploy, and Railway
-restarts failed containers automatically). There is no database, no email
-notification, and no forwarding into BuildMyBot. Every lead captured here
-today is functionally lost within one redeploy cycle. See `PLAN.md` for the
-fix (forward captures into BuildMyBot's `/api/leads` or Supabase directly).
+- Personal/brand flagship
+- Projects and AI/software ventures
+- We The People News tie-ins
+- American Injustice book hub
+- Bad Actors music and releases
+- The Record / case timeline
+- Press, media, support, and contact
 
 ## Structure
-- `src/app/` — pages and API routes (App Router)
-- `src/components/` — UI components
-- `src/lib/` — shared helpers
+- `src/app/` — current Next.js pages and API routes
+- `src/components/` — current UI components
+- `src/lib/` — current shared helpers
+- `wordpress-rebuild/` — permanent WordPress theme, core plugin, and migration work
 
-## Local dev
-```
+## Local Next.js development
+```bash
 npm ci
 npm run dev
 ```

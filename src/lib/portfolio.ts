@@ -3,7 +3,8 @@
 // lead-followup agent nurtures it. Discord is the redundant human-visible
 // channel so a capture is never silent even if the CRM forward fails.
 //
-// Env (Railway → Variables):
+// Current runtime: Vercel. Railway is retired.
+// Env:
 //   BUILDMYBOT_INTAKE_URL      default https://www.buildmybot.app/api/leads/capture
 //   PORTFOLIO_INTAKE_SECRET    must match the same var on the BuildMyBot Vercel project
 //   DISCORD_WEBHOOK_URL        optional backup notification channel
@@ -36,7 +37,6 @@ export async function forwardLeadToBuildMyBot(
         "x-portfolio-secret": secret,
       },
       body: JSON.stringify({ portfolio: true, email, name: name || "", source }),
-      // A hung CRM must not hang the marketing site's form submit.
       signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) {
