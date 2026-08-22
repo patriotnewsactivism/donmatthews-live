@@ -1,34 +1,38 @@
 # donmatthews.live — Build Plan
 
-Last updated 2026-07-12.
+Last updated 2026-08-22.
 
 ## Done
-- [x] Fixed nav logo hardcoding ("MATTHEW REARDON" → "DON MATTHEWS").
-- [x] Fixed GitHub App webhook: correct endpoint (`/api/webhooks`),
-      required signature secret (no more `"default_secret"` fallback),
-      constant-time comparison. Verified live with a signed 200 OK.
-- [x] Deleted orphaned, zero-deployment "web" Railway service.
-- [x] Full 17-track "Bad Actors" Volume 1 tracklist wired in with in-page
-      BandLab playback (replaces old teaser section).
+- [x] Public-facing brand standardized as Don Matthews.
+- [x] Full 17-track Bad Actors Volume 1 tracklist wired for in-page playback.
+- [x] Current application is delivered through Vercel; Railway is retired.
+- [x] Next.js waitlist/notify routes no longer write to ephemeral `/tmp`; they
+      forward to the BuildMyBot CRM with a Discord fallback.
+- [x] WordPress rebuild branch created without touching production code.
+- [x] Custom dark/gold WordPress block theme scaffolded.
+- [x] Structured WordPress content types created for Projects, The Record,
+      Music, and Press/Media.
+- [x] Durable WordPress lead table, REST capture endpoint, admin view, and CSV
+      export added. WordPress database rows are the lead source of truth after
+      cutover.
 
 ## Next — in priority order
-1. **Fix lead capture data loss (highest priority).** Waitlist/notify
-   routes currently write to `/tmp` (ephemeral on Railway — wiped every
-   restart). Replace with either:
-   - POST directly into BuildMyBot's `/api/leads` endpoint, or
-   - Write directly into Supabase's `leads` table (service-role key).
-   Either option turns this site from a decorative funnel into a real
-   pipeline source feeding BuildMyBot's AI Team lead-followup worker.
-   This requires an infra/env change — confirm with Don before wiring the
-   destination credential in.
-2. **Per-track playback IDs.** Current BandLab embed is one general
-   playlist link. Once individual BandLab track IDs are available for all
-   17 songs, map each to its row for proper per-track playback instead of
-   a single shared embed.
-3. **Book site tie-in.** "American Injustice" cover/launch assets will
-   eventually need a home here too — not yet scoped, revisit once the
-   cover is finalized.
+1. **Publish the new flagship preview on Vercel.** Keep the permanent WordPress
+   architecture visible in the redesign while WordPress provisioning is being
+   completed.
+2. **Provision WordPress staging** and activate the custom theme plus
+   `don-matthews-core` plugin.
+3. **Migrate content and assets** from the current Next.js components into
+   WordPress pages and structured content entries.
+4. **Migrate existing leads** from the BuildMyBot/Supabase pipeline into the
+   WordPress lead table before final cutover, preserving source attribution.
+5. **SEO and discovery:** canonicals, Open Graph, schema/JSON-LD, sitemap,
+   redirects, and search/AI-friendly page structure.
+6. **QA and cutover:** mobile, forms, lead export, analytics, backups, redirects,
+   then point donmatthews.live at WordPress only after the replacement passes.
 
-## Explicitly NOT planned
-- No plan to move this site off Railway — Next.js + Railway is a fine fit
-  and there's no active problem forcing a change.
+## Deployment policy
+- Railway: retired; do not add Railway configuration or dependencies.
+- Vercel: temporary Next.js production/preview delivery during migration.
+- WordPress: permanent content platform and final destination for the domain.
+- Never use ephemeral filesystem storage for leads or mailing-list signups.
