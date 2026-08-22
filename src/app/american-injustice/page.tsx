@@ -111,7 +111,7 @@ export default function AmericanInjusticePage() {
               ))}
             </div>
 
-            <p className="mt-5 text-sm leading-6 text-white/40">Pre-order submissions currently reserve your selected edition and capture your email. Payment checkout will be connected separately; no charge is made by this reservation form.</p>
+            <p className="mt-5 text-sm leading-6 text-white/40">Pre-order submissions reserve your selected edition and capture your email. No payment is collected on this page yet; checkout will be connected separately.</p>
           </div>
 
           <div className="relative mx-auto w-full max-w-[430px]">
