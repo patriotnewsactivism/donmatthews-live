@@ -8,7 +8,6 @@ export const metadata: Metadata = {
 };
 
 const archives = [
-  ["Harvey v. Galveston", "Federal/civil-rights source material organized separately from narrative commentary.", "https://github.com/patriotnewsactivism/American-Injustice/tree/main/evidence-organized/01-Harvey-v-Galveston"],
   ["Reardon v. Osteen", "Filings and documentary material connected to the Galveston litigation.", "https://github.com/patriotnewsactivism/American-Injustice/tree/main/evidence-organized/02-Reardon-v-Osteen"],
   ["Galveston Criminal Record", "Organized material associated with criminal case 23-CR-2981.", "https://github.com/patriotnewsactivism/American-Injustice/tree/main/evidence-organized/03-Reardon-Criminal-23-CR-2981"],
   ["Crowder v. Reardon", "Chancery and family-court source material maintained as its own record set.", "https://github.com/patriotnewsactivism/American-Injustice/tree/main/evidence-organized/04-Crowder-v-Reardon-Chancery"],
