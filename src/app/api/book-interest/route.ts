@@ -13,6 +13,10 @@ const formats = {
 
 type FormatKey = keyof typeof formats;
 
+function isValidEmail(value: string) {
+  return value.length >= 3 && value.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -20,7 +24,7 @@ export async function POST(request: Request) {
     const name = typeof body.name === "string" ? body.name.trim().slice(0, 120) : "";
     const mode = body.mode === "preorder" ? "preorder" : body.mode === "interest" ? "interest" : "";
 
-    if (!email || !email.includes("@") || email.length > 320) {
+    if (!isValidEmail(email)) {
       return NextResponse.json({ error: "Enter a valid email address" }, { status: 400 });
     }
     if (!mode) {
