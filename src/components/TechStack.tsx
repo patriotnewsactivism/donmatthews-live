@@ -19,7 +19,7 @@ const categories = [
   },
   {
     title: "Infrastructure",
-    items: ["Railway", "Vercel", "Docker", "GitHub Actions", "AWS", "Cloudflare"],
+    items: ["Vercel", "WordPress", "Docker", "GitHub Actions", "AWS", "Cloudflare"],
   },
   {
     title: "Creative",
