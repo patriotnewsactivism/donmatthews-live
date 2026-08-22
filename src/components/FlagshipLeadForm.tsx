@@ -22,7 +22,7 @@ export default function FlagshipLeadForm() {
         body: JSON.stringify({
           email,
           name,
-          source: "donmatthews.live/new-flagship",
+          source: "donmatthews.live/homepage-flagship",
         }),
       });
       const data = await response.json();
