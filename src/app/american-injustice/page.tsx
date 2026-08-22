@@ -54,9 +54,27 @@ const method = [
   ["Corrections", "Later-discovered dates, amounts, names, or procedural details are corrected openly in the working source record."],
 ] as const;
 
+const bookSchema = {
+  "@context": "https://schema.org",
+  "@type": "Book",
+  name: "American Injustice",
+  author: {
+    "@type": "Person",
+    name: "Don Matthews",
+    url: "https://donmatthews.live",
+  },
+  url: "https://donmatthews.live/american-injustice",
+  inLanguage: "en",
+  genre: ["Nonfiction", "Legal memoir", "Investigative journalism"],
+  description: "A 39-chapter nonfiction legal-thriller memoir built alongside a source-first documentary record.",
+  numberOfPages: 291,
+  isBasedOn: "https://github.com/patriotnewsactivism/American-Injustice",
+};
+
 export default function AmericanInjusticePage() {
   return (
     <FlagshipPage>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(bookSchema) }} />
       <PageHero
         eyebrow="AMERICAN INJUSTICE"
         title="The story. The record behind it. Both matter."
