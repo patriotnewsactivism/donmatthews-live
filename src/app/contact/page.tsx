@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { FlagshipLeadForm } from "@/components/FlagshipLeadForm";
+import FlagshipLeadForm from "@/components/FlagshipLeadForm";
 import { FlagshipPage, PageHero } from "@/components/FlagshipShell";
 
 export const metadata: Metadata = {
