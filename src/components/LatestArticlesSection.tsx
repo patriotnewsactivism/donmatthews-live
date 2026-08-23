@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { ArticleCard } from "@/components/ArticleCard";
-import { getLatestPosts } from "@/lib/wordpress";
+import { getLatestPosts, type WordPressPost } from "@/lib/wordpress";
 
 export async function LatestArticlesSection() {
-  let posts = [];
+  let posts: WordPressPost[] = [];
 
   try {
     posts = await getLatestPosts(3);
