@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArticleCard } from "@/components/ArticleCard";
 import { FlagshipPage, PageHero } from "@/components/FlagshipShell";
-import { getAllPosts } from "@/lib/wordpress";
+import { getAllPosts, type WordPressPost } from "@/lib/wordpress";
 
 export const metadata: Metadata = {
   title: "Articles & Updates | Don Matthews",
@@ -17,7 +17,7 @@ export default async function UpdatesPage({
 }: {
   searchParams?: { page?: string };
 }) {
-  let posts = [];
+  let posts: WordPressPost[] = [];
 
   try {
     posts = await getAllPosts();
