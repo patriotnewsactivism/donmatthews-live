@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import FlagshipLeadForm from "@/components/FlagshipLeadForm";
+import { LatestArticlesSection } from "@/components/LatestArticlesSection";
 import { SiteFooter, SiteHeader } from "@/components/FlagshipShell";
 
 const pillars = [
@@ -150,19 +151,7 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl gap-7 px-5 py-14 sm:gap-10 sm:py-20 lg:grid-cols-2"><div><p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">THE RECORD</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">Cases, filings, evidence, conflicts.</h2></div><div className="space-y-4 text-base leading-8 text-white/60 sm:text-lg"><p>A source-first public archive that distinguishes documents, allegations, court findings, unresolved conflicts, and editorial corrections.</p><Link href="/record" className="inline-block font-bold text-[#c9a84c]">Open The Record →</Link></div></div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-14 sm:py-20">
-        <div className="relative overflow-hidden rounded-2xl border border-[#c9a84c]/25 bg-[#c9a84c]/[0.045] p-6 sm:p-10">
-          <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full border border-[#c9a84c]/10" />
-          <div className="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
-            <div>
-              <p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">LATEST UPDATE · AUGUST 22, 2026</p>
-              <h2 className="mt-3 text-2xl font-black sm:text-4xl">The manuscript and source record just completed another prepublication integration pass.</h2>
-              <p className="mt-4 max-w-3xl text-base leading-7 text-white/55 sm:text-lg sm:leading-8">The latest source packet records new documents, corrections, preserved record conflicts, and a publication build of approximately 78,920 words and 291 pages.</p>
-            </div>
-            <Link href="/updates" className="rounded-md bg-[#c9a84c] px-5 py-3 text-center font-bold text-black hover:bg-[#d9bb64]">View Updates</Link>
-          </div>
-        </div>
-      </section>
+      <LatestArticlesSection />
 
       <section className="mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:gap-10 sm:py-20 lg:grid-cols-[1fr_.8fr] lg:items-center">
         <div><p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">DOCUMENTARY MUSIC</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">Bad Actors</h2><p className="mt-5 max-w-2xl text-base leading-7 text-white/55 sm:text-lg sm:leading-8">Documentary-style releases built around evidence, conflict, accountability, and the stories behind the record.</p><Link href="/music" className="mt-7 inline-flex rounded-md bg-[#c9a84c] px-5 py-3 font-bold text-black hover:bg-[#d9bb64]">Explore Music</Link></div>

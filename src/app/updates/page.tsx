@@ -1,69 +1,88 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ArticleCard } from "@/components/ArticleCard";
 import { FlagshipPage, PageHero } from "@/components/FlagshipShell";
+import { getAllPosts, type WordPressPost } from "@/lib/wordpress";
 
 export const metadata: Metadata = {
-  title: "Updates | Don Matthews",
-  description: "Dated updates on American Injustice, The Record, software projects, journalism, and major flagship-site changes.",
+  title: "Articles & Updates | Don Matthews",
+  description: "Investigative reporting, legal updates, technology, music, and public-record work from Don Matthews.",
   alternates: { canonical: "/updates" },
 };
 
-const updates = [
-  {
-    date: "August 22, 2026",
-    category: "AMERICAN INJUSTICE",
-    title: "Final prepublication source packet integrated",
-    text: "A new source packet was folded into the manuscript and editorial record. The current build reports approximately 78,920 assembled words, 39 chapters, 291 pages at 6 × 9 trim, and passing source/PDF QA.",
-    href: "https://github.com/patriotnewsactivism/American-Injustice/blob/main/evidence-organized/NEW_SOURCE_PACKET_2026-08-22.md",
-  },
-  {
-    date: "August 22, 2026",
-    category: "FLAGSHIP",
-    title: "DonMatthews.live rebuilt as a multi-page platform",
-    text: "The site moved from a giant single-page portfolio into dedicated destinations for About, Projects, Technology, American Injustice, The Record, Music, Press, Support, Contact, and Updates.",
-    href: "/",
-  },
-  {
-    date: "August 22, 2026",
-    category: "THE RECORD",
-    title: "Public source archive exposed through the flagship",
-    text: "American Injustice and The Record now link directly to the organized public evidence repository, with visible distinctions between documented facts, attributed claims, court findings, record conflicts, and editorial notes.",
-    href: "/record",
-  },
-  {
-    date: "August 22, 2026",
-    category: "INFRASTRUCTURE",
-    title: "Railway dependency retired",
-    text: "The flagship repository and deployment guidance were cleaned of the former Railway dependency. Vercel is the current public delivery layer while the WordPress CMS package remains prepared for a future cutover.",
-    href: "/technology",
-  },
-  {
-    date: "August 7, 2026",
-    category: "SOURCE RECORD",
-    title: "Sentencing allocution preserved as a source artifact",
-    text: "The prepared federal allocution was transcribed into the source repository, with the editorial record distinguishing intended wording from the public delivery and from any later official transcript.",
-    href: "https://github.com/patriotnewsactivism/American-Injustice/tree/main/sentencing-2026",
-  },
-] as const;
+const PER_PAGE = 6;
 
-export default function UpdatesPage() {
+export default async function UpdatesPage({
+  searchParams,
+}: {
+  searchParams?: { page?: string };
+}) {
+  let posts: WordPressPost[] = [];
+
+  try {
+    posts = await getAllPosts();
+  } catch {
+    posts = [];
+  }
+
+  const requestedPage = Number(searchParams?.page ?? "1");
+  const totalPages = Math.max(1, Math.ceil(posts.length / PER_PAGE));
+  const page = Number.isFinite(requestedPage)
+    ? Math.min(Math.max(Math.trunc(requestedPage), 1), totalPages)
+    : 1;
+  const visible = posts.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
   return (
     <FlagshipPage>
-      <PageHero eyebrow="UPDATES" title="What changed, when, and where to inspect it." intro="A dated changelog for the book, documentary record, software portfolio, journalism work, and the flagship platform itself." />
-      <section className="mx-auto max-w-5xl px-5 py-20">
-        <div className="relative border-l border-white/10 pl-6 sm:pl-10">
-          {updates.map((update) => {
-            const external = update.href.startsWith("http");
-            return (
-              <article key={`${update.date}-${update.title}`} className="relative pb-12 last:pb-0">
-                <span className="absolute -left-[31px] top-1 h-2.5 w-2.5 rounded-full bg-[#c9a84c] sm:-left-[45px]" />
-                <p className="text-xs font-black tracking-[0.16em] text-[#c9a84c]">{update.date} · {update.category}</p>
-                <h2 className="mt-3 text-3xl font-black">{update.title}</h2>
-                <p className="mt-4 max-w-3xl text-lg leading-8 text-white/55">{update.text}</p>
-                {external ? <a href={update.href} target="_blank" rel="noopener noreferrer" className="mt-5 inline-block text-sm font-bold text-[#c9a84c]">Inspect source →</a> : <a href={update.href} className="mt-5 inline-block text-sm font-bold text-[#c9a84c]">Open update →</a>}
-              </article>
-            );
-          })}
-        </div>
+      <PageHero
+        eyebrow="ARTICLES & UPDATES"
+        title="Reporting without the endless scroll."
+        intro="Six stories at a time. Each card gives you the scene, the headline, and enough context to decide whether to open the full article."
+      />
+
+      <section className="mx-auto max-w-7xl px-5 py-12 sm:py-16">
+        {visible.length ? (
+          <div className="grid gap-5 lg:grid-cols-2">
+            {visible.map((post) => <ArticleCard key={post.ID} post={post} />)}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-white/10 bg-[#101010] p-8 text-white/55">
+            The article feed is temporarily unavailable. Please try again shortly.
+          </div>
+        )}
+
+        {posts.length > PER_PAGE ? (
+          <nav className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-7" aria-label="Article pagination">
+            <div>
+              {page > 1 ? (
+                <Link href={page === 2 ? "/updates" : `/updates?page=${page - 1}`} className="font-bold text-[#c9a84c]">← Newer</Link>
+              ) : <span />}
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-2">
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map((number) => (
+                <Link
+                  key={number}
+                  href={number === 1 ? "/updates" : `/updates?page=${number}`}
+                  aria-current={number === page ? "page" : undefined}
+                  className={`grid h-9 min-w-9 place-items-center rounded-full px-3 text-sm font-bold transition ${
+                    number === page
+                      ? "bg-[#c9a84c] text-black"
+                      : "border border-white/10 text-white/50 hover:border-[#c9a84c]/40 hover:text-white"
+                  }`}
+                >
+                  {number}
+                </Link>
+              ))}
+            </div>
+
+            <div>
+              {page < totalPages ? (
+                <Link href={`/updates?page=${page + 1}`} className="font-bold text-[#c9a84c]">Older →</Link>
+              ) : <span />}
+            </div>
+          </nav>
+        ) : null}
       </section>
     </FlagshipPage>
   );
