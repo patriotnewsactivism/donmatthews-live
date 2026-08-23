@@ -14,6 +14,87 @@ body {
   color: var(--foreground);
 }
 
+.wordpress-content {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 1.06rem;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+
+.wordpress-content > * + * {
+  margin-top: 1.5rem;
+}
+
+.wordpress-content h2,
+.wordpress-content h3,
+.wordpress-content h4 {
+  color: #fff;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-top: 2.75rem;
+}
+
+.wordpress-content h2 { font-size: clamp(1.8rem, 5vw, 2.7rem); }
+.wordpress-content h3 { font-size: clamp(1.45rem, 4vw, 2.05rem); }
+.wordpress-content h4 { font-size: 1.3rem; }
+
+.wordpress-content a {
+  color: #c9a84c;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: rgba(201, 168, 76, 0.35);
+  text-underline-offset: 0.18em;
+}
+
+.wordpress-content img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 680px;
+  object-fit: cover;
+  border: 1px solid rgba(201, 168, 76, 0.22);
+  border-radius: 0.9rem;
+}
+
+.wordpress-content figure {
+  margin: 2rem 0;
+}
+
+.wordpress-content figcaption {
+  margin-top: 0.7rem;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.wordpress-content ul,
+.wordpress-content ol {
+  padding-left: 1.4rem;
+}
+
+.wordpress-content ul { list-style: disc; }
+.wordpress-content ol { list-style: decimal; }
+.wordpress-content li + li { margin-top: 0.6rem; }
+
+.wordpress-content blockquote {
+  border-left: 3px solid #c9a84c;
+  padding-left: 1.25rem;
+  color: rgba(255, 255, 255, 0.62);
+  font-style: italic;
+}
+
+.wordpress-content iframe {
+  width: 100%;
+  min-height: 420px;
+  border: 0;
+  border-radius: 0.9rem;
+}
+
+.wordpress-content .more-link {
+  display: none;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
