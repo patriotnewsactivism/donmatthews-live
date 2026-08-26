@@ -33,13 +33,14 @@ export function SiteHeader() {
             ))}
           </nav>
 
-          <details className="relative lg:hidden [&>summary::-webkit-details-marker]:hidden">
-            <summary className="cursor-pointer list-none rounded-full border border-[#c9a84c]/35 bg-[#c9a84c]/[0.06] px-3.5 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-[#c9a84c] transition hover:bg-[#c9a84c]/10">Menu</summary>
-            <div className="absolute right-0 top-[calc(100%+0.75rem)] w-[min(320px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#c9a84c]/20 bg-[#0d0d0d]/98 p-2 shadow-2xl shadow-black/70 backdrop-blur-xl">
+          <details className="relative z-[60] lg:hidden [&>summary::-webkit-details-marker]:hidden">
+            <summary className="cursor-pointer list-none rounded-full border border-[#c9a84c]/45 bg-[#111111] px-3.5 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-[#d7b957] shadow-[0_6px_20px_rgba(0,0,0,0.45)] transition hover:border-[#c9a84c]/70 hover:bg-[#171717]">Menu</summary>
+            <div className="absolute right-0 top-[calc(100%+0.75rem)] z-[100] w-[min(320px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-[#c9a84c]/45 bg-[#050505] p-2 shadow-[0_24px_80px_rgba(0,0,0,0.95)] ring-1 ring-black">
+              <div className="mb-1 border-b border-white/10 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#c9a84c]">Navigate</div>
               <div className="grid grid-cols-2 gap-1">
                 {nav.map(([label, href], index) => (
-                  <Link key={href} href={href} className="rounded-xl px-3 py-3 text-sm font-semibold text-white/65 transition hover:bg-white/[0.05] hover:text-white">
-                    <span className="mr-2 text-[10px] font-black text-[#c9a84c]/65">{String(index + 1).padStart(2, "0")}</span>{label}
+                  <Link key={href} href={href} className="rounded-xl border border-transparent bg-[#0b0b0b] px-3 py-3 text-sm font-semibold text-white/90 transition hover:border-[#c9a84c]/30 hover:bg-[#151515] hover:text-white">
+                    <span className="mr-2 text-[10px] font-black text-[#d0ae50]">{String(index + 1).padStart(2, "0")}</span>{label}
                   </Link>
                 ))}
               </div>
