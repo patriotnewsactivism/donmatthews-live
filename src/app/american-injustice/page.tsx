@@ -7,6 +7,17 @@ export const metadata: Metadata = {
   title: "American Injustice | Don Matthews",
   description: "Pre-order American Injustice by Don Matthews and join the launch updates list.",
   alternates: { canonical: "/american-injustice" },
+  openGraph: {
+    title: "American Injustice | Don Matthews",
+    description: "A memoir of constitutional warfare — the true story of fighting back.",
+    images: [{ url: "/images/american-injustice-desktop.jpg", width: 1536, height: 864, alt: "American Injustice by Don Matthews" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "American Injustice | Don Matthews",
+    description: "A memoir of constitutional warfare — the true story of fighting back.",
+    images: ["/images/american-injustice-desktop.jpg"],
+  },
 };
 
 const publicationStats = [
@@ -21,6 +32,13 @@ const formats = [
   { key: "hardback", label: "Hardback", price: "$35.99", detail: "Premium hardcover edition" },
   { key: "audiobook", label: "Audiobook", price: "$15", detail: "Read by the author" },
   { key: "ebook", label: "eBook", price: "FREE", detail: "With a donation of any amount" },
+] as const;
+
+const campaignProof = [
+  ["A true story", "A Marine’s promise"],
+  ["Constitutional warfare", "Retaliation documented"],
+  ["Three federal actions", "Filed in three states"],
+  ["The public record", "Evidence before narrative"],
 ] as const;
 
 const parts = [
@@ -72,7 +90,7 @@ const bookSchema = {
     name: "Don Matthews",
     url: "https://donmatthews.live",
   },
-  image: "https://donmatthews.live/images/american-injustice-cover.svg",
+  image: "https://donmatthews.live/images/american-injustice-cover.jpg",
   url: "https://donmatthews.live/american-injustice",
   inLanguage: "en",
   genre: ["Nonfiction", "Legal memoir", "Investigative journalism"],
@@ -92,38 +110,86 @@ export default function AmericanInjusticePage() {
     <FlagshipPage>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(bookSchema) }} />
 
-      <section className="book-campaign relative overflow-hidden border-b border-[#c9a84c]/20 bg-[#070706]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_28%,rgba(201,168,76,0.14),transparent_32%),radial-gradient(circle_at_10%_90%,rgba(201,168,76,0.05),transparent_28%)]" />
-        <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:py-18 lg:grid-cols-[1.18fr_.82fr] lg:items-center lg:gap-20 lg:py-24">
-          <div className="max-w-3xl">
-            <div className="mb-5 flex items-center gap-3"><span className="h-px w-10 bg-[#c9a84c]" /><p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#c9a84c] sm:text-xs">Pre-orders open</p></div>
-            <h1 className="display-serif text-[3.2rem] font-semibold leading-[.88] tracking-[-0.05em] text-[#f0e7d0] sm:text-6xl lg:text-[5.4rem]">American<br />Injustice</h1>
-            <p className="display-serif mt-4 text-xl italic leading-7 text-[#c9a84c] sm:text-3xl">A Memoir of Constitutional Warfare</p>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-white/62 sm:text-lg sm:leading-8">The true story of fighting back — told through lived experience, court records, recordings, public documents, and the constitutional battles behind them.</p>
+      <section className="book-campaign book-campaign-hero relative isolate overflow-hidden border-b border-[#c9a84c]/25 bg-[#050504]">
+        <div className="absolute inset-0 -z-30 hidden lg:block">
+          <Image
+            src="/images/american-injustice-desktop.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="book-campaign-wide object-cover object-[center_40%]"
+          />
+        </div>
+        <div className="absolute inset-0 -z-20 hidden bg-[linear-gradient(90deg,#050504_0%,rgba(5,5,4,0.99)_37%,rgba(5,5,4,0.9)_50%,rgba(5,5,4,0.38)_69%,rgba(5,5,4,0.08)_100%)] lg:block" />
+        <div className="absolute inset-x-0 top-0 -z-10 hidden h-28 bg-gradient-to-b from-[#050504] via-[#050504]/90 to-transparent lg:block" />
+        <div className="absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-t from-[#050504] via-[#050504]/75 to-transparent" />
+
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-10 sm:py-16 lg:min-h-[740px] lg:grid-cols-[.92fr_1.08fr] lg:items-center lg:gap-10 lg:py-20">
+          <div className="max-w-[700px]">
+            <div className="mb-5 flex items-center gap-3">
+              <span className="h-px w-10 bg-[#c9a84c]" />
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#d6b85a] sm:text-xs">Pre-orders open · The true story of fighting back</p>
+            </div>
+            <h1 className="display-serif text-[3.35rem] font-semibold leading-[.86] tracking-[-0.055em] text-[#f2ead8] sm:text-7xl lg:text-[5.6rem] xl:text-[6.35rem]">American<br />Injustice</h1>
+            <p className="display-serif mt-4 text-xl italic leading-7 text-[#d0ad4f] sm:text-3xl">A Memoir of Constitutional Warfare</p>
+
+            <div className="mx-auto mt-8 w-full max-w-[390px] lg:hidden">
+              <div className="relative rounded-[1.4rem] border border-[#c9a84c]/45 bg-black/80 p-2 shadow-[0_32px_90px_rgba(0,0,0,0.72)]">
+                <Image
+                  src="/images/american-injustice-cover.jpg"
+                  alt="American Injustice book cover by Don Matthews"
+                  width={1025}
+                  height={1536}
+                  priority
+                  sizes="(max-width: 640px) 88vw, 390px"
+                  className="h-auto w-full rounded-[.95rem] object-contain"
+                />
+              </div>
+            </div>
+
+            <p className="mt-7 max-w-2xl text-base leading-7 text-white/68 sm:text-lg sm:leading-8 lg:mt-6">The factual, first-person record of fighting back — told through lived experience, court filings, recordings, public documents, and the constitutional battles behind them.</p>
+
             <div className="mt-7 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:gap-3">
-              {formats.map((format) => (<a key={format.key} href={`#preorder-${format.key}`} className="rounded-xl border border-[#c9a84c]/30 bg-black/35 px-4 py-3.5 transition hover:border-[#c9a84c]/65 hover:bg-[#c9a84c]/[0.06]"><p className="text-[9px] font-black uppercase tracking-[0.14em] text-white/42">{format.label}</p><p className="mt-1 text-xl font-black text-[#d6b85a]">{format.price}</p></a>))}
+              {formats.map((format) => (
+                <a key={format.key} href={`#preorder-${format.key}`} className="rounded-lg border border-[#c9a84c]/40 bg-[#080807]/85 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:-translate-y-0.5 hover:border-[#d8b85a] hover:bg-[#c9a84c]/10">
+                  <p className="text-[9px] font-black uppercase tracking-[0.14em] text-white/48">{format.label}</p>
+                  <p className="mt-1 text-xl font-black text-[#d6b85a]">{format.price}</p>
+                </a>
+              ))}
             </div>
-            <p className="mt-5 max-w-2xl text-xs leading-5 text-white/38 sm:text-sm sm:leading-6">Reserve your edition and join the launch list. No payment is collected here yet; checkout will be connected separately.</p>
-          </div>
-          <div className="mx-auto w-full max-w-[260px] sm:max-w-[340px] lg:max-w-[390px]">
-            <div className="relative rounded-[1.4rem] border border-[#c9a84c]/35 bg-black/70 p-2.5 shadow-[0_40px_100px_rgba(0,0,0,0.68)]">
-              <Image src="/images/american-injustice-cover.svg" alt="American Injustice book cover" width={1600} height={2560} unoptimized priority className="h-auto w-full rounded-[.95rem] object-contain" />
+
+            <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
+              <a href="#reserve-edition" className="gold-action rounded-lg px-6 py-3.5 text-center text-sm font-black text-black transition hover:-translate-y-0.5 sm:text-base">Reserve Your Edition</a>
+              <a href="#book-interest" className="rounded-lg border border-[#c9a84c]/45 bg-black/55 px-6 py-3.5 text-center text-sm font-bold text-[#e2c66d] transition hover:-translate-y-0.5 hover:border-[#d8b85a] hover:bg-[#c9a84c]/10 sm:text-base">Get Updates & Early Access</a>
             </div>
+            <p className="mt-4 max-w-2xl text-xs leading-5 text-white/40 sm:text-sm">No payment is collected yet. Your reservation is saved and checkout details will be sent when ordering opens.</p>
           </div>
+
+          <div className="hidden min-h-[660px] lg:block" aria-hidden="true" />
+        </div>
+
+        <div className="relative mx-auto grid max-w-7xl grid-cols-2 border-x border-t border-[#c9a84c]/15 bg-black/55 sm:grid-cols-4">
+          {campaignProof.map(([title, detail]) => (
+            <div key={title} className="border-b border-r border-[#c9a84c]/10 px-4 py-4 last:border-r-0 sm:py-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.14em] text-[#d0ad4f]">{title}</p>
+              <p className="mt-1 text-xs text-white/45">{detail}</p>
+            </div>
+          ))}
         </div>
       </section>
 
       <section className="border-b border-white/10 bg-[#101010]">
         <div className="mx-auto max-w-7xl px-5 py-12 sm:py-16">
           <div className="grid gap-5 sm:gap-6 lg:grid-cols-[1.05fr_.95fr]">
-            <div className="rounded-2xl border border-[#c9a84c]/25 bg-black/30 p-5 sm:p-9">
+            <div id="reserve-edition" className="scroll-mt-24 rounded-2xl border border-[#c9a84c]/25 bg-black/30 p-5 sm:p-9">
               <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#c9a84c] sm:text-xs sm:tracking-[0.2em]">Reserve an edition</p>
               <h2 className="mt-3 text-2xl font-black sm:text-4xl">Pre-order interest</h2>
               <p className="mt-3 text-sm leading-6 text-white/55 sm:mt-4 sm:text-base sm:leading-7">Choose your format and leave your email. Each reservation is stored as its own event, even if you have already joined the updates list.</p>
               <BookLaunchForm mode="preorder" formats={formats} />
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 sm:p-9">
+            <div id="book-interest" className="scroll-mt-24 rounded-2xl border border-white/10 bg-white/[0.025] p-5 sm:p-9">
               <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#c9a84c] sm:text-xs sm:tracking-[0.2em]">Stay informed</p>
               <h2 className="mt-3 text-2xl font-black sm:text-4xl">Get updates and early access</h2>
               <p className="mt-3 text-sm leading-6 text-white/55 sm:mt-4 sm:text-base sm:leading-7">Be first to know about release dates, excerpts, preorder checkout, audiobook availability, and publication news.</p>
