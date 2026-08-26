@@ -84,11 +84,11 @@ export default function Home() {
           <div className="relative mx-auto w-full max-w-[560px] lg:max-w-[520px]">
             <div className="absolute -inset-8 -z-10 rounded-[2.5rem] bg-[#c9a84c]/[0.08] blur-3xl" />
             <div className="relative overflow-hidden rounded-[1.5rem] border border-[#c9a84c]/25 bg-[#080808] shadow-[0_30px_90px_rgba(0,0,0,0.55)]">
-              <Image src="/images/wanted-poster.jpg" alt="Don Matthews â€” We The People News" width={1024} height={1536} priority className="h-auto w-full object-contain" />
+              <Image src="/images/wanted-poster.jpg" alt="Don Matthews — We The People News" width={1024} height={1536} priority className="h-auto w-full object-contain" />
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_68%,rgba(5,5,5,0.72)_100%)]" />
             </div>
             <div className="mt-3 flex items-center justify-between gap-4 text-[9px] font-black uppercase tracking-[0.16em] text-white/34">
-              <span>Field record Â· WTP News</span><span className="text-[#c9a84c]">Full document view</span>
+              <span>Field record · WTP News</span><span className="text-[#c9a84c]">Full document view</span>
             </div>
           </div>
         </div>
@@ -129,7 +129,7 @@ export default function Home() {
             </div>
           </div>
           <div className="max-w-3xl">
-            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#c9a84c] sm:text-xs">The book Â· Pre-orders open</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#c9a84c] sm:text-xs">The book · Pre-orders open</p>
             <h2 className="display-serif mt-4 text-[2.8rem] font-semibold leading-[.92] tracking-[-0.04em] text-[#f0e7d0] sm:text-6xl lg:text-7xl">American Injustice</h2>
             <p className="display-serif mt-3 text-xl italic text-[#c9a84c] sm:text-2xl">A Memoir of Constitutional Warfare</p>
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/60 sm:text-lg sm:leading-8">A factual, first-person legal-thriller memoir built from lived experience, court records, recordings, public documents, and the collision between one citizen and government power.</p>

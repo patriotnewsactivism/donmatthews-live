@@ -99,7 +99,7 @@ export default function AmericanInjusticePage() {
             <div className="mb-5 flex items-center gap-3"><span className="h-px w-10 bg-[#c9a84c]" /><p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#c9a84c] sm:text-xs">Pre-orders open</p></div>
             <h1 className="display-serif text-[3.2rem] font-semibold leading-[.88] tracking-[-0.05em] text-[#f0e7d0] sm:text-6xl lg:text-[5.4rem]">American<br />Injustice</h1>
             <p className="display-serif mt-4 text-xl italic leading-7 text-[#c9a84c] sm:text-3xl">A Memoir of Constitutional Warfare</p>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-white/62 sm:text-lg sm:leading-8">The true story of fighting back â€” told through lived experience, court records, recordings, public documents, and the constitutional battles behind them.</p>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/62 sm:text-lg sm:leading-8">The true story of fighting back — told through lived experience, court records, recordings, public documents, and the constitutional battles behind them.</p>
             <div className="mt-7 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:gap-3">
               {formats.map((format) => (<a key={format.key} href={`#preorder-${format.key}`} className="rounded-xl border border-[#c9a84c]/30 bg-black/35 px-4 py-3.5 transition hover:border-[#c9a84c]/65 hover:bg-[#c9a84c]/[0.06]"><p className="text-[9px] font-black uppercase tracking-[0.14em] text-white/42">{format.label}</p><p className="mt-1 text-xl font-black text-[#d6b85a]">{format.price}</p></a>))}
             </div>
