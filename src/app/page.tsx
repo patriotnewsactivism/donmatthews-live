@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import AllocutionVideo from "@/components/AllocutionVideo";
 import FlagshipLeadForm from "@/components/FlagshipLeadForm";
 import { LatestArticlesSection } from "@/components/LatestArticlesSection";
 import { SiteFooter, SiteHeader } from "@/components/FlagshipShell";
@@ -84,7 +85,7 @@ export default function Home() {
           <div className="relative mx-auto w-full max-w-[560px] lg:max-w-[520px]">
             <div className="absolute -inset-8 -z-10 rounded-[2.5rem] bg-[#c9a84c]/[0.08] blur-3xl" />
             <div className="relative overflow-hidden rounded-[1.5rem] border border-[#c9a84c]/25 bg-[#080808] shadow-[0_30px_90px_rgba(0,0,0,0.55)]">
-              <Image src="/images/wanted-poster.jpg" alt="Don Matthews — We The People News" width={1024} height={1536} priority className="h-auto w-full object-contain" />
+              <Image src="/images/wanted-poster.jpg" alt="Wanted by the State and Federal Government for possession of a camera with intent to expose — Don Matthews" width={1024} height={1060} priority sizes="(max-width: 1023px) 92vw, 460px" className="h-auto w-full object-contain" />
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_68%,rgba(5,5,5,0.72)_100%)]" />
             </div>
             <div className="mt-3 flex items-center justify-between gap-4 text-[9px] font-black uppercase tracking-[0.16em] text-white/34">
@@ -173,6 +174,8 @@ export default function Home() {
       <section className="border-b border-white/10 bg-[#101010]">
         <div className="mx-auto grid max-w-7xl gap-7 px-5 py-14 sm:gap-10 sm:py-20 lg:grid-cols-2"><div><p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">THE RECORD</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">Cases, filings, evidence, conflicts.</h2></div><div className="space-y-4 text-base leading-8 text-white/60 sm:text-lg"><p>A source-first public archive that distinguishes documents, allegations, court findings, unresolved conflicts, and editorial corrections.</p><Link href="/record" className="inline-block font-bold text-[#c9a84c]">Open The Record →</Link></div></div>
       </section>
+
+      <AllocutionVideo />
 
       <LatestArticlesSection />
 

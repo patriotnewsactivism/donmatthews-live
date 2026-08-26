@@ -57,6 +57,15 @@ export async function getPostBySlug(slug: string): Promise<WordPressPost | null>
   return posts.find((post) => post.slug === slug) ?? null;
 }
 
+/**
+ * Titles arrive entity-encoded from the API for the same reason category names
+ * do, so an undecoded title renders as "Don&#8217;s Case" in the article grid
+ * and in the <title> tag.
+ */
+export function getPostTitle(post: WordPressPost): string {
+  return decodeHtmlEntities(post.title);
+}
+
 export function getCategoryNames(post: WordPressPost): string[] {
   return Object.values(post.categories ?? {}).map((category) => decodeHtmlEntities(category.name));
 }

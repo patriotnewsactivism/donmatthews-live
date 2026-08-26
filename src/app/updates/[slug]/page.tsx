@@ -10,6 +10,7 @@ import {
   getPostBySlug,
   getPostExcerpt,
   getPostImage,
+  getPostTitle,
 } from "@/lib/wordpress";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -20,12 +21,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const description = getPostExcerpt(post);
 
   return {
-    title: `${post.title} | Don Matthews`,
+    title: `${getPostTitle(post)} | Don Matthews`,
     description,
     alternates: { canonical: `/updates/${post.slug}` },
     robots: { index: false, follow: true },
     openGraph: {
-      title: post.title,
+      title: getPostTitle(post),
       description,
       type: "article",
       publishedTime: post.date,
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     },
     twitter: {
       card: "summary_large_image",
-      title: post.title,
+      title: getPostTitle(post),
       description,
       images: image ? [image] : undefined,
     },
@@ -65,7 +66,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               ))}
             </div>
             <h1 className="mt-5 text-[2.25rem] font-black leading-[1.02] tracking-[-0.04em] sm:text-6xl sm:tracking-[-0.025em]">
-              {post.title}
+              {getPostTitle(post)}
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-white/58">{getPostExcerpt(post)}</p>
             <div className="mt-6 flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.12em] text-white/35">
