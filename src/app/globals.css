@@ -261,9 +261,23 @@ textarea {
 
 
 .book-campaign {
-  background-image: linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.008) 1px, transparent 1px);
-  background-size: 64px 64px;
+  background:
+    radial-gradient(circle at 82% 22%, rgba(201, 168, 76, 0.11), transparent 30rem),
+    radial-gradient(circle at 8% 92%, rgba(201, 168, 76, 0.045), transparent 26rem),
+    linear-gradient(rgba(255, 255, 255, 0.014) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+    #050504;
+  background-size: auto, auto, 64px 64px, 64px 64px, auto;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025), inset 0 -1px 0 rgba(201, 168, 76, 0.08);
 }
+
+.book-campaign-wide {
+  transform: scale(1.035);
+  filter: saturate(0.88) contrast(1.06) brightness(0.82);
+}
+
 @media (max-width: 640px) {
-  .book-campaign { background-size: 48px 48px; }
+  .book-campaign {
+    background-size: auto, auto, 48px 48px, 48px 48px, auto;
+  }
 }

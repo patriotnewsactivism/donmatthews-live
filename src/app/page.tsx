@@ -120,22 +120,53 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="book-campaign relative overflow-hidden border-y border-[#c9a84c]/15 bg-[#070706]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(201,168,76,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.012),transparent)]" />
-        <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:py-20 lg:grid-cols-[.72fr_1.28fr] lg:items-center lg:gap-20 lg:py-28">
-          <div className="mx-auto w-full max-w-[250px] sm:max-w-[310px] lg:max-w-[360px]">
-            <div className="relative rounded-[1.25rem] border border-[#c9a84c]/30 bg-black/70 p-2 shadow-[0_36px_90px_rgba(0,0,0,0.6)]">
-              <Image src="/images/american-injustice-cover.svg" alt="American Injustice book cover" width={1600} height={2560} unoptimized className="h-auto w-full rounded-[.85rem] object-contain" />
+      <section className="book-campaign book-campaign-home relative isolate overflow-hidden border-y border-[#c9a84c]/25 bg-[#050504]">
+        <div className="absolute inset-0 -z-30 hidden lg:block">
+          <Image
+            src="/images/american-injustice-desktop.jpg"
+            alt=""
+            fill
+            sizes="100vw"
+            className="book-campaign-wide object-cover object-[center_40%]"
+          />
+        </div>
+        <div className="absolute inset-0 -z-20 hidden bg-[linear-gradient(90deg,#050504_0%,rgba(5,5,4,0.99)_37%,rgba(5,5,4,0.9)_50%,rgba(5,5,4,0.38)_69%,rgba(5,5,4,0.08)_100%)] lg:block" />
+        <div className="absolute inset-x-0 top-0 -z-10 hidden h-28 bg-gradient-to-b from-[#050504] via-[#050504]/90 to-transparent lg:block" />
+        <div className="absolute inset-x-0 bottom-0 -z-10 h-28 bg-gradient-to-t from-[#050504] via-[#050504]/75 to-transparent" />
+
+        <div className="relative mx-auto grid max-w-7xl gap-9 px-5 py-14 sm:py-20 lg:min-h-[700px] lg:grid-cols-[.92fr_1.08fr] lg:items-center lg:gap-10 lg:py-24">
+          <div className="max-w-[690px]">
+            <div className="flex items-center gap-3">
+              <span className="h-px w-10 bg-[#c9a84c]" />
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#d6b85a] sm:text-xs">The book · Pre-orders open</p>
+            </div>
+            <h2 className="display-serif mt-5 text-[3.35rem] font-semibold leading-[.86] tracking-[-0.055em] text-[#f2ead8] sm:text-7xl lg:text-[5.6rem]">American<br />Injustice</h2>
+            <p className="display-serif mt-4 text-xl italic text-[#d0ad4f] sm:text-3xl">A Memoir of Constitutional Warfare</p>
+
+            <div className="mx-auto mt-8 w-full max-w-[380px] lg:hidden">
+              <div className="relative rounded-[1.35rem] border border-[#c9a84c]/45 bg-black/80 p-2 shadow-[0_32px_90px_rgba(0,0,0,0.72)]">
+                <Image
+                  src="/images/american-injustice-cover.jpg"
+                  alt="American Injustice book cover by Don Matthews"
+                  width={1025}
+                  height={1536}
+                  sizes="(max-width: 640px) 88vw, 380px"
+                  className="h-auto w-full rounded-[.9rem] object-contain"
+                />
+              </div>
+            </div>
+
+            <p className="mt-7 max-w-2xl text-base leading-7 text-white/68 sm:text-lg sm:leading-8 lg:mt-6">A factual, first-person legal-thriller memoir built from lived experience, court records, recordings, public documents, and the collision between one citizen and government power.</p>
+            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 border-y border-[#c9a84c]/15 py-4 text-[11px] font-bold uppercase tracking-[0.12em] text-white/48">
+              <span>Paperback $25.99</span><span>Hardback $35.99</span><span>Audiobook $15</span><span>eBook with donation</span>
+            </div>
+            <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
+              <Link href="/american-injustice" className="gold-action rounded-lg px-6 py-3.5 text-center text-sm font-black text-black transition hover:-translate-y-0.5 sm:text-base">Pre-order / Join Updates</Link>
+              <Link href="/record" className="rounded-lg border border-[#c9a84c]/45 bg-black/55 px-6 py-3.5 text-center text-sm font-bold text-[#e2c66d] transition hover:-translate-y-0.5 hover:border-[#d8b85a] hover:bg-[#c9a84c]/10 sm:text-base">Inspect The Record</Link>
             </div>
           </div>
-          <div className="max-w-3xl">
-            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#c9a84c] sm:text-xs">The book · Pre-orders open</p>
-            <h2 className="display-serif mt-4 text-[2.8rem] font-semibold leading-[.92] tracking-[-0.04em] text-[#f0e7d0] sm:text-6xl lg:text-7xl">American Injustice</h2>
-            <p className="display-serif mt-3 text-xl italic text-[#c9a84c] sm:text-2xl">A Memoir of Constitutional Warfare</p>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-white/60 sm:text-lg sm:leading-8">A factual, first-person legal-thriller memoir built from lived experience, court records, recordings, public documents, and the collision between one citizen and government power.</p>
-            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 border-y border-white/10 py-4 text-[11px] font-bold uppercase tracking-[0.12em] text-white/42"><span>Paperback $25.99</span><span>Hardback $35.99</span><span>Audiobook $15</span><span>eBook with donation</span></div>
-            <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap"><Link href="/american-injustice" className="gold-action rounded-lg px-6 py-3.5 text-center text-sm font-black text-black transition hover:-translate-y-0.5 sm:text-base">Pre-order / Join Updates</Link><Link href="/record" className="outline-action rounded-lg border border-[#c9a84c]/30 bg-black/25 px-6 py-3.5 text-center text-sm font-bold text-[#e0c66f] transition hover:-translate-y-0.5 hover:border-[#c9a84c]/60 sm:text-base">Inspect The Record</Link></div>
-          </div>
+
+          <div className="hidden min-h-[610px] lg:block" aria-hidden="true" />
         </div>
       </section>
 
