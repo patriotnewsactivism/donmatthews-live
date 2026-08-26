@@ -92,30 +92,23 @@ export default function AmericanInjusticePage() {
     <FlagshipPage>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(bookSchema) }} />
 
-      <section className="relative overflow-hidden border-b border-[#c9a84c]/20 bg-[#090909]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_30%,rgba(201,168,76,0.16),transparent_34%)]" />
-        <div className="relative mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:gap-12 sm:py-16 lg:grid-cols-[1.1fr_.9fr] lg:items-center lg:py-24">
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#c9a84c] sm:text-xs sm:tracking-[0.24em]">Pre-orders open</p>
-            <h1 className="mt-3 text-[2.5rem] font-black leading-[.94] tracking-[-0.03em] sm:mt-5 sm:text-6xl sm:tracking-normal lg:text-7xl">American Injustice</h1>
-            <p className="mt-3 text-xl font-semibold leading-7 text-[#c9a84c] sm:mt-4 sm:text-2xl">A Memoir of Constitutional Warfare</p>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-white/60 sm:mt-6 sm:text-lg sm:leading-8">Reserve your copy and join the updates list for launch news, excerpts, release dates, and major publication announcements.</p>
-
-            <div className="mt-6 grid grid-cols-2 gap-2.5 sm:mt-8 sm:gap-3">
-              {formats.map((format) => (
-                <a key={format.key} href={`#preorder-${format.key}`} className="rounded-xl border border-[#c9a84c]/35 bg-[#c9a84c]/[0.05] p-4 transition hover:border-[#c9a84c] hover:bg-[#c9a84c]/10 sm:p-5">
-                  <p className="text-[10px] font-black uppercase tracking-[0.13em] text-white/45 sm:text-xs sm:tracking-[0.16em]">{format.label}</p>
-                  <p className="mt-1.5 text-2xl font-black text-[#c9a84c] sm:mt-2 sm:text-3xl">{format.price}</p>
-                  <p className="mt-1.5 text-xs leading-5 text-white/50 sm:mt-2 sm:text-sm">{format.detail}</p>
-                </a>
-              ))}
+      <section className="book-campaign relative overflow-hidden border-b border-[#c9a84c]/20 bg-[#070706]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_28%,rgba(201,168,76,0.14),transparent_32%),radial-gradient(circle_at_10%_90%,rgba(201,168,76,0.05),transparent_28%)]" />
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:py-18 lg:grid-cols-[1.18fr_.82fr] lg:items-center lg:gap-20 lg:py-24">
+          <div className="max-w-3xl">
+            <div className="mb-5 flex items-center gap-3"><span className="h-px w-10 bg-[#c9a84c]" /><p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#c9a84c] sm:text-xs">Pre-orders open</p></div>
+            <h1 className="display-serif text-[3.2rem] font-semibold leading-[.88] tracking-[-0.05em] text-[#f0e7d0] sm:text-6xl lg:text-[5.4rem]">American<br />Injustice</h1>
+            <p className="display-serif mt-4 text-xl italic leading-7 text-[#c9a84c] sm:text-3xl">A Memoir of Constitutional Warfare</p>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/62 sm:text-lg sm:leading-8">The true story of fighting back â€” told through lived experience, court records, recordings, public documents, and the constitutional battles behind them.</p>
+            <div className="mt-7 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:gap-3">
+              {formats.map((format) => (<a key={format.key} href={`#preorder-${format.key}`} className="rounded-xl border border-[#c9a84c]/30 bg-black/35 px-4 py-3.5 transition hover:border-[#c9a84c]/65 hover:bg-[#c9a84c]/[0.06]"><p className="text-[9px] font-black uppercase tracking-[0.14em] text-white/42">{format.label}</p><p className="mt-1 text-xl font-black text-[#d6b85a]">{format.price}</p></a>))}
             </div>
-
-            <p className="mt-4 text-xs leading-5 text-white/40 sm:mt-5 sm:text-sm sm:leading-6">Pre-order submissions reserve your selected edition and capture your email. No payment is collected on this page yet; checkout will be connected separately.</p>
+            <p className="mt-5 max-w-2xl text-xs leading-5 text-white/38 sm:text-sm sm:leading-6">Reserve your edition and join the launch list. No payment is collected here yet; checkout will be connected separately.</p>
           </div>
-
-          <div className="book-cover-frame relative mx-auto w-full max-w-[280px] sm:max-w-[380px] lg:max-w-[410px]">
-            <Image src="/images/american-injustice-cover.svg" alt="American Injustice book cover" width={1600} height={2560} unoptimized priority className="relative w-full rounded-xl border border-[#c9a84c]/35" />
+          <div className="mx-auto w-full max-w-[260px] sm:max-w-[340px] lg:max-w-[390px]">
+            <div className="relative rounded-[1.4rem] border border-[#c9a84c]/35 bg-black/70 p-2.5 shadow-[0_40px_100px_rgba(0,0,0,0.68)]">
+              <Image src="/images/american-injustice-cover.svg" alt="American Injustice book cover" width={1600} height={2560} unoptimized priority className="h-auto w-full rounded-[.95rem] object-contain" />
+            </div>
           </div>
         </div>
       </section>

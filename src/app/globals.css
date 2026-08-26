@@ -258,3 +258,12 @@ textarea {
     animation-iteration-count: 1 !important;
   }
 }
+
+
+.book-campaign {
+  background-image: linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.008) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+@media (max-width: 640px) {
+  .book-campaign { background-size: 48px 48px; }
+}

@@ -81,29 +81,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="lg:hidden">
-            <div className="relative overflow-hidden rounded-2xl border border-[#c9a84c]/25 bg-[#111] shadow-2xl shadow-black/60">
-              <div className="relative h-[210px]">
-                <Image src="/images/wanted-poster.jpg" alt="Don Matthews — We The People News" fill priority sizes="(max-width: 1024px) 100vw, 0px" className="object-cover object-top opacity-90" />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_38%,rgba(8,8,8,0.95)_100%)]" />
-                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-4">
-                  <div>
-                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#c9a84c]">Field work · public record</p>
-                    <p className="mt-1 text-sm font-bold text-white/85">Independent. Documented. Built in public.</p>
-                  </div>
-                  <span className="shrink-0 rounded-full border border-white/15 bg-black/50 px-2.5 py-1 text-[9px] font-black tracking-[0.12em] text-white/55">WTP NEWS</span>
-                </div>
-              </div>
+          <div className="relative mx-auto w-full max-w-[560px] lg:max-w-[520px]">
+            <div className="absolute -inset-8 -z-10 rounded-[2.5rem] bg-[#c9a84c]/[0.08] blur-3xl" />
+            <div className="relative overflow-hidden rounded-[1.5rem] border border-[#c9a84c]/25 bg-[#080808] shadow-[0_30px_90px_rgba(0,0,0,0.55)]">
+              <Image src="/images/wanted-poster.jpg" alt="Don Matthews â€” We The People News" width={1024} height={1536} priority className="h-auto w-full object-contain" />
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_68%,rgba(5,5,5,0.72)_100%)]" />
             </div>
-          </div>
-
-          <div className="relative mx-auto hidden w-full max-w-md lg:block lg:max-w-none">
-            <div className="absolute -inset-5 rounded-3xl border border-[#c9a84c]/10" />
-            <div className="absolute -inset-4 rounded-2xl bg-[#c9a84c]/10 blur-3xl" />
-            <div className="premium-card relative rotate-[0.6deg] overflow-hidden rounded-2xl border border-[#c9a84c]/30 bg-[#0c0c0b] p-2.5 shadow-2xl shadow-black/60">
-              <div className="absolute left-6 top-6 z-10 rounded-full border border-[#c9a84c]/30 bg-black/75 px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.17em] text-[#d5b85f] backdrop-blur">Field record · WTP News</div>
-              <Image src="/images/wanted-poster.jpg" alt="Don Matthews — We The People News" width={1024} height={1024} priority className="relative aspect-square w-full rounded-xl object-cover" />
-              <div className="flex items-center justify-between gap-4 px-2 pb-1 pt-3 text-[9px] font-black uppercase tracking-[0.16em] text-white/34"><span>Independent journalism</span><span className="text-[#c9a84c]">Documented in public</span></div>
+            <div className="mt-3 flex items-center justify-between gap-4 text-[9px] font-black uppercase tracking-[0.16em] text-white/34">
+              <span>Field record Â· WTP News</span><span className="text-[#c9a84c]">Full document view</span>
             </div>
           </div>
         </div>
@@ -135,18 +120,21 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_25%,rgba(201,168,76,0.11),transparent_28%)]" />
-        <div className="relative mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:gap-10 sm:py-24 lg:grid-cols-[.55fr_1.45fr] lg:items-center">
-          <div className="book-cover-frame mx-auto w-full max-w-[210px] sm:max-w-[270px]">
-            <Image src="/images/american-injustice-cover.svg" alt="American Injustice book cover" width={1600} height={2560} unoptimized className="w-full rounded-xl border border-[#c9a84c]/30" />
+      <section className="book-campaign relative overflow-hidden border-y border-[#c9a84c]/15 bg-[#070706]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(201,168,76,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.012),transparent)]" />
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:py-20 lg:grid-cols-[.72fr_1.28fr] lg:items-center lg:gap-20 lg:py-28">
+          <div className="mx-auto w-full max-w-[250px] sm:max-w-[310px] lg:max-w-[360px]">
+            <div className="relative rounded-[1.25rem] border border-[#c9a84c]/30 bg-black/70 p-2 shadow-[0_36px_90px_rgba(0,0,0,0.6)]">
+              <Image src="/images/american-injustice-cover.svg" alt="American Injustice book cover" width={1600} height={2560} unoptimized className="h-auto w-full rounded-[.85rem] object-contain" />
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">THE BOOK · PRE-ORDERS OPEN</p>
-            <h2 className="display-serif mt-3 text-5xl font-semibold leading-none tracking-[-0.035em] sm:text-7xl">American Injustice</h2>
-            <p className="mt-5 max-w-3xl text-lg leading-8 text-white/62 sm:text-xl sm:leading-9">A factual, first-person legal-thriller memoir built from lived experience, court records, recordings, public documents, and the collision between one citizen and government power.</p>
-            <p className="mt-4 max-w-3xl leading-8 text-white/42">Paperback $25.99 · Hardback $35.99 · Author-read audiobook $15 · eBook free with a donation of any amount.</p>
-            <div className="mt-7 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap"><Link href="/american-injustice" className="gold-action rounded-lg px-5 py-3 text-center text-sm font-black text-black transition hover:-translate-y-0.5 sm:text-base">Pre-order / Join Updates</Link><Link href="/record" className="outline-action rounded-lg border border-white/15 bg-black/10 px-5 py-3 text-center text-sm font-bold text-white/70 transition hover:-translate-y-0.5 hover:border-[#c9a84c]/35 hover:text-white sm:text-base">Inspect The Record</Link></div>
+          <div className="max-w-3xl">
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#c9a84c] sm:text-xs">The book Â· Pre-orders open</p>
+            <h2 className="display-serif mt-4 text-[2.8rem] font-semibold leading-[.92] tracking-[-0.04em] text-[#f0e7d0] sm:text-6xl lg:text-7xl">American Injustice</h2>
+            <p className="display-serif mt-3 text-xl italic text-[#c9a84c] sm:text-2xl">A Memoir of Constitutional Warfare</p>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/60 sm:text-lg sm:leading-8">A factual, first-person legal-thriller memoir built from lived experience, court records, recordings, public documents, and the collision between one citizen and government power.</p>
+            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 border-y border-white/10 py-4 text-[11px] font-bold uppercase tracking-[0.12em] text-white/42"><span>Paperback $25.99</span><span>Hardback $35.99</span><span>Audiobook $15</span><span>eBook with donation</span></div>
+            <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap"><Link href="/american-injustice" className="gold-action rounded-lg px-6 py-3.5 text-center text-sm font-black text-black transition hover:-translate-y-0.5 sm:text-base">Pre-order / Join Updates</Link><Link href="/record" className="outline-action rounded-lg border border-[#c9a84c]/30 bg-black/25 px-6 py-3.5 text-center text-sm font-bold text-[#e0c66f] transition hover:-translate-y-0.5 hover:border-[#c9a84c]/60 sm:text-base">Inspect The Record</Link></div>
           </div>
         </div>
       </section>
