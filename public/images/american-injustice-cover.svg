@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 2560" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 2560" overflow="hidden" role="img" aria-labelledby="title description">
   <title id="title">American Injustice by Don Matthews</title>
   <desc id="description">A black and gold legal-thriller book cover with courthouse columns, documentary markings, and the subtitle A Memoir of Constitutional Warfare.</desc>
   <defs>
@@ -64,8 +64,8 @@
   <rect x="452" y="304" width="990" height="1" fill="#fff" opacity="0.12"/>
 
   <g filter="url(#shadow)">
-    <text x="108" y="662" fill="#f2eee2" font-family="Georgia, 'Times New Roman', serif" font-size="238" font-weight="700" letter-spacing="-9">AMERICAN</text>
-    <text x="108" y="920" fill="url(#gold)" font-family="Georgia, 'Times New Roman', serif" font-size="220" font-weight="700" letter-spacing="-8">INJUSTICE</text>
+    <text x="108" y="662" textLength="1260" lengthAdjust="spacingAndGlyphs" fill="#f2eee2" font-family="Georgia, 'Times New Roman', serif" font-size="238" font-weight="700">AMERICAN</text>
+    <text x="108" y="920" textLength="1300" lengthAdjust="spacingAndGlyphs" fill="url(#gold)" font-family="Georgia, 'Times New Roman', serif" font-size="220" font-weight="700">INJUSTICE</text>
   </g>
 
   <rect x="122" y="1042" width="10" height="585" fill="#9e2b24"/>
