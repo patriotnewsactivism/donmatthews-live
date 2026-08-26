@@ -58,14 +58,27 @@ export async function getPostBySlug(slug: string): Promise<WordPressPost | null>
 }
 
 export function getCategoryNames(post: WordPressPost): string[] {
-  return Object.values(post.categories ?? {}).map((category) => category.name);
+  return Object.values(post.categories ?? {}).map((category) => decodeHtmlEntities(category.name));
 }
 
 export function getPostImage(post: WordPressPost): string | null {
-  if (post.featured_image) return post.featured_image;
+  const candidate = post.featured_image || post.content.match(/<img[^>]+src=["']([^"']+)["']/i)?.[1];
+  if (!candidate) return null;
 
-  const match = post.content.match(/<img[^>]+src=["']([^"']+)["']/i);
-  return match?.[1] ?? null;
+  try {
+    const image = new URL(decodeHtmlEntities(candidate));
+    if (image.protocol !== "https:") return null;
+
+    // YouTube's max-resolution endpoint is not guaranteed to exist. A missing
+    // thumbnail otherwise leaves a broken image icon in every article grid.
+    if (image.hostname === "i.ytimg.com" && image.pathname.endsWith("/maxresdefault.jpg")) {
+      return null;
+    }
+
+    return image.toString();
+  } catch {
+    return null;
+  }
 }
 
 export function stripHtml(value: string): string {

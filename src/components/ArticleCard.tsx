@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
+import { ArticleMedia } from "@/components/ArticleMedia";
 import {
   getCategoryNames,
   getPostExcerpt,
@@ -13,19 +13,12 @@ export function ArticleCard({ post, compact = false }: { post: WordPressPost; co
   const excerpt = getPostExcerpt(post);
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(160deg,rgba(255,255,255,0.045),rgba(255,255,255,0.015))] transition hover:-translate-y-0.5 hover:border-[#c9a84c]/35">
-      {image ? (
-        <Link href={`/updates/${post.slug}`} className={`block overflow-hidden bg-[#111] ${compact ? "aspect-[16/9]" : "aspect-[16/10]"}`}>
-          <img
-            src={image}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
-          />
-        </Link>
-      ) : null}
+    <article className="premium-card group flex min-h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(155deg,rgba(255,255,255,0.052),rgba(255,255,255,0.012))] transition duration-300 hover:-translate-y-1 hover:border-[#c9a84c]/40">
+      <Link href={`/updates/${post.slug}`} className="block overflow-hidden bg-[#111]">
+        <ArticleMedia src={image} alt={post.title} compact={compact} eyebrow={categories[0] ?? "THE RECORD"} />
+      </Link>
 
-      <div className={compact ? "p-5" : "p-6 sm:p-7"}>
+      <div className={`flex flex-1 flex-col ${compact ? "p-5" : "p-6 sm:p-7"}`}>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-black uppercase tracking-[0.14em] text-white/35">
           <time dateTime={post.date}>{formatDate(post.date)}</time>
           {categories.slice(0, 2).map((category) => (
@@ -43,7 +36,7 @@ export function ArticleCard({ post, compact = false }: { post: WordPressPost; co
           {excerpt}
         </p>
 
-        <Link href={`/updates/${post.slug}`} className="mt-5 inline-flex text-sm font-black text-[#c9a84c]">
+        <Link href={`/updates/${post.slug}`} className="mt-auto inline-flex pt-5 text-sm font-black text-[#c9a84c] transition group-hover:text-[#e3ca77]">
           Read More →
         </Link>
       </div>

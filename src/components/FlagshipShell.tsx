@@ -16,16 +16,21 @@ const nav = [
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-50 border-b border-[#c9a84c]/15 bg-[#090909]/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-[#c9a84c]/15 bg-[#080808]/88 shadow-[0_12px_40px_rgba(0,0,0,0.2)] backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-5">
-        <div className="flex items-center justify-between gap-4 py-3.5 sm:py-4">
-          <Link href="/" className="group shrink-0">
-            <span className="block text-[13px] font-black tracking-[0.16em] text-[#c9a84c] transition group-hover:text-[#e1c66f] sm:text-base sm:tracking-[0.19em]">DON MATTHEWS</span>
-            <span className="mt-0.5 block text-[8px] font-bold tracking-[0.22em] text-white/30 sm:hidden">OFFICIAL FLAGSHIP</span>
+        <div className="flex items-center justify-between gap-4 py-3 sm:py-3.5">
+          <Link href="/" className="group flex shrink-0 items-center gap-3">
+            <span className="grid h-9 w-9 place-items-center rounded-lg border border-[#c9a84c]/35 bg-[linear-gradient(145deg,rgba(201,168,76,0.14),rgba(201,168,76,0.02))] text-[11px] font-black tracking-[0.08em] text-[#d9bd65] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition group-hover:border-[#c9a84c]/65">DM</span>
+            <span>
+              <span className="block text-[13px] font-black tracking-[0.16em] text-[#d4b75d] transition group-hover:text-[#ead37e] sm:text-sm sm:tracking-[0.19em]">DON MATTHEWS</span>
+              <span className="mt-0.5 block text-[8px] font-bold tracking-[0.22em] text-white/28">OFFICIAL FLAGSHIP</span>
+            </span>
           </Link>
 
-          <nav className="hidden flex-wrap items-center justify-end gap-x-4 gap-y-2 text-[13px] text-white/55 lg:flex">
-            {nav.map(([label, href]) => <Link key={href} href={href} className="transition hover:text-white">{label}</Link>)}
+          <nav className="hidden flex-wrap items-center justify-end gap-x-3.5 gap-y-2 text-[12px] font-medium text-white/48 lg:flex xl:gap-x-4 xl:text-[13px]">
+            {nav.map(([label, href]) => (
+              <Link key={href} href={href} className={label === "Support" ? "rounded-full border border-[#c9a84c]/30 bg-[#c9a84c]/[0.055] px-3 py-1.5 font-bold text-[#d4b75d] transition hover:border-[#c9a84c]/60 hover:bg-[#c9a84c]/10" : "transition hover:text-white"}>{label}</Link>
+            ))}
           </nav>
 
           <details className="relative lg:hidden [&>summary::-webkit-details-marker]:hidden">
@@ -42,17 +47,23 @@ export function SiteHeader() {
           </details>
         </div>
       </div>
+      <div className="h-px bg-gradient-to-r from-transparent via-[#c9a84c]/20 to-transparent" />
     </header>
   );
 }
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-white/10 bg-[#080808]">
-      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 md:grid-cols-[1fr_auto] md:items-end">
-        <div>
-          <p className="font-black tracking-[0.16em] text-[#c9a84c]">DON MATTHEWS</p>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-white/45">Journalism, technology, American Injustice, documentary music, and the public record.</p>
+    <footer className="relative overflow-hidden border-t border-white/10 bg-[#070707]">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c9a84c]/40 to-transparent" />
+      <div className="absolute -right-24 top-6 h-56 w-56 rounded-full border border-[#c9a84c]/[0.06]" />
+      <div className="relative mx-auto grid max-w-7xl gap-8 px-5 py-12 md:grid-cols-[1fr_auto] md:items-end">
+        <div className="flex items-start gap-4">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-[#c9a84c]/25 bg-[#c9a84c]/[0.045] text-[11px] font-black text-[#c9a84c]">DM</span>
+          <div>
+            <p className="font-black tracking-[0.16em] text-[#c9a84c]">DON MATTHEWS</p>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-white/42">Journalism, technology, <em>American Injustice</em>, documentary music, and the public record.</p>
+          </div>
         </div>
         <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/45">
           <Link href="/updates" className="hover:text-white">Updates</Link>
@@ -61,7 +72,7 @@ export function SiteFooter() {
           <Link href="/contact" className="hover:text-white">Contact</Link>
         </div>
       </div>
-      <div className="border-t border-white/5 px-5 py-5 text-center text-xs text-white/30">© 2026 Don Matthews. All rights reserved.</div>
+      <div className="border-t border-white/5 px-5 py-5 text-center text-[10px] font-bold uppercase tracking-[0.13em] text-white/24">© 2026 Don Matthews · Independent work, built in public</div>
     </footer>
   );
 }
@@ -69,7 +80,7 @@ export function SiteFooter() {
 export function PageHero({ eyebrow, title, intro, actions }: { eyebrow: string; title: string; intro: string; actions?: ReactNode }) {
   return (
     <section className="relative isolate overflow-hidden border-b border-[#c9a84c]/15 bg-[#090909]">
-      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_82%_18%,rgba(201,168,76,0.18),transparent_33%),radial-gradient(circle_at_8%_95%,rgba(201,168,76,0.06),transparent_28%)]" />
+      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_82%_18%,rgba(201,168,76,0.19),transparent_33%),radial-gradient(circle_at_8%_95%,rgba(201,168,76,0.065),transparent_28%),linear-gradient(180deg,#0b0b0a,#080808)]" />
       <div className="absolute inset-0 -z-10 opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:42px_42px]" />
       <div className="absolute right-[-7rem] top-[-7rem] h-60 w-60 rounded-full border border-[#c9a84c]/10 sm:h-80 sm:w-80" />
       <div className="absolute right-[-3rem] top-[-3rem] h-40 w-40 rounded-full border border-[#c9a84c]/10 sm:h-56 sm:w-56" />
@@ -79,7 +90,7 @@ export function PageHero({ eyebrow, title, intro, actions }: { eyebrow: string; 
           <span className="h-px w-8 bg-[#c9a84c] sm:w-12" />
           <p className="text-[10px] font-black tracking-[0.2em] text-[#c9a84c] sm:text-xs sm:tracking-[0.24em]">{eyebrow}</p>
         </div>
-        <h1 className="max-w-5xl text-[2.2rem] font-black leading-[.98] tracking-[-0.035em] sm:text-6xl sm:tracking-normal lg:text-7xl">{title}</h1>
+        <h1 className="max-w-5xl text-[2.2rem] font-black leading-[.98] tracking-[-0.035em] text-[#f8f5ed] [text-wrap:balance] sm:text-6xl sm:tracking-normal lg:text-7xl">{title}</h1>
         <p className="mt-5 max-w-3xl text-[15px] leading-7 text-white/58 sm:mt-6 sm:text-xl sm:leading-8">{intro}</p>
         {actions ? <div className="mt-7 grid gap-3 sm:mt-8 sm:flex sm:flex-wrap">{actions}</div> : null}
       </div>
@@ -88,12 +99,12 @@ export function PageHero({ eyebrow, title, intro, actions }: { eyebrow: string; 
 }
 
 export function FlagshipPage({ children }: { children: ReactNode }) {
-  return <main className="min-h-screen bg-[#0a0a0a] text-white"><SiteHeader />{children}<SiteFooter /></main>;
+  return <main className="site-shell min-h-screen bg-[#0a0a0a] text-white"><SiteHeader />{children}<SiteFooter /></main>;
 }
 
 export function GoldButton({ href, children }: { href: string; children: ReactNode }) {
   const external = href.startsWith("http");
-  const classes = "rounded-md bg-[#c9a84c] px-5 py-3 text-center text-sm font-bold text-black transition hover:bg-[#d9bb64] sm:text-base";
+  const classes = "gold-action rounded-lg px-5 py-3 text-center text-sm font-black text-black transition duration-300 hover:-translate-y-0.5 sm:text-base";
   return external ? (
     <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>{children}</a>
   ) : (
@@ -103,7 +114,7 @@ export function GoldButton({ href, children }: { href: string; children: ReactNo
 
 export function OutlineButton({ href, children }: { href: string; children: ReactNode }) {
   const external = href.startsWith("http");
-  const classes = "rounded-md border border-[#c9a84c]/45 bg-black/10 px-5 py-3 text-center text-sm font-bold text-[#c9a84c] transition hover:bg-[#c9a84c]/10 sm:text-base";
+  const classes = "outline-action rounded-lg border border-[#c9a84c]/40 bg-black/20 px-5 py-3 text-center text-sm font-bold text-[#d5b85f] transition duration-300 hover:-translate-y-0.5 hover:border-[#c9a84c]/70 hover:bg-[#c9a84c]/10 sm:text-base";
   return external ? (
     <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>{children}</a>
   ) : (

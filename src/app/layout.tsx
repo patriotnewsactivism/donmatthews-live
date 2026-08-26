@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Cormorant_Garamond, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const editorial = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-editorial",
+  weight: ["500", "600", "700"],
+});
 
 const title = "Don Matthews | Journalist, Builder, Author & Artist";
 const description =
@@ -68,7 +73,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.variable} font-sans bg-background text-foreground antialiased selection:bg-gold/30 selection:text-white`}>
+      <body className={`${inter.variable} ${editorial.variable} font-sans bg-background text-foreground antialiased selection:bg-gold/30 selection:text-white`}>
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1419193124255967"

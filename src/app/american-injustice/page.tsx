@@ -72,7 +72,7 @@ const bookSchema = {
     name: "Don Matthews",
     url: "https://donmatthews.live",
   },
-  image: "https://donmatthews.live/images/american-injustice-cover.jpg",
+  image: "https://donmatthews.live/images/american-injustice-cover.svg",
   url: "https://donmatthews.live/american-injustice",
   inLanguage: "en",
   genre: ["Nonfiction", "Legal memoir", "Investigative journalism"],
@@ -114,9 +114,8 @@ export default function AmericanInjusticePage() {
             <p className="mt-4 text-xs leading-5 text-white/40 sm:mt-5 sm:text-sm sm:leading-6">Pre-order submissions reserve your selected edition and capture your email. No payment is collected on this page yet; checkout will be connected separately.</p>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[280px] sm:max-w-[380px] lg:max-w-[430px]">
-            <div className="absolute -inset-5 rounded-[2rem] bg-[#c9a84c]/10 blur-3xl" />
-            <Image src="/images/american-injustice-cover.jpg" alt="American Injustice book cover" width={320} height={480} priority className="relative w-full rounded-xl border border-[#c9a84c]/35 shadow-2xl shadow-black/70" />
+          <div className="book-cover-frame relative mx-auto w-full max-w-[280px] sm:max-w-[380px] lg:max-w-[410px]">
+            <Image src="/images/american-injustice-cover.svg" alt="American Injustice book cover" width={1600} height={2560} unoptimized priority className="relative w-full rounded-xl border border-[#c9a84c]/35" />
           </div>
         </div>
       </section>
