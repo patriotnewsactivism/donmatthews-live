@@ -1,0 +1,90 @@
+name: Deploy Help Center to Netlify
+
+on:
+  push:
+    branches: [help-center-source]
+    paths:
+      - 'help-site/**'
+      - '.github/workflows/deploy-help.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: help-center-production
+  cancel-in-progress: false
+
+env:
+  NETLIFY_SITE_ID: 3f261ae4-f130-4809-94c1-bd5e4c12278f
+  NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate static source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s help-site/index.html
+          grep -q '<title>Help Center | Don Matthews</title>' help-site/index.html
+          grep -q 'https://apex.donmatthews.live' help-site/index.html
+          ! grep -R -nE '(BEGIN (RSA|EC|OPENSSH) PRIVATE KEY|AIza[0-9A-Za-z_-]{20,}|sk-[A-Za-z0-9_-]{20,})' help-site
+
+  deploy:
+    needs: validate
+    if: vars.HELP_NETLIFY_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require Netlify authentication
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$NETLIFY_AUTH_TOKEN" ]]; then
+            echo 'NETLIFY_AUTH_TOKEN is required when HELP_NETLIFY_DEPLOY_ENABLED=true.' >&2
+            exit 2
+          fi
+
+      - name: Stamp immutable source provenance
+        shell: bash
+        run: |
+          printf '{"status":"ok","build":{"sha":"%s"},"service":"help-center"}\n' "$GITHUB_SHA" > help-site/version.json
+
+      - name: Deploy exact existing Netlify site
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes netlify-cli@latest deploy \
+            --dir help-site \
+            --prod \
+            --site "$NETLIFY_SITE_ID" \
+            --auth "$NETLIFY_AUTH_TOKEN" \
+            --message "GitHub ${GITHUB_SHA}"
+
+      - name: Verify Netlify production hostname
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="$(curl -fsS --retry 5 --retry-delay 2 --max-time 20 https://help-donmatthews.netlify.app/version.json)"
+          live_sha="$(node -e 'const x=JSON.parse(process.argv[1]); process.stdout.write(x?.build?.sha || "")' "$body")"
+          [[ "$live_sha" == "$GITHUB_SHA" ]]
+          curl -fsS --retry 5 --retry-delay 2 --max-time 20 https://help-donmatthews.netlify.app/ | grep -q 'Help Center'
+
+      - name: Verify custom domain cutover
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="$(curl -fsS --retry 5 --retry-delay 2 --max-time 20 https://help.donmatthews.live/version.json)"
+          live_sha="$(node -e 'const x=JSON.parse(process.argv[1]); process.stdout.write(x?.build?.sha || "")' "$body")"
+          if [[ "$live_sha" != "$GITHUB_SHA" ]]; then
+            echo "help.donmatthews.live is not mapped to the deployed Help Center site. expected=$GITHUB_SHA actual=$live_sha" >&2
+            exit 3
+          fi
+          echo "Help Center verified at https://help.donmatthews.live with SHA $live_sha"
