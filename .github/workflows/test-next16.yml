@@ -1,0 +1,34 @@
+name: Test Next.js 16 migration
+
+on:
+  push:
+    branches: [security/test-next16]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Overlay Next.js 16 + React 19 in runner only
+        run: npm install --no-save next@16.3.3 react@19.2.4 react-dom@19.2.4
+      - name: Build with migrated runtime
+        run: npm run build
+      - name: Production audit after overlay
+        shell: bash
+        run: |
+          set +e
+          npm audit --omit=dev --json > audit.json
+          code=$?
+          jq '{metadata:.metadata.vulnerabilities,direct:[.vulnerabilities|to_entries[]|select(.value.isDirect)|{name:.key,severity:.value.severity,fixAvailable:.value.fixAvailable}]}' audit.json
+          echo "audit_exit=$code"
+          exit 0
