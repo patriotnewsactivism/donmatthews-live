@@ -1,0 +1,37 @@
+name: Diagnose Help Center Netlify access
+
+on:
+  push:
+    branches: [help-center-source]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NETLIFY_SITE_ID: 3f261ae4-f130-4809-94c1-bd5e4c12278f
+  NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Report token presence only
+        shell: bash
+        run: |
+          if [[ -n "$NETLIFY_AUTH_TOKEN" ]]; then
+            echo 'NETLIFY_AUTH_TOKEN=present'
+          else
+            echo 'NETLIFY_AUTH_TOKEN=missing'
+          fi
+      - name: Read existing Netlify site configuration
+        if: env.NETLIFY_AUTH_TOKEN != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          json="$(curl -fsS \
+            -H "Authorization: Bearer $NETLIFY_AUTH_TOKEN" \
+            "https://api.netlify.com/api/v1/sites/$NETLIFY_SITE_ID")"
+          jq '{id,name,url,ssl_url,custom_domain,domain_aliases,admin_url,build_settings:{repo_url:.build_settings.repo_url,repo_branch:.build_settings.repo_branch,dir:.build_settings.dir}}' <<<"$json"
