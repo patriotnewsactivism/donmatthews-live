@@ -27,9 +27,6 @@ export default function Footer() {
           <a href="https://wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
             WTPNews.org
           </a>
-          <a href="https://buildmybot.app" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
-            BuildMyBot.App
-          </a>
           <a href="https://civilrightshub.org" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
             CivilRightsHub.org
           </a>

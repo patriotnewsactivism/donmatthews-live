@@ -9,12 +9,6 @@ export const metadata: Metadata = {
 
 const systems = [
   {
-    name: "BuildMyBot.App",
-    type: "AI WORKFORCE PLATFORM",
-    text: "A product centered on deploying AI workers and automating repeatable business functions through configurable agent workflows.",
-    href: "https://buildmybot.app",
-  },
-  {
     name: "APEX",
     type: "AUTONOMOUS AI WORKFORCE",
     text: "A multi-agent framework focused on autonomous sourcing, orchestration, campaign execution, and eventually broader business operations.",
@@ -25,12 +19,6 @@ const systems = [
     type: "AI COWORKER",
     text: "An agent concept combining memory, workflows, a working shell, and an operator-facing dashboard.",
     href: "/projects",
-  },
-  {
-    name: "CaseBuddy",
-    type: "LEGAL TECHNOLOGY",
-    text: "AI-assisted legal research and case-management tooling designed around working legal records rather than generic chat alone.",
-    href: "https://casebuddy.live",
   },
   {
     name: "ChatScream",
@@ -60,7 +48,7 @@ export default function TechnologyPage() {
         eyebrow="TECHNOLOGY & AI"
         title="AI systems built to do work, not just talk about it."
         intro="A portfolio of autonomous-agent systems, legal technology, media tools, and production software aimed at turning AI into an operating layer for real workflows."
-        actions={<><GoldButton href="https://buildmybot.app">BuildMyBot.App</GoldButton><OutlineButton href="/projects">All Projects</OutlineButton></>}
+        actions={<><GoldButton href="/projects">All Projects</GoldButton><OutlineButton href="/projects">Explore the Systems</OutlineButton></>}
       />
       <section className="mx-auto max-w-7xl px-5 py-20">
         <p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">SYSTEMS</p>

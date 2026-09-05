@@ -13,18 +13,6 @@ interface Project {
 
 const projects: Project[] = [
   {
-    name: "BuildMyBot.App",
-    description: "AI agency in a box. Deploy your own AI workforce in minutes.",
-    status: "LIVE",
-    link: "https://buildmybot.app",
-  },
-  {
-    name: "CaseBuddy",
-    description: "AI-powered legal research and case management.",
-    status: "LIVE",
-    link: "https://casebuddy.live",
-  },
-  {
     name: "We The People News",
     description: "Independent investigative journalism. Government accountability, unfiltered.",
     status: "LIVE",
@@ -43,15 +31,15 @@ const projects: Project[] = [
     link: "https://chatscream.live",
   },
   {
-    name: "CodeForge",
-    description: "AI developer tools for modern engineering teams.",
-    status: "IN DEVELOPMENT",
-  },
-  {
     name: "TubeScribe",
     description: "YouTube video transcription and AI summarization.",
     status: "BETA",
     link: "https://tubescribe.donmatthews.live",
+  },
+  {
+    name: "CodeForge",
+    description: "AI developer tools for modern engineering teams.",
+    status: "IN DEVELOPMENT",
   },
   {
     name: "ARIA",

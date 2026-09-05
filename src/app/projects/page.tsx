@@ -8,8 +8,6 @@ export const metadata: Metadata = {
 };
 
 const projects = [
-  ["BuildMyBot.App", "LIVE", "AI agency in a box. Deploy an AI workforce in minutes.", "https://buildmybot.app"],
-  ["CaseBuddy", "LIVE", "AI-powered legal research and case management.", "https://casebuddy.live"],
   ["We The People News", "LIVE", "Independent investigative journalism and government accountability.", "https://wtpnews.org"],
   ["Civil Rights Hub", "LIVE", "Legal resources and advocacy tools for civil-rights issues.", "https://civilrightshub.org"],
   ["ChatScream", "LIVE", "AI-powered real-time communication and streaming platform.", "https://chatscream.live"],
