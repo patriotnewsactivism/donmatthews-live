@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import AllocutionVideo from "@/components/AllocutionVideo";
+import CaughtRedHandedVideo from "@/components/CaughtRedHandedVideo";
 import FlagshipLeadForm from "@/components/FlagshipLeadForm";
 import { LatestArticlesSection } from "@/components/LatestArticlesSection";
 import { SiteFooter, SiteHeader } from "@/components/FlagshipShell";
@@ -183,6 +184,8 @@ export default function Home() {
         <div><p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">DOCUMENTARY MUSIC</p><h2 className="display-serif mt-3 text-4xl font-semibold sm:text-6xl">Bad Actors</h2><p className="mt-5 max-w-2xl text-base leading-7 text-white/55 sm:text-lg sm:leading-8">Documentary-style releases built around evidence, conflict, accountability, and the stories behind the record.</p><Link href="/music" className="gold-action mt-7 inline-flex rounded-lg px-5 py-3 font-black text-black transition hover:-translate-y-0.5">Explore Music</Link></div>
         <div className="premium-card mx-auto w-full max-w-[280px] rounded-2xl border border-[#c9a84c]/20 bg-[#0d0d0d] p-2 shadow-2xl shadow-black/60 sm:max-w-sm"><Image src="/images/bad-actors-cover.jpg" alt="Bad Actors album cover" width={1024} height={1024} className="w-full rounded-xl" /></div>
       </section>
+
+      <CaughtRedHandedVideo />
 
       <section className="border-t border-white/10 bg-[linear-gradient(180deg,#101010,#0a0a0a)]">
         <div className="mx-auto max-w-5xl px-5 py-14 sm:py-20"><p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">STAY CONNECTED</p><h2 className="mt-3 text-3xl font-black sm:text-5xl">Book, project, music, and case updates.</h2><p className="mt-4 max-w-2xl text-base leading-7 text-white/55 sm:text-lg sm:leading-8">Join the update list for new investigations, product launches, American Injustice updates, music releases, and major developments from The Record.</p><FlagshipLeadForm /><div className="mt-8 flex flex-wrap gap-4 text-sm"><Link href="/updates" className="font-bold text-[#c9a84c]">Updates →</Link><Link href="/press" className="font-bold text-[#c9a84c]">Press & Media →</Link><Link href="/support" className="font-bold text-[#c9a84c]">Support →</Link><Link href="/contact" className="font-bold text-[#c9a84c]">Contact →</Link></div></div>
