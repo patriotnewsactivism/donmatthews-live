@@ -5,37 +5,45 @@ import Image from "next/image";
 import Link from "next/link";
 import { BookOpen, BookText, Tablet, Shield, Scale, Star, Feather, CheckCircle2 } from "lucide-react";
 
+type SubscribeStatus = "idle" | "loading" | "success" | "error";
+
 export default function Hero() {
   const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<SubscribeStatus>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const submitted = status === "success";
+  const loading = status === "loading";
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes("@")) return;
 
-    setLoading(true);
+    setStatus("loading");
+    setErrorMessage("");
+
     try {
-      const res = await fetch("/api/lead", {
+      const res = await fetch("/api/book-interest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "hero_header_interest" }),
+        body: JSON.stringify({ email, mode: "interest" }),
       });
-      if (res.ok) {
-        setSubmitted(true);
-      } else {
-        setSubmitted(true);
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(typeof data?.error === "string" ? data.error : "Unable to join the interest list right now.");
       }
-    } catch {
-      setSubmitted(true);
-    } finally {
-      setLoading(false);
+
+      setStatus("success");
+      setEmail("");
+    } catch (error) {
+      setStatus("error");
+      setErrorMessage(error instanceof Error ? error.message : "Unable to join the interest list right now.");
     }
   };
 
   return (
     <section id="hero" className="relative w-full bg-[#0a0a0a] text-[#f5eedb] overflow-hidden">
-      
       {/* ========================================================================= */}
       {/* 1. DESKTOP & TABLET: Pixel-Aligned Interactive Overlay over your graphic */}
       {/* ========================================================================= */}
@@ -89,7 +97,7 @@ export default function Hero() {
               Contact
             </Link>
             <a
-              href="#preorder-section"
+              href="/american-injustice#reserve-edition"
               className="w-[115px] lg:w-[130px] h-[32px] rounded border border-transparent hover:border-amber-400 hover:bg-amber-400/10 transition-all cursor-pointer"
               title="Pre-Order Now"
             />
@@ -98,17 +106,17 @@ export default function Hero() {
           {/* --- 3 PRE-ORDER BUTTONS --- */}
           <div className="absolute top-[58.5%] left-[3.9%] w-[40.5%] h-[9.5%] z-20 grid grid-cols-3 gap-[2.5%]">
             <a
-              href="#preorder-paperback"
+              href="/american-injustice#preorder-paperback"
               title="Pre-Order Paperback"
               className="w-full h-full rounded border border-transparent hover:border-amber-400/80 hover:bg-amber-400/10 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all cursor-pointer"
             />
             <a
-              href="#preorder-hardcover"
+              href="/american-injustice#preorder-hardback"
               title="Pre-Order Hardcover"
               className="w-full h-full rounded border border-transparent hover:border-amber-400/80 hover:bg-amber-400/10 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all cursor-pointer"
             />
             <a
-              href="#preorder-ebook"
+              href="/american-injustice#preorder-ebook"
               title="Pre-Order eBook"
               className="w-full h-full rounded border border-transparent hover:border-amber-400/80 hover:bg-amber-400/10 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all cursor-pointer"
             />
@@ -122,7 +130,7 @@ export default function Hero() {
                 <span>You&apos;re on the interest list. Check your inbox for updates.</span>
               </div>
             ) : (
-              <form onSubmit={handleSubscribe} className="w-full h-full flex items-center gap-[2%]">
+              <form onSubmit={handleSubscribe} className="relative w-full h-full flex items-center gap-[2%]">
                 <input
                   type="email"
                   required
@@ -134,10 +142,15 @@ export default function Hero() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-[40%] h-full bg-amber-400/90 hover:bg-amber-300 active:scale-[0.99] text-black font-bold text-[10px] lg:text-xs uppercase tracking-wider rounded transition-all cursor-pointer shadow-md"
+                  className="w-[40%] h-full bg-amber-400/90 hover:bg-amber-300 active:scale-[0.99] text-black font-bold text-[10px] lg:text-xs uppercase tracking-wider rounded transition-all cursor-pointer shadow-md disabled:cursor-wait disabled:opacity-60"
                 >
                   {loading ? "Joining..." : "Join The Interest List"}
                 </button>
+                {status === "error" ? (
+                  <p role="status" className="absolute -bottom-5 left-0 text-[10px] text-red-300">
+                    {errorMessage}
+                  </p>
+                ) : null}
               </form>
             )}
           </div>
@@ -167,7 +180,6 @@ export default function Hero() {
               className="w-full h-full rounded border border-transparent hover:border-amber-500/30 hover:bg-amber-400/5 transition-colors cursor-pointer"
             />
           </div>
-
         </div>
       </div>
 
@@ -195,7 +207,7 @@ export default function Hero() {
         {/* 3 Mobile Format Buttons */}
         <div className="grid grid-cols-3 gap-2 mb-6">
           <a
-            href="#preorder-paperback"
+            href="/american-injustice#preorder-paperback"
             className="flex flex-col items-center justify-center p-2.5 rounded border border-amber-500/40 bg-[#16120c] hover:border-amber-400 active:bg-amber-400/20 text-center"
           >
             <BookOpen className="w-4 h-4 text-amber-400 mb-1" />
@@ -203,7 +215,7 @@ export default function Hero() {
             <span className="text-[11px] uppercase font-bold text-[#f5eedb]">Paperback</span>
           </a>
           <a
-            href="#preorder-hardcover"
+            href="/american-injustice#preorder-hardback"
             className="flex flex-col items-center justify-center p-2.5 rounded border border-amber-500/40 bg-[#16120c] hover:border-amber-400 active:bg-amber-400/20 text-center"
           >
             <BookText className="w-4 h-4 text-amber-400 mb-1" />
@@ -211,7 +223,7 @@ export default function Hero() {
             <span className="text-[11px] uppercase font-bold text-[#f5eedb]">Hardcover</span>
           </a>
           <a
-            href="#preorder-ebook"
+            href="/american-injustice#preorder-ebook"
             className="flex flex-col items-center justify-center p-2.5 rounded border border-amber-500/40 bg-[#16120c] hover:border-amber-400 active:bg-amber-400/20 text-center"
           >
             <Tablet className="w-4 h-4 text-amber-400 mb-1" />
@@ -247,10 +259,15 @@ export default function Hero() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 bg-amber-400 text-black font-bold text-xs uppercase tracking-wider rounded"
+                className="w-full py-2.5 bg-amber-400 text-black font-bold text-xs uppercase tracking-wider rounded disabled:cursor-wait disabled:opacity-60"
               >
                 {loading ? "Joining..." : "Join The Interest List"}
               </button>
+              {status === "error" ? (
+                <p role="status" className="text-[11px] leading-4 text-red-300">
+                  {errorMessage}
+                </p>
+              ) : null}
             </form>
           )}
         </div>
@@ -290,7 +307,6 @@ export default function Hero() {
           </div>
         </div>
       </div>
-
     </section>
   );
 }
