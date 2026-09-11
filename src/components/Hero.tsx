@@ -1,166 +1,296 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Sparkles } from "lucide-react";
+import React, { useState } from "react";
 import Image from "next/image";
-
-const titles = [
-  "AI Builder.",
-  "Journalist.",
-  "Litigator.",
-  "Artist.",
-  "Author."
-];
+import Link from "next/link";
+import { BookOpen, BookText, Tablet, Shield, Scale, Star, Feather, CheckCircle2 } from "lucide-react";
 
 export default function Hero() {
-  const [index, setIndex] = useState(0);
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % titles.length);
-    }, 2800);
-    return () => clearInterval(interval);
-  }, []);
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !email.includes("@")) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "hero_header_interest" }),
+      });
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        setSubmitted(true);
+      }
+    } catch {
+      setSubmitted(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <section
-      id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a0a0a] pt-16"
-    >
-      {/* Background Tech Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-40" />
-
-      {/* Radial Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-gold/10 rounded-full blur-[100px] pointer-events-none" />
-
-      {/* Wanted Poster — decorative accent, right side on large screens */}
-      <motion.div
-        initial={{ opacity: 0, x: 40, rotate: 6 }}
-        animate={{ opacity: 1, x: 0, rotate: 3 }}
-        transition={{ duration: 1, delay: 0.4 }}
-        className="hidden lg:block absolute right-8 xl:right-20 top-1/2 -translate-y-1/2 w-[260px] xl:w-[320px] pointer-events-none z-0"
-      >
-        <div className="relative rounded-sm overflow-hidden border border-white/10 shadow-2xl shadow-black/60">
+    <section id="hero" className="relative w-full bg-[#0a0a0a] text-[#f5eedb] overflow-hidden">
+      
+      {/* ========================================================================= */}
+      {/* 1. DESKTOP & TABLET: Pixel-Aligned Interactive Overlay over your graphic */}
+      {/* ========================================================================= */}
+      <div className="hidden md:block relative w-full max-w-[1920px] mx-auto select-none">
+        {/* Base Header Graphic */}
+        <div className="relative w-full aspect-[16/9]">
           <Image
-            src="/images/wanted-poster.jpg"
-            alt="Wanted by the State and Federal Government for Possession of a Camera with Intent to Expose — Don Matthews, We The People News"
-            width={1024}
-            height={1024}
-            className="w-full h-auto opacity-90"
+            src="/images/american-injustice-desktop.jpg"
+            alt="American Injustice - Don Matthews"
+            fill
             priority
+            sizes="100vw"
+            className="object-cover object-top"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
-        </div>
-      </motion.div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-        {/* Subtle Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/30 bg-gold/5 text-gold text-xs sm:text-sm font-medium tracking-wide mb-8"
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>donmatthews.live — Portfolio & Access Hub</span>
-        </motion.div>
-
-        {/* Main Headline — Don Matthews only */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight text-white mb-6"
-        >
-          Don Matthews
-        </motion.h1>
-
-        {/* Cycling Subtitle */}
-        <div className="h-16 sm:h-20 flex items-center justify-center mb-8">
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={index}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.4 }}
-              className="text-2xl sm:text-4xl md:text-5xl font-semibold text-gold tracking-wide"
+          {/* --- TOP NAVIGATION HOTSPOTS --- */}
+          <div className="absolute top-[2.4%] right-[2.2%] h-[5.2%] flex items-center gap-2 lg:gap-4 z-20 text-[11px] lg:text-xs tracking-wider uppercase font-serif">
+            <Link
+              href="/about"
+              className="text-transparent hover:text-amber-200/90 hover:bg-black/30 px-2 py-1 rounded transition-colors"
+              title="About Don"
             >
-              {titles[index]}
-            </motion.p>
-          </AnimatePresence>
+              About Don
+            </Link>
+            <Link
+              href="/american-injustice"
+              className="text-transparent hover:text-amber-200/90 hover:bg-black/30 px-2 py-1 rounded transition-colors"
+              title="The Book"
+            >
+              The Book
+            </Link>
+            <Link
+              href="/press"
+              className="text-transparent hover:text-amber-200/90 hover:bg-black/30 px-2 py-1 rounded transition-colors"
+              title="Media"
+            >
+              Media
+            </Link>
+            <Link
+              href="/updates"
+              className="text-transparent hover:text-amber-200/90 hover:bg-black/30 px-2 py-1 rounded transition-colors"
+              title="Updates"
+            >
+              Updates
+            </Link>
+            <Link
+              href="/contact"
+              className="text-transparent hover:text-amber-200/90 hover:bg-black/30 px-2 py-1 rounded transition-colors"
+              title="Contact"
+            >
+              Contact
+            </Link>
+            <a
+              href="#preorder-section"
+              className="w-[115px] lg:w-[130px] h-[32px] rounded border border-transparent hover:border-amber-400 hover:bg-amber-400/10 transition-all cursor-pointer"
+              title="Pre-Order Now"
+            />
+          </div>
+
+          {/* --- 3 PRE-ORDER BUTTONS --- */}
+          <div className="absolute top-[58.5%] left-[3.9%] w-[40.5%] h-[9.5%] z-20 grid grid-cols-3 gap-[2.5%]">
+            <a
+              href="#preorder-paperback"
+              title="Pre-Order Paperback"
+              className="w-full h-full rounded border border-transparent hover:border-amber-400/80 hover:bg-amber-400/10 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all cursor-pointer"
+            />
+            <a
+              href="#preorder-hardcover"
+              title="Pre-Order Hardcover"
+              className="w-full h-full rounded border border-transparent hover:border-amber-400/80 hover:bg-amber-400/10 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all cursor-pointer"
+            />
+            <a
+              href="#preorder-ebook"
+              title="Pre-Order eBook"
+              className="w-full h-full rounded border border-transparent hover:border-amber-400/80 hover:bg-amber-400/10 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all cursor-pointer"
+            />
+          </div>
+
+          {/* --- EMAIL SIGNUP FORM OVERLAY --- */}
+          <div className="absolute top-[74.0%] left-[10.2%] w-[33.5%] h-[6.0%] z-20 flex items-center">
+            {submitted ? (
+              <div className="w-full h-full flex items-center justify-center gap-2 bg-[#120f0a] border border-emerald-500/60 rounded text-emerald-400 text-xs font-serif">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>You&apos;re on the interest list. Check your inbox for updates.</span>
+              </div>
+            ) : (
+              <form onSubmit={handleSubscribe} className="w-full h-full flex items-center gap-[2%]">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  className="w-[58%] h-full bg-[#100d08]/80 text-[#f5eedb] text-xs lg:text-sm px-3 rounded border border-amber-500/30 focus:border-amber-400 focus:bg-[#100d08] focus:outline-none transition-colors placeholder-[#837865]"
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-[40%] h-full bg-amber-400/90 hover:bg-amber-300 active:scale-[0.99] text-black font-bold text-[10px] lg:text-xs uppercase tracking-wider rounded transition-all cursor-pointer shadow-md"
+                >
+                  {loading ? "Joining..." : "Join The Interest List"}
+                </button>
+              </form>
+            )}
+          </div>
+
+          {/* --- BOTTOM 4 FEATURE PILLARS HOTSPOTS --- */}
+          <div className="absolute top-[86.5%] left-[2.8%] w-[54.0%] h-[11.5%] z-20 grid grid-cols-4 gap-2">
+            <Link
+              href="/about"
+              title="A True Story - A Marine's Promise"
+              className="w-full h-full rounded border border-transparent hover:border-amber-500/30 hover:bg-amber-400/5 transition-colors cursor-pointer"
+            />
+            <Link
+              href="/american-injustice"
+              title="Constitutional Warfare - Restoring Truth"
+              className="w-full h-full rounded border border-transparent hover:border-amber-500/30 hover:bg-amber-400/5 transition-colors cursor-pointer"
+            />
+            <Link
+              href="/record"
+              title="Three Federal Cases - MS, UT, TX"
+              className="w-full h-full rounded border border-transparent hover:border-amber-500/30 hover:bg-amber-400/5 transition-colors cursor-pointer"
+            />
+            <a
+              href="https://help.donmatthews.live"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="A Call to Stand - Support & Action"
+              className="w-full h-full rounded border border-transparent hover:border-amber-500/30 hover:bg-amber-400/5 transition-colors cursor-pointer"
+            />
+          </div>
+
         </div>
-
-        {/* Short Bio */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="max-w-2xl mx-auto text-gray-400 text-base sm:text-xl leading-relaxed mb-6 font-light"
-        >
-          Entrepreneur, software developer, AI architect, and songwriter.
-          Building the future — one line of code, one song, and one lawsuit at a time.
-        </motion.p>
-
-        {/* Social proof line */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.25 }}
-          className="max-w-lg mx-auto text-gray-500 text-sm leading-relaxed mb-12"
-        >
-          100+ apps built &bull; 8 live platforms &bull; Federal civil rights litigant &bull; 17-track documentary album
-        </motion.p>
-
-        {/* Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-        >
-          <a
-            href="#projects"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-gold hover:bg-gold-light text-black font-semibold rounded-lg shadow-lg shadow-gold/10 transition-colors duration-300"
-          >
-            Explore My Work
-            <ArrowRight className="w-4 h-4" />
-          </a>
-          <a
-            href="#bundle"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/10 hover:border-white/30 bg-white/5 hover:bg-white/10 text-white font-medium rounded-lg transition-all duration-300"
-          >
-            All-Access Bundle
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-gold/20 text-gold-light">
-              Coming Soon
-            </span>
-          </a>
-        </motion.div>
-
-        {/* Story CTA — the most important link on this page. Off-site to
-            help.donmatthews.live, distinct visual weight from the two
-            in-page actions above so it doesn't get lost. */}
-        <motion.div
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-6 flex justify-center"
-        >
-          <a
-            href="https://help.donmatthews.live"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-gold-light hover:text-gold text-sm sm:text-base font-semibold underline underline-offset-4 decoration-gold/40 hover:decoration-gold transition-colors"
-          >
-            Read my full story &amp; how you can help
-            <ArrowRight className="w-4 h-4" />
-          </a>
-        </motion.div>
       </div>
 
-      {/* Decorative Bottom Fade */}
-      <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
+      {/* ========================================================================= */}
+      {/* 2. MOBILE RESPONSIVE FALLBACK: Full legibility & large touch targets     */}
+      {/* ========================================================================= */}
+      <div className="block md:hidden px-4 py-8 bg-[#0d0b08] border-b border-[#31291d]">
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-2 text-amber-400 text-xs tracking-widest uppercase font-serif mb-2">
+            <span>★</span>
+            <span>Pre-Order</span>
+            <span>★</span>
+          </div>
+          <h1 className="text-3xl font-extrabold font-serif uppercase tracking-tight text-[#f4ebdc]">
+            American Injustice
+          </h1>
+          <p className="text-base text-amber-200/90 font-serif italic mt-1">
+            A Memoir of Constitutional Warfare
+          </p>
+          <p className="text-xs text-[#b8ad96] mt-3 leading-relaxed">
+            Reserve your copy and join the updates list for launch news, excerpts, and release announcements.
+          </p>
+        </div>
+
+        {/* 3 Mobile Format Buttons */}
+        <div className="grid grid-cols-3 gap-2 mb-6">
+          <a
+            href="#preorder-paperback"
+            className="flex flex-col items-center justify-center p-2.5 rounded border border-amber-500/40 bg-[#16120c] hover:border-amber-400 active:bg-amber-400/20 text-center"
+          >
+            <BookOpen className="w-4 h-4 text-amber-400 mb-1" />
+            <span className="text-[9px] uppercase tracking-wider text-amber-200/70">Pre-Order</span>
+            <span className="text-[11px] uppercase font-bold text-[#f5eedb]">Paperback</span>
+          </a>
+          <a
+            href="#preorder-hardcover"
+            className="flex flex-col items-center justify-center p-2.5 rounded border border-amber-500/40 bg-[#16120c] hover:border-amber-400 active:bg-amber-400/20 text-center"
+          >
+            <BookText className="w-4 h-4 text-amber-400 mb-1" />
+            <span className="text-[9px] uppercase tracking-wider text-amber-200/70">Pre-Order</span>
+            <span className="text-[11px] uppercase font-bold text-[#f5eedb]">Hardcover</span>
+          </a>
+          <a
+            href="#preorder-ebook"
+            className="flex flex-col items-center justify-center p-2.5 rounded border border-amber-500/40 bg-[#16120c] hover:border-amber-400 active:bg-amber-400/20 text-center"
+          >
+            <Tablet className="w-4 h-4 text-amber-400 mb-1" />
+            <span className="text-[9px] uppercase tracking-wider text-amber-200/70">Pre-Order</span>
+            <span className="text-[11px] uppercase font-bold text-[#f5eedb]">eBook</span>
+          </a>
+        </div>
+
+        {/* Mobile Lead Form */}
+        <div className="p-4 rounded border border-amber-500/30 bg-[#14100b] mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Star className="w-4 h-4 text-amber-400" />
+            <span className="text-xs font-serif font-medium text-amber-200">
+              Get updates and early access
+            </span>
+          </div>
+
+          {submitted ? (
+            <div className="flex items-center gap-2 p-2.5 text-emerald-400 text-xs bg-emerald-950/40 border border-emerald-500/30 rounded">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>Added to interest list!</span>
+            </div>
+          ) : (
+            <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address"
+                className="w-full bg-[#1c1811] border border-amber-500/30 rounded px-3 py-2 text-xs text-[#f5eedb] focus:outline-none focus:border-amber-400 placeholder-[#7d7463]"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-2.5 bg-amber-400 text-black font-bold text-xs uppercase tracking-wider rounded"
+              >
+                {loading ? "Joining..." : "Join The Interest List"}
+              </button>
+            </form>
+          )}
+        </div>
+
+        {/* Mobile Book Graphic Preview */}
+        <div className="relative w-full rounded overflow-hidden border border-amber-500/20 shadow-xl mb-6">
+          <Image
+            src="/images/american-injustice-desktop.jpg"
+            alt="American Injustice - Don Matthews"
+            width={1200}
+            height={675}
+            className="w-full h-auto object-cover"
+          />
+        </div>
+
+        {/* Mobile 4 Pillars */}
+        <div className="grid grid-cols-2 gap-2 text-left">
+          <div className="p-2.5 rounded bg-[#14100b] border border-[#2b2419]">
+            <Shield className="w-4 h-4 text-amber-400 mb-1" />
+            <h4 className="text-[11px] font-bold uppercase text-amber-300 font-serif">A True Story</h4>
+            <p className="text-[10px] text-[#b8ad96]">A Marine&apos;s promise.</p>
+          </div>
+          <div className="p-2.5 rounded bg-[#14100b] border border-[#2b2419]">
+            <Scale className="w-4 h-4 text-amber-400 mb-1" />
+            <h4 className="text-[11px] font-bold uppercase text-amber-300 font-serif">Warfare</h4>
+            <p className="text-[10px] text-[#b8ad96]">Restoring truth.</p>
+          </div>
+          <div className="p-2.5 rounded bg-[#14100b] border border-[#2b2419]">
+            <Star className="w-4 h-4 text-amber-400 mb-1" />
+            <h4 className="text-[11px] font-bold uppercase text-amber-300 font-serif">3 Cases</h4>
+            <p className="text-[10px] text-[#b8ad96]">MS, UT, TX documented.</p>
+          </div>
+          <div className="p-2.5 rounded bg-[#14100b] border border-[#2b2419]">
+            <Feather className="w-4 h-4 text-amber-400 mb-1" />
+            <h4 className="text-[11px] font-bold uppercase text-amber-300 font-serif">A Call to Stand</h4>
+            <p className="text-[10px] text-[#b8ad96]">Freedom isn&apos;t free.</p>
+          </div>
+        </div>
+      </div>
+
     </section>
   );
 }
