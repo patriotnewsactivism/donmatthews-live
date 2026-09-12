@@ -3,7 +3,9 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpen, BookText, Tablet, Shield, Scale, Star, Feather, CheckCircle2 } from "lucide-react";
+import { BookOpen, BookText, Tablet, CheckCircle2 } from "lucide-react";
+
+type SubscribeStatus = "idle" | "loading" | "success" | "error";
 
 type SubscribeStatus = "idle" | "loading" | "success" | "error";
 
