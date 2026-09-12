@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import DocumentArchiveBrowser from "@/components/DocumentArchiveBrowser";
 import { FlagshipPage, OutlineButton, PageHero } from "@/components/FlagshipShell";
-import { getPublicDocuments, publicPdfRepositoryUrl, type PublicDocument } from "@/lib/documentArchive";
+import { getPublicDocuments, type PublicDocument } from "@/lib/documentArchive";
 
 export const metadata: Metadata = {
   title: "The Record | Don Matthews",
@@ -65,17 +65,17 @@ export default async function RecordPage() {
           <div className="grid gap-7 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
             <div>
               <p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">PRIMARY DOCUMENT ARCHIVE</p>
-              <h2 className="display-serif mt-3 text-4xl font-semibold tracking-[-0.035em] sm:text-6xl">The PDFs. All of them.</h2>
+              <h2 className="display-serif mt-3 text-4xl font-semibold tracking-[-0.035em] sm:text-6xl">Court-entered documents.</h2>
             </div>
             <p className="max-w-2xl text-base leading-8 text-white/55 sm:text-lg lg:justify-self-end">
-              This browser is generated directly from the public <strong className="text-white/75">patriotnewsactivism/PDFs</strong> repository. New PDFs added there can appear here automatically after the site refreshes its archive index.
+              This public browser is intentionally limited to PDFs whose pages visibly carry a court-generated filing or entry mark with both a date and a time. Drafts, correspondence, exhibits, records, and unstamped copies remain off the site unless expressly approved.
             </p>
           </div>
 
           <div className="mt-8 grid grid-cols-3 overflow-hidden rounded-2xl border border-[#c9a84c]/15 bg-black/30">
-            <div className="border-r border-[#c9a84c]/10 p-4 text-center sm:p-6"><p className="text-2xl font-black text-[#d7b85d] sm:text-3xl">{stats.count.toLocaleString()}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[.14em] text-white/30 sm:text-[10px]">Public PDFs</p></div>
+            <div className="border-r border-[#c9a84c]/10 p-4 text-center sm:p-6"><p className="text-2xl font-black text-[#d7b85d] sm:text-3xl">{stats.count.toLocaleString()}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[.14em] text-white/30 sm:text-[10px]">Verified filings</p></div>
             <div className="border-r border-[#c9a84c]/10 p-4 text-center sm:p-6"><p className="text-2xl font-black text-[#d7b85d] sm:text-3xl">{stats.range}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[.14em] text-white/30 sm:text-[10px]">Date range</p></div>
-            <div className="p-4 text-center sm:p-6"><p className="text-2xl font-black text-[#d7b85d] sm:text-3xl">{stats.size}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[.14em] text-white/30 sm:text-[10px]">Indexed source files</p></div>
+            <div className="p-4 text-center sm:p-6"><p className="text-2xl font-black text-[#d7b85d] sm:text-3xl">{stats.size}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[.14em] text-white/30 sm:text-[10px]">Verified source files</p></div>
           </div>
 
           <div className="mt-8">
@@ -88,10 +88,7 @@ export default async function RecordPage() {
             )}
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-4 text-sm font-bold">
-            <a href={publicPdfRepositoryUrl} target="_blank" rel="noopener noreferrer" className="text-[#c9a84c]">Open the complete PDFs repository ↗</a>
-            <a href="https://www.wtpnews.org/case-documents/" target="_blank" rel="noopener noreferrer" className="text-white/45 transition hover:text-white">WTP News case documents ↗</a>
-          </div>
+          <p className="mt-6 max-w-3xl text-sm leading-6 text-white/40">Publication is fail-closed: a repository filename or document title never establishes filing status. Each item above was admitted to this page only after its visible court mark was reviewed.</p>
         </div>
       </section>
 
