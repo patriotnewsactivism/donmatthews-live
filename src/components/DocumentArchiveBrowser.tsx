@@ -29,7 +29,7 @@ export default function DocumentArchiveBrowser({ documents }: { documents: Publi
     const normalized = query.trim().toLowerCase();
     return documents.filter((document) => {
       const matchesYear = year === "all" || document.year === Number(year);
-      const matchesQuery = !normalized || [document.title, document.fileName, document.collection, document.date ?? ""]
+      const matchesQuery = !normalized || [document.title, document.fileName, document.collection, document.date, document.filedAt, document.court, document.docket]
         .join(" ")
         .toLowerCase()
         .includes(normalized);
@@ -93,9 +93,8 @@ export default function DocumentArchiveBrowser({ documents }: { documents: Publi
                   </div>
                   <div>
                     <h3 className="text-base font-bold leading-6 text-[#eee5d3] transition group-hover:text-[#e5c96f] sm:text-lg">{document.title}</h3>
-                    {document.collection !== "Chronological Archive" ? (
-                      <p className="mt-1 text-xs text-white/30">{document.collection}</p>
-                    ) : null}
+                    <p className="mt-1 text-xs text-white/40">{document.court} · {document.docket}</p>
+                    <p className="mt-1 text-xs font-bold text-[#c9a84c]/75">Court mark: {document.filedAt}</p>
                   </div>
                   <span className="text-sm font-black text-[#c9a84c] sm:pl-4">Open →</span>
                 </a>
