@@ -1,4 +1,4 @@
-const WORDPRESS_SITE = "donmatthewslive.wordpress.com";
+const WORDPRESS_SITE = "242647481"; // WTPNews.org WordPress.com / Jetpack site ID
 const WORDPRESS_API = `https://public-api.wordpress.com/rest/v1.1/sites/${WORDPRESS_SITE}`;
 
 export type WordPressTerm = {
