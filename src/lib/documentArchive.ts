@@ -1,79 +1,95 @@
 const PDF_REPOSITORY = "patriotnewsactivism/PDFs";
 const PDF_BRANCH = "main";
-const TREE_URL = `https://api.github.com/repos/${PDF_REPOSITORY}/git/trees/${PDF_BRANCH}?recursive=1`;
-
-type GitTreeEntry = {
-  path: string;
-  type: "blob" | "tree";
-  size?: number;
-};
-
-type GitTreeResponse = {
-  tree?: GitTreeEntry[];
-  truncated?: boolean;
-};
 
 export type PublicDocument = {
   path: string;
   fileName: string;
   title: string;
-  date: string | null;
-  year: number | null;
+  date: string;
+  year: number;
+  filedAt: string;
+  court: string;
+  docket: string;
   collection: string;
-  size: number | null;
+  size: number;
   href: string;
 };
+
+/**
+ * Fail-closed publication manifest.
+ *
+ * A PDF belongs here only after visual review confirms that the PDF itself
+ * displays a court-generated filed/entered mark containing a date and time.
+ * A filename date, signature date, fax header, or "filing ready" label is not
+ * proof that a document was entered by a court.
+ */
+const VERIFIED_COURT_DOCUMENTS = [
+  {
+    path: "2021-09-20 - State Response To Peremptory Challenge.pdf",
+    title: "State Response to Motion for Peremptory Reversal",
+    date: "2021-09-20",
+    filedAt: "Sep 20, 2021 at 16:52:40",
+    court: "Mississippi Court of Appeals",
+    docket: "2020-CP-01259-COA",
+    size: 144236,
+  },
+  {
+    path: "2021-12-07 - AGO Motion For Time.pdf",
+    title: "Attorney General Motion for Additional Time",
+    date: "2021-12-07",
+    filedAt: "Dec 7, 2021 at 10:05:31",
+    court: "Mississippi Court of Appeals",
+    docket: "2020-CP-01259-COA",
+    size: 72837,
+  },
+  {
+    path: "2021-12-15 - Greenlee Grants COA Order.pdf",
+    title: "Order Granting Additional Time",
+    date: "2021-12-15",
+    filedAt: "Dec 15, 2021 at 10:49:07",
+    court: "Mississippi Court of Appeals",
+    docket: "2020-CP-01259-COA",
+    size: 40334,
+  },
+  {
+    path: "2022-01-05 - Appellee Brief Filed In COA.pdf",
+    title: "Brief of Appellee",
+    date: "2022-01-05",
+    filedAt: "Jan 5, 2022 at 13:39:13",
+    court: "Mississippi Court of Appeals",
+    docket: "2020-CP-01259-COA",
+    size: 207773,
+  },
+  {
+    path: "2024-12-23 - Order On Motion For Counsel.pdf",
+    title: "Order on Motion for Appointment of Counsel",
+    date: "2024-12-23",
+    filedAt: "Dec 23, 2024 at 14:30:31",
+    court: "Supreme Court of Mississippi",
+    docket: "2024-TS-00839",
+    size: 56422,
+  },
+  {
+    path: "2023-08-11 - Motion For A Franks Hearing Ocr1.pdf",
+    title: "Motion for a Franks Hearing",
+    date: "2025-02-25",
+    filedAt: "Feb 25, 2025 at 12:54 PM",
+    court: "County Court No. 3, Galveston County, Texas",
+    docket: "MD-0417962",
+    size: 4105963,
+  },
+] as const;
 
 function encodeRepositoryPath(path: string) {
   return path.split("/").map((part) => encodeURIComponent(part)).join("/");
 }
 
-function parseDocument(entry: GitTreeEntry): PublicDocument {
-  const parts = entry.path.split("/");
-  const fileName = parts.at(-1) ?? entry.path;
-  const dateMatch = fileName.match(/^(\d{4})-(\d{2})-(\d{2})\s*-\s*(.+)\.pdf$/i);
-  const fallbackTitle = fileName.replace(/\.pdf$/i, "").replace(/^\d{4}-\d{2}-\d{2}\s*-\s*/, "").trim();
-  const date = dateMatch ? `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}` : null;
-  const title = dateMatch?.[4]?.trim() || fallbackTitle;
-
-  return {
-    path: entry.path,
-    fileName,
-    title,
-    date,
-    year: date ? Number(date.slice(0, 4)) : null,
-    collection: parts.length > 1 ? parts[0] : "Chronological Archive",
-    size: typeof entry.size === "number" ? entry.size : null,
-    href: `https://github.com/${PDF_REPOSITORY}/blob/${PDF_BRANCH}/${encodeRepositoryPath(entry.path)}`,
-  };
-}
-
 export async function getPublicDocuments(): Promise<PublicDocument[]> {
-  const response = await fetch(TREE_URL, {
-    headers: {
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-    },
-    next: { revalidate: 900 },
-  });
-
-  if (!response.ok) {
-    throw new Error(`PDF archive request failed (${response.status})`);
-  }
-
-  const payload = (await response.json()) as GitTreeResponse;
-  const entries = (payload.tree ?? []).filter(
-    (entry) => entry.type === "blob" && entry.path.toLowerCase().endsWith(".pdf"),
-  );
-
-  return entries
-    .map(parseDocument)
-    .sort((a, b) => {
-      if (a.date && b.date) return b.date.localeCompare(a.date) || a.title.localeCompare(b.title);
-      if (a.date) return -1;
-      if (b.date) return 1;
-      return a.fileName.localeCompare(b.fileName);
-    });
+  return VERIFIED_COURT_DOCUMENTS.map((document) => ({
+    ...document,
+    fileName: document.path,
+    year: Number(document.date.slice(0, 4)),
+    collection: "Court-Stamped Record",
+    href: `https://github.com/${PDF_REPOSITORY}/blob/${PDF_BRANCH}/${encodeRepositoryPath(document.path)}`,
+  })).sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
 }
-
-export const publicPdfRepositoryUrl = `https://github.com/${PDF_REPOSITORY}`;
