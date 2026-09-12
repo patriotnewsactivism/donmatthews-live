@@ -23,12 +23,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title: `${getPostTitle(post)} | Don Matthews`,
     description,
-    alternates: { canonical: `/updates/${post.slug}` },
+    alternates: { canonical: post.URL },
     robots: { index: false, follow: true },
     openGraph: {
       title: getPostTitle(post),
       description,
       type: "article",
+      url: post.URL,
       publishedTime: post.date,
       modifiedTime: post.modified,
       images: image ? [{ url: image }] : undefined,
@@ -57,7 +58,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         <header className="relative isolate overflow-hidden border-b border-[#c9a84c]/15 bg-[#090909]">
           <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_82%_18%,rgba(201,168,76,0.15),transparent_34%),radial-gradient(circle_at_8%_95%,rgba(201,168,76,0.05),transparent_28%)]" />
           <div className="mx-auto max-w-5xl px-5 py-12 sm:py-20">
-            <Link href="/updates" className="text-xs font-black uppercase tracking-[0.18em] text-[#c9a84c]">← Articles & Updates</Link>
+            <Link href="/updates" className="text-xs font-black uppercase tracking-[0.18em] text-[#c9a84c]">← WTP News on DonMatthews.live</Link>
             <div className="mt-6 flex flex-wrap gap-2">
               {categories.map((category) => (
                 <span key={category} className="rounded-full border border-[#c9a84c]/20 bg-[#c9a84c]/[0.05] px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#c9a84c]">
@@ -72,7 +73,9 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             <div className="mt-6 flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.12em] text-white/35">
               <time dateTime={post.date}>{formatDate(post.date)}</time>
               <span>·</span>
-              <span>Republished from the WordPress editorial library</span>
+              <span>Originally published by We The People News</span>
+              <span>·</span>
+              <a href={post.URL} target="_blank" rel="noopener noreferrer" className="text-[#c9a84c] transition hover:text-[#e1c979]">Open original ↗</a>
             </div>
           </div>
         </header>
@@ -87,10 +90,10 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           <div className="mx-auto max-w-7xl px-5 py-14 sm:py-20">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
               <div>
-                <p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">MORE TO READ</p>
-                <h2 className="mt-3 text-3xl font-black sm:text-5xl">Keep going without the endless scroll.</h2>
+                <p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">MORE FROM WTP NEWS</p>
+                <h2 className="mt-3 text-3xl font-black sm:text-5xl">Keep following the reporting.</h2>
               </div>
-              <Link href="/updates" className="font-bold text-[#c9a84c]">Browse all articles →</Link>
+              <Link href="/updates" className="font-bold text-[#c9a84c]">Browse all stories →</Link>
             </div>
             <div className="mt-8 grid gap-5 md:grid-cols-3">
               {related.map((candidate) => <ArticleCard key={candidate.ID} post={candidate} compact />)}
