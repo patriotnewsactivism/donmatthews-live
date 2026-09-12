@@ -9,7 +9,6 @@ import { SiteFooter } from "@/components/FlagshipShell";
 
 const projects = [
   ["BuildMyBot.App", "AI agency in a box. Deploy an AI workforce in minutes.", "https://buildmybot.app", "LIVE"],
-  ["CaseBuddy", "AI-powered legal research and case-management tools.", "https://casebuddy.live", "LIVE"],
   ["We The People News", "Independent investigative journalism and government accountability.", "https://wtpnews.org", "LIVE"],
   ["Civil Rights Hub", "Resources and tools for civil-rights advocacy.", "https://civilrightshub.org", "LIVE"],
   ["ChatScream", "AI-powered real-time communication and streaming platform.", "https://chatscream.live", "LIVE"],

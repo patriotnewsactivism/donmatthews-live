@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     q: "What software products does Don Matthews build?",
-    a: "Current live products include BuildMyBot.App (AI workforce deployment), CaseBuddy (legal research), ChatScream (AI chat platform), TubeScribe (YouTube transcription), and We The People News. CodeForge (AI dev tools) and APEX (autonomous AI framework) are in development.",
+    a: "Current live products include BuildMyBot.App (AI workforce deployment), ChatScream (AI chat platform), TubeScribe (YouTube transcription), and We The People News. CodeForge (AI dev tools) and APEX (autonomous AI framework) are in development.",
   },
   {
     q: "When is the American Injustice book coming out?",

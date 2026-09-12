@@ -27,12 +27,6 @@ const systems = [
     href: "/projects",
   },
   {
-    name: "CaseBuddy",
-    type: "LEGAL TECHNOLOGY",
-    text: "AI-assisted legal research and case-management tooling designed around working legal records rather than generic chat alone.",
-    href: "https://casebuddy.live",
-  },
-  {
     name: "ChatScream",
     type: "COMMUNICATION & STREAMING",
     text: "A real-time communication and streaming platform with AI-assisted workflows around live media and audience interaction.",

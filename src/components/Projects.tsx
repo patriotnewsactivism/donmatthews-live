@@ -19,12 +19,6 @@ const projects: Project[] = [
     link: "https://buildmybot.app",
   },
   {
-    name: "CaseBuddy",
-    description: "AI-powered legal research and case management.",
-    status: "LIVE",
-    link: "https://casebuddy.live",
-  },
-  {
     name: "We The People News",
     description: "Independent investigative journalism. Government accountability, unfiltered.",
     status: "LIVE",
