@@ -5,8 +5,8 @@ import { FlagshipPage, PageHero } from "@/components/FlagshipShell";
 import { getAllPosts, type WordPressPost } from "@/lib/wordpress";
 
 export const metadata: Metadata = {
-  title: "Articles & Updates | Don Matthews",
-  description: "Investigative reporting, legal updates, technology, music, and public-record work from Don Matthews.",
+  title: "WTP News Reporting | Don Matthews",
+  description: "Investigative reporting, civil-rights coverage, court filings, public records, and major stories from We The People News on DonMatthews.live.",
   alternates: { canonical: "/updates" },
 };
 
@@ -35,9 +35,10 @@ export default async function UpdatesPage({
   return (
     <FlagshipPage>
       <PageHero
-        eyebrow="ARTICLES & UPDATES"
-        title="Reporting without the endless scroll."
-        intro="Six stories at a time. Each card gives you the scene, the headline, and enough context to decide whether to open the full article."
+        eyebrow="WE THE PEOPLE NEWS"
+        title="The reporting behind the record."
+        intro="Investigations, civil-rights coverage, court filings, public records, breaking developments, and commentary pulled from the WTP News newsroom."
+        actions={<a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="inline-flex rounded-lg border border-[#c9a84c]/40 px-5 py-3 font-black text-[#d8bd6a] transition hover:bg-[#c9a84c]/10">Open WTPNews.org ↗</a>}
       />
 
       <section className="mx-auto max-w-7xl px-5 py-12 sm:py-16">
@@ -47,7 +48,7 @@ export default async function UpdatesPage({
           </div>
         ) : (
           <div className="rounded-2xl border border-white/10 bg-[#101010] p-8 text-white/55">
-            The article feed is temporarily unavailable. Please try again shortly.
+            The WTP News feed is temporarily unavailable. You can still read the newsroom directly at WTPNews.org.
           </div>
         )}
 
