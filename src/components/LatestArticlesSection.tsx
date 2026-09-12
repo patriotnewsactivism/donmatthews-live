@@ -20,11 +20,14 @@ export async function LatestArticlesSection() {
       <div className="relative mx-auto max-w-7xl px-5 py-14 sm:py-20">
         <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
-            <p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">LATEST ARTICLES</p>
-            <h2 className="display-serif mt-3 max-w-3xl text-4xl font-semibold leading-[0.98] tracking-[-0.025em] sm:text-6xl">Read enough to get hooked. Then go deeper.</h2>
-            <p className="mt-4 max-w-2xl leading-7 text-white/50">Three recent stories from the WordPress editorial library, presented in the same Don Matthews flagship design.</p>
+            <p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">FROM WE THE PEOPLE NEWS</p>
+            <h2 className="display-serif mt-3 max-w-3xl text-4xl font-semibold leading-[0.98] tracking-[-0.025em] sm:text-6xl">The reporting behind the record.</h2>
+            <p className="mt-4 max-w-2xl leading-7 text-white/50">Recent reporting pulled directly from the WTP News newsroom: investigations, civil-rights coverage, court filings, public records, and major case developments.</p>
           </div>
-          <Link href="/updates" className="shrink-0 font-bold text-[#c9a84c]">View all articles →</Link>
+          <div className="flex shrink-0 flex-wrap gap-4 text-sm font-bold">
+            <Link href="/updates" className="text-[#c9a84c]">Read on DonMatthews.live →</Link>
+            <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="text-white/45 transition hover:text-white">Open WTP News ↗</a>
+          </div>
         </div>
 
         <div className="mt-8 grid gap-5 md:grid-cols-3 sm:mt-10">
