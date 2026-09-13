@@ -10,17 +10,18 @@ export const metadata: Metadata = {
 };
 
 const caseCollections = [
-  ["Reardon v. Osteen", "Filings and documentary material connected to the Galveston litigation.", "https://github.com/patriotnewsactivism/American-Injustice/tree/main/evidence-organized/02-Reardon-v-Osteen"],
-  ["Galveston Criminal Record", "Organized material associated with criminal case 23-CR-2981.", "https://github.com/patriotnewsactivism/American-Injustice/tree/main/evidence-organized/03-Reardon-Criminal-23-CR-2981"],
-  ["Crowder v. Reardon", "Chancery and family-court source material maintained as its own record set.", "https://github.com/patriotnewsactivism/American-Injustice/tree/main/evidence-organized/04-Crowder-v-Reardon-Chancery"],
-  ["Reardon v. Layton", "Utah federal-case source material and related records.", "https://github.com/patriotnewsactivism/American-Injustice/tree/main/evidence-organized/06-Reardon-v-Layton"],
-  ["FBI / Beavers / East", "Complaint, correspondence, and related source material organized for review.", "https://github.com/patriotnewsactivism/American-Injustice/tree/main/evidence-organized/07-FBI-Beavers-East-Complaint"],
-  ["Mississippi Court of Appeals", "Appellate filings and source documents organized by matter.", "https://github.com/patriotnewsactivism/American-Injustice/tree/main/evidence-organized/08-MS-Court-of-Appeals"],
-  ["New Orleans Records", "Public-record requests and related material associated with New Orleans events.", "https://github.com/patriotnewsactivism/American-Injustice/tree/main/evidence-organized/10-NOLA-Records-Requests"],
+  ["Reardon v. Osteen", "Filings and documentary material connected to the Galveston litigation."],
+  ["Galveston Criminal Record", "Organized material associated with criminal case 23-CR-2981."],
+  ["Crowder v. Reardon", "Chancery and family-court source material maintained as its own record set."],
+  ["Reardon v. Layton", "Utah federal-case source material and related records."],
+  ["FBI / Beavers / East", "Complaint, correspondence, and related source material organized for review."],
+  ["Mississippi Court of Appeals", "Appellate filings and source documents organized by matter."],
+  ["New Orleans Records", "Public-record requests and related material associated with New Orleans events."],
 ] as const;
 
 const labels = [
-  ["VERIFIED SOURCE", "Directly supported by an identified source document, recording, transcript, order, or filing."],
+  ["COURT-STAMP VERIFIED", "The PDF itself has been visually reviewed and displays a court-generated filed or entered mark with a date and time."],
+  ["SOURCE DOCUMENT", "A public source PDF in the archive that is not being represented as court-stamp verified solely because of its filename or title."],
   ["ATTRIBUTED CLAIM", "A statement made by a party, witness, officer, filing, or the author that remains attributed to its source."],
   ["RECORD CONFLICT", "Two or more source records materially disagree and the discrepancy remains unresolved."],
   ["COURT FINDING", "A proposition actually decided or stated by a court, kept distinct from either side's advocacy."],
@@ -33,15 +34,19 @@ function archiveStats(documents: PublicDocument[]) {
   const newest = years.length ? Math.max(...years) : null;
   const bytes = documents.reduce((total, item) => total + (item.size ?? 0), 0);
   const gigabytes = bytes / (1024 ** 3);
+  const verified = documents.filter((document) => document.status === "court-verified").length;
 
   return {
     count: documents.length,
+    verified,
     range: oldest && newest ? `${oldest}–${newest}` : "Chronological",
-    size: gigabytes >= 1 ? `${gigabytes.toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / (1024 ** 2)))} MB`,
+    size: gigabytes >= 1 ? `${gigabytes.toFixed(1)} GB` : `${Math.round(bytes / (1024 ** 2))} MB`,
   };
 }
 
-export default async function RecordPage() {
+type SearchParams = Record<string, string | string[] | undefined>;
+
+export default async function RecordPage({ searchParams }: { searchParams?: SearchParams }) {
   let documents: PublicDocument[] = [];
   try {
     documents = await getPublicDocuments();
@@ -50,6 +55,9 @@ export default async function RecordPage() {
   }
 
   const stats = archiveStats(documents);
+  const requestedCollection = typeof searchParams?.collection === "string" ? searchParams.collection : "all";
+  const initialCollection = documents.some((document) => document.collections.includes(requestedCollection)) ? requestedCollection : "all";
+  const initialQuery = typeof searchParams?.q === "string" ? searchParams.q : "";
 
   return (
     <FlagshipPage>
@@ -65,45 +73,52 @@ export default async function RecordPage() {
           <div className="grid gap-7 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
             <div>
               <p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">PRIMARY DOCUMENT ARCHIVE</p>
-              <h2 className="display-serif mt-3 text-4xl font-semibold tracking-[-0.035em] sm:text-6xl">Court-entered documents.</h2>
+              <h2 className="display-serif mt-3 text-4xl font-semibold tracking-[-0.035em] sm:text-6xl">The source record.</h2>
             </div>
             <p className="max-w-2xl text-base leading-8 text-white/55 sm:text-lg lg:justify-self-end">
-              This public browser is intentionally limited to PDFs whose pages visibly carry a court-generated filing or entry mark with both a date and a time. Drafts, correspondence, exhibits, records, and unstamped copies remain off the site unless expressly approved.
+              This browser inventories the public PDFs in the document repositories and removes duplicate files by content. Court-stamp verification is tracked separately, so the archive can be complete without implying that every source document was filed or entered by a court.
             </p>
           </div>
 
-          <div className="mt-8 grid grid-cols-3 overflow-hidden rounded-2xl border border-[#c9a84c]/15 bg-black/30">
-            <div className="border-r border-[#c9a84c]/10 p-4 text-center sm:p-6"><p className="text-2xl font-black text-[#d7b85d] sm:text-3xl">{stats.count.toLocaleString()}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[.14em] text-white/30 sm:text-[10px]">Verified filings</p></div>
-            <div className="border-r border-[#c9a84c]/10 p-4 text-center sm:p-6"><p className="text-2xl font-black text-[#d7b85d] sm:text-3xl">{stats.range}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[.14em] text-white/30 sm:text-[10px]">Date range</p></div>
-            <div className="p-4 text-center sm:p-6"><p className="text-2xl font-black text-[#d7b85d] sm:text-3xl">{stats.size}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[.14em] text-white/30 sm:text-[10px]">Verified source files</p></div>
+          <div className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="rounded-xl border border-[#c9a84c]/15 bg-black/30 p-4 text-center sm:p-6"><p className="text-2xl font-black text-[#d7b85d] sm:text-3xl">{stats.count.toLocaleString()}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[.14em] text-white/30 sm:text-[10px]">Public source PDFs</p></div>
+            <div className="rounded-xl border border-[#c9a84c]/15 bg-black/30 p-4 text-center sm:p-6"><p className="text-2xl font-black text-[#d7b85d] sm:text-3xl">{stats.verified.toLocaleString()}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[.14em] text-white/30 sm:text-[10px]">Court-stamp verified</p></div>
+            <div className="rounded-xl border border-[#c9a84c]/15 bg-black/30 p-4 text-center sm:p-6"><p className="text-2xl font-black text-[#d7b85d] sm:text-3xl">{stats.range}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[.14em] text-white/30 sm:text-[10px]">Date range</p></div>
+            <div className="rounded-xl border border-[#c9a84c]/15 bg-black/30 p-4 text-center sm:p-6"><p className="text-2xl font-black text-[#d7b85d] sm:text-3xl">{stats.size}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[.14em] text-white/30 sm:text-[10px]">Indexed PDF size</p></div>
           </div>
 
           <div className="mt-8">
             {documents.length ? (
-              <DocumentArchiveBrowser documents={documents} />
+              <DocumentArchiveBrowser documents={documents} initialCollection={initialCollection} initialQuery={initialQuery} />
             ) : (
               <div className="rounded-2xl border border-white/10 bg-black/30 p-7 text-white/50">
-                The live document index could not be loaded right now. The source repository remains available directly on GitHub.
+                The document index could not be loaded right now. Please try again shortly.
               </div>
             )}
           </div>
 
-          <p className="mt-6 max-w-3xl text-sm leading-6 text-white/40">Publication is fail-closed: a repository filename or document title never establishes filing status. Each item above was admitted to this page only after its visible court mark was reviewed.</p>
+          <p className="mt-6 max-w-4xl text-sm leading-6 text-white/40">
+            Verification remains fail-closed: a filename, title, signature date, fax header, or “filing ready” label does not establish filing status. Documents carrying the Court-stamp verified label were separately reviewed for a visible court-generated filing or entry mark.
+          </p>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-16 sm:py-20">
         <p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">CASE-CENTERED COLLECTIONS</p>
         <h2 className="mt-3 max-w-3xl text-4xl font-black sm:text-5xl">Evidence organized by matter.</h2>
-        <p className="mt-5 max-w-3xl text-lg leading-8 text-white/55">The chronological PDF archive is the broad source shelf. These case-centered collections organize the same larger record around specific litigation, records requests, and editorial source packets.</p>
+        <p className="mt-5 max-w-3xl text-lg leading-8 text-white/55">These links now stay inside DonMatthews.live and filter the same public archive by matter instead of sending visitors into a source-code directory.</p>
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {caseCollections.map(([title, text, href]) => (
-            <a key={title} href={href} target="_blank" rel="noopener noreferrer" className="group rounded-xl border border-white/10 bg-white/[0.025] p-6 transition hover:border-[#c9a84c]/40">
-              <h3 className="text-xl font-bold group-hover:text-[#c9a84c]">{title}</h3>
-              <p className="mt-3 leading-7 text-white/50">{text}</p>
-              <span className="mt-5 inline-block text-sm font-bold text-[#c9a84c]">Open collection →</span>
-            </a>
-          ))}
+          {caseCollections.map(([title, text]) => {
+            const count = documents.filter((document) => document.collections.includes(title)).length;
+            return (
+              <a key={title} href={`/record?collection=${encodeURIComponent(title)}#archive`} className="group rounded-xl border border-white/10 bg-white/[0.025] p-6 transition hover:border-[#c9a84c]/40">
+                <h3 className="text-xl font-bold group-hover:text-[#c9a84c]">{title}</h3>
+                <p className="mt-3 leading-7 text-white/50">{text}</p>
+                <p className="mt-4 text-xs font-black uppercase tracking-[0.12em] text-white/30">{count.toLocaleString()} indexed PDF{count === 1 ? "" : "s"}</p>
+                <span className="mt-5 inline-block text-sm font-bold text-[#c9a84c]">Browse collection →</span>
+              </a>
+            );
+          })}
         </div>
       </section>
 
