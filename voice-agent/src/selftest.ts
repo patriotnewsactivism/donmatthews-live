@@ -11,6 +11,7 @@ import {
 } from "./audio.js";
 import { stripHtml, isAllowedPageFetch } from "./content.js";
 import { parseStreamStart, toWsUrl, xmlEscape, dtmfDigit } from "./telephony.js";
+import { buildRealtimeSessionConfig, isSessionReadyForGreeting } from "./xai.js";
 
 const pcm24k = Array.from({ length: 24000 }, (_, i) => Math.round(Math.sin(i / 64) * 12000));
 
@@ -51,6 +52,11 @@ assert.ok(!isAllowedPageFetch("https://evil.example.com"));
 assert.equal(toWsUrl("https://voice.example.com"), "wss://voice.example.com");
 assert.equal(toWsUrl("http://localhost:8080"), "ws://localhost:8080");
 assert.equal(xmlEscape(`a&b<"c">`), "a&amp;b&lt;&quot;c&quot;&gt;");
+
+const realtimeSession = buildRealtimeSessionConfig();
+assert.ok(!("voice" in realtimeSession), "agent-configured voice must not be overridden");
+assert.ok(!isSessionReadyForGreeting("session.created"), "greeting waits for session update");
+assert.ok(isSessionReadyForGreeting("session.updated"), "greeting starts after session update");
 
 const telnyxStart = parseStreamStart({
   event: "start",

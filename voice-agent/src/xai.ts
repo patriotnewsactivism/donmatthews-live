@@ -37,6 +37,32 @@ export const xaiWsUrl = (opts: { agentId?: string; callId?: string }): string =>
   return `wss://api.x.ai/v1/realtime?agent_id=${encodeURIComponent(opts.agentId ?? "")}`;
 };
 
+export const isSessionReadyForGreeting = (eventType: unknown): boolean => eventType === "session.updated";
+
+export const buildRealtimeSessionConfig = (): Record<string, unknown> => ({
+  modalities: ["text", "audio"],
+  instructions: SYSTEM_PROMPT(),
+  tools: TOOL_DEFINITIONS.map((t: ToolDefinition) => ({
+    type: "function",
+    name: t.name,
+    description: t.description,
+    parameters: t.parameters,
+  })),
+  // Do not set `voice` here. The agent_id/call_id connection owns the selected
+  // voice; overriding it would make later responses switch away from the agent.
+  audio: {
+    input: { format: { type: "audio/pcm", rate: 24000 } },
+    output: { format: { type: "audio/pcm", rate: 24000 } },
+  },
+  turn_detection: {
+    type: "server_vad",
+    threshold: 0.6,
+    prefix_padding_ms: 300,
+    silence_duration_ms: 600,
+  },
+  input_audio_transcription: { model: "whisper-1" },
+});
+
 export class XaiRealtimeClient {
   private ws: WebSocket | null = null;
   private readonly handledCalls = new Set<string>();
@@ -91,28 +117,7 @@ export class XaiRealtimeClient {
   private sendSessionUpdate(): void {
     this.send({
       type: "session.update",
-      session: {
-        modalities: ["text", "audio"],
-        instructions: SYSTEM_PROMPT(),
-        tools: TOOL_DEFINITIONS.map((t: ToolDefinition) => ({
-          type: "function",
-          name: t.name,
-          description: t.description,
-          parameters: t.parameters,
-        })),
-        voice: "eve",
-        audio: {
-          input: { format: { type: "audio/pcm", rate: 24000 } },
-          output: { format: { type: "audio/pcm", rate: 24000 } },
-        },
-        turn_detection: {
-          type: "server_vad",
-          threshold: 0.6,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 600,
-        },
-        input_audio_transcription: { model: "whisper-1" },
-      },
+      session: buildRealtimeSessionConfig(),
     });
   }
 
@@ -121,13 +126,14 @@ export class XaiRealtimeClient {
     session: CallSession,
     handlers: XaiMessageHandlers,
   ): Promise<void> {
+    if (isSessionReadyForGreeting(event.type) && !this.greeted) {
+      this.greeted = true;
+      this.send({ type: "response.create" });
+    }
+
     switch (event.type) {
       case "session.created":
       case "session.updated": {
-        if (!this.greeted) {
-          this.greeted = true;
-          this.send({ type: "response.create" });
-        }
         return;
       }
       case "response.output_audio.delta": {

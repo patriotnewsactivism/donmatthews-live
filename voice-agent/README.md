@@ -2,7 +2,7 @@
 
 Voice agent that answers phone calls as Don Matthews: it answers questions from We The People News (`wtpnews.org`) and Civil Rights Hub (`civilrightshub.org`), gives donation/support info, persists memory across calls in Supabase, and — when called from the owner's phone with the passcode — unlocks admin tools that operate on the owner's GitHub repos through the GitHub API.
 
-Architecture: Telnyx TeXML Media Streams (μ-law 8 kHz; Twilio TwiML still accepted) <-> x.ai Realtime WebSocket (PCM16 24 kHz), bridged in this Node service. No auxiliary TTS/STT services needed — the x.ai `agent_id` supplies voice and speech recognition.
+Architecture: Telnyx TeXML Media Streams (μ-law 8 kHz; Twilio TwiML still accepted) <-> x.ai Realtime WebSocket (PCM16 24 kHz), bridged in this Node service. No auxiliary TTS/STT services needed — the x.ai `agent_id` supplies the configured voice and speech recognition. Session updates intentionally do not override that voice.
 
 ```
 Phone -> Telnyx -> POST /voice (TeXML) -> wss /stream -> bridge -> wss api.x.ai/v1/realtime?agent_id=...
