@@ -2,27 +2,31 @@
 
 Voice agent that answers phone calls as Don Matthews. It answers questions from We The People News (`wtpnews.org`) and Civil Rights Hub (`civilrightshub.org`), gives donation/support information, can persist memory across calls in Supabase, and can unlock owner-only GitHub administration tools after phone-number plus passcode verification.
 
-## Production architecture
+## Current production arrangement
 
-The production target is **Vercel**, in the same `donmatthews-live` project that serves `donmatthews.live`.
+**Google Cloud Run remains the live phone runtime for now.** Vercel is maintained as a hot standby in the same `donmatthews-live` project that serves the website.
+
+The standby architecture is already implemented:
 
 ```text
-Phone -> Telnyx -> POST https://donmatthews.live/voice
-                   -> wss://donmatthews.live/stream
+Phone -> Telnyx -> POST https://www.donmatthews.live/voice
+                   -> wss://www.donmatthews.live/stream
                    -> xAI Realtime WebSocket
                    -> response audio back to Telnyx
 ```
 
-Vercel routes:
+The apex hostname redirects to `www.donmatthews.live`; telephony and WebSocket traffic should use the `www` host directly. The Vercel adapter also normalizes an apex `PUBLIC_BASE_URL` to `www` so a stale apex setting does not create a redirect in the media path.
 
-- `GET /health` — voice runtime health/configuration-presence check
-- `GET|POST /voice` — primary Telnyx/TwiML-compatible voice webhook
+Vercel standby routes:
+
+- `GET /health` — voice runtime health/configuration check
+- `GET|POST /voice` — primary failover voice webhook
 - `GET|POST /telnyx/voice` — Telnyx compatibility alias
 - `GET|POST /twilio/voice` — Twilio compatibility alias
 - `GET /stream` — bidirectional media WebSocket
 - `POST /xai/sip` — xAI Direct SIP webhook
 
-The `voice-agent/src` directory remains the shared voice engine and local standalone runner. Vercel adapters live under `src/app` and `src/lib` so the website and voice backend deploy together from the same Git commit.
+The `voice-agent/src` directory remains the shared voice engine and local standalone runner. Vercel adapters live under `src/app` and `src/lib`, so Cloud Run and Vercel use the same core voice implementation rather than two divergent systems.
 
 ## Required Vercel environment variables
 
@@ -32,8 +36,8 @@ Required for live calling:
 
 - `XAI_API_KEY`
 - `XAI_AGENT_ID` (defaults to the configured Don agent ID when omitted)
-- `PUBLIC_BASE_URL=https://donmatthews.live`
-- `STREAM_TOKEN` — random shared secret protecting the media stream URL
+- `PUBLIC_BASE_URL=https://www.donmatthews.live`
+- `STREAM_TOKEN`
 - `OWNER_PHONE`
 - `ADMIN_PASSCODE`
 
@@ -41,11 +45,11 @@ Required for persistent memory:
 
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `DATABASE_URL`
+- `DATABASE_URL` when the selected persistence path requires it
 
 Optional owner administration:
 
-- `GITHUB_TOKEN` — fine-grained token with only the repository/actions permissions the owner intends to expose
+- `GITHUB_TOKEN`
 - `GITHUB_USER` — defaults to `patriotnewsactivism`
 
 Other optional settings:
@@ -53,19 +57,20 @@ Other optional settings:
 - `MAX_VERIFY_ATTEMPTS` — defaults to `3`
 - `DONATION_INFO_TEXT`
 
-The runtime fails closed for owner access when `ADMIN_PASSCODE` is absent. `/health` reports only whether sensitive integrations are configured; it never returns secret values.
+The runtime fails closed for owner access when `ADMIN_PASSCODE` is absent. A missing `XAI_API_KEY` makes `/health` return HTTP 503 and the voice webhook returns a controlled unavailable message instead of opening a broken media stream.
 
-## Cutover procedure
+## Emergency failover
 
-1. Merge a Vercel-verified migration commit to `main`.
-2. Confirm `https://donmatthews.live/health` returns `ok: true`, `platform: vercel`, and `xai: configured`.
-3. Confirm Supabase/admin fields show the intended state.
-4. Point the Telnyx TeXML application's voice webhook at `POST https://donmatthews.live/voice`.
-5. Place a real inbound test call and verify greeting, conversational voice consistency, two-way audio, DTMF, and hangup cleanup.
-6. Verify Supabase session persistence and owner verification if those features are enabled.
-7. Only after the live call passes, retire the old Cloud Run service and Google deployment credentials.
+Do not rebuild the service during an outage. The Vercel routes are already deployed from the same repository.
 
-The old Cloud Run instance is a rollback source during migration only; it is no longer the deployment target.
+When Vercel production health is fully configured, failover consists of:
+
+1. Confirm `https://www.donmatthews.live/health` returns `ok: true`, `platform: vercel`, and `xai: configured`.
+2. Point the Telnyx TeXML application's voice webhook to `POST https://www.donmatthews.live/voice`.
+3. Place one verification call for greeting, two-way audio, voice consistency, DTMF/owner verification if enabled, and clean hangup/session persistence.
+4. Keep Cloud Run available as rollback until the Vercel call succeeds.
+
+See `docs/VERCEL_VOICE_FAILOVER.md` for the exact runbook.
 
 ## Local setup
 
@@ -99,7 +104,7 @@ Every `admin_*` and `verify_access` invocation is written to `admin_audit_log`. 
 - Use a strong random `STREAM_TOKEN` for production.
 - Keep GitHub token scopes as narrow as practical.
 - The configured xAI agent owns the Don voice. Session updates must not hard-code a different voice.
-- Vercel function/WebSocket duration limits apply to active calls; clients/carriers must tolerate reconnect/termination behavior at the platform limit.
+- Vercel function/WebSocket duration limits apply to active calls.
 
 ## Scripts
 
