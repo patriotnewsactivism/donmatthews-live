@@ -1,13 +1,5 @@
 import "dotenv/config";
 
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value || value.trim() === "") {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
-}
-
 function optEnv(name: string, fallback = ""): string {
   const value = process.env[name];
   return value && value.trim() !== "" ? value.trim() : fallback;
@@ -30,7 +22,9 @@ export const config = {
   supabaseServiceKey: optEnv("SUPABASE_SERVICE_ROLE_KEY"),
   databaseUrl: optEnv("DATABASE_URL"),
   ownerPhone: optEnv("OWNER_PHONE", "+18328804970"),
-  adminPasscode: requireEnv("ADMIN_PASSCODE"),
+  // Fail closed when unset: verify_access can never succeed with an empty passcode.
+  // This lets Vercel preview/builds come up before production secrets are copied over.
+  adminPasscode: optEnv("ADMIN_PASSCODE"),
   maxVerifyAttempts: Number(optEnv("MAX_VERIFY_ATTEMPTS", "3")),
   githubToken: optEnv("GITHUB_TOKEN"),
   githubUser: optEnv("GITHUB_USER", "patriotnewsactivism"),
