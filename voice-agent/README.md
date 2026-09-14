@@ -1,91 +1,122 @@
 # Don Voice Agent
 
-Voice agent that answers phone calls as Don Matthews. It answers questions from We The People News (`wtpnews.org`) and Civil Rights Hub (`civilrightshub.org`), gives donation/support information, can persist memory across calls in Supabase, and can unlock owner-only GitHub administration tools after phone-number plus passcode verification.
+Voice agent for Don Matthews / donmatthews.live. It can answer questions from We The People News (`wtpnews.org`) and Civil Rights Hub (`civilrightshub.org`), provide support/donation information, persist memory across calls in Supabase, and unlock owner-only GitHub administration tools after caller-number plus passcode verification.
 
-## Current production arrangement
+## Architecture
 
-**Google Cloud Run remains the live phone runtime for now.** Vercel is maintained as a hot standby in the same `donmatthews-live` project that serves the website.
-
-The standby architecture is already implemented:
+Telnyx managed Conversational AI is the primary architecture. The old xAI realtime/WebSocket bridge remains in the repository as an explicit rollback path while the managed assistant is proven in production.
 
 ```text
-Phone -> Telnyx -> POST https://www.donmatthews.live/voice
-                   -> wss://www.donmatthews.live/stream
-                   -> xAI Realtime WebSocket
-                   -> response audio back to Telnyx
+PRIMARY
+Phone / Telnyx number
+  -> TeXML POST https://www.donmatthews.live/voice
+  -> <AIAssistant id="...">
+  -> Telnyx managed telephony + STT + LLM + TTS
+  -> HTTPS webhook tools on www.donmatthews.live
+
+ROLLBACK
+Phone / Telnyx number
+  -> TeXML POST https://www.donmatthews.live/voice
+  -> <Stream ...>
+  -> legacy xAI realtime WebSocket bridge
 ```
 
-The apex hostname redirects to `www.donmatthews.live`; telephony and WebSocket traffic should use the `www` host directly. The Vercel adapter also normalizes an apex `PUBLIC_BASE_URL` to `www` so a stale apex setting does not create a redirect in the media path.
+The managed path does **not** send live call audio through Vercel. Vercel serves only the small TeXML response and normal HTTPS tool/dynamic-variable requests. This removes the long-lived WebSocket/function-duration problem from the primary call path.
 
-Vercel standby routes:
+`/voice`, `/telnyx/voice`, and `/twilio/voice` select the managed assistant whenever `TELNYX_ASSISTANT_ID` is available (directly from the environment or persisted in `voice_memory`). If no managed assistant is configured, they fall back to the legacy xAI stream when `XAI_API_KEY` is present.
 
-- `GET /health` — voice runtime health/configuration check
-- `GET|POST /voice` — primary failover voice webhook
+## Managed Telnyx defaults
+
+The provisioning code uses:
+
+- LLM: `moonshotai/Kimi-K2.5`
+- voice: `Telnyx.NaturalHD.andersen_johan`
+- STT: `deepgram/flux`
+- one fixed assistant voice for the full call
+- Telnyx-hosted telephony/orchestration instead of a custom media bridge
+- existing Don voice tools exposed as authenticated Telnyx webhook tools
+- built-in hangup support
+
+Every setting can be overridden with environment variables without changing code.
+
+## Routes
+
+Public telephony:
+
+- `GET|POST /voice` — preferred TeXML webhook
 - `GET|POST /telnyx/voice` — Telnyx compatibility alias
-- `GET|POST /twilio/voice` — Twilio compatibility alias
-- `GET /stream` — bidirectional media WebSocket
-- `POST /xai/sip` — xAI Direct SIP webhook
+- `GET|POST /twilio/voice` — compatibility alias
+- `GET /health` — reports managed/fallback mode and configuration state
 
-The `voice-agent/src` directory remains the shared voice engine and local standalone runner. Vercel adapters live under `src/app` and `src/lib`, so Cloud Run and Vercel use the same core voice implementation rather than two divergent systems.
+Managed assistant support:
 
-## Required Vercel environment variables
+- `POST /api/voice/telnyx/dynamic` — initializes caller/session state for Telnyx dynamic variables; authenticated by a generated/explicit webhook token
+- `POST /api/voice/telnyx/tool/[name]` — executes the existing article, memory, donation, verification, and admin tools; authenticated by a Telnyx-configured header token
+- `POST /api/voice/telnyx/provision` — creates or updates the Telnyx assistant; protected by `ADMIN_PASSCODE`
+- `POST /api/voice/telnyx/call` — optional outbound call endpoint; protected by `ADMIN_PASSCODE`
 
-Set secrets in Vercel Project Settings -> Environment Variables. Do **not** commit them.
+Legacy rollback:
 
-Required for live calling:
+- `GET /stream` — bidirectional media WebSocket used only by the legacy bridge
+- `POST /xai/sip` — legacy xAI Direct SIP webhook
 
-- `XAI_API_KEY`
-- `XAI_AGENT_ID` (defaults to the configured Don agent ID when omitted)
+## Environment variables
+
+Primary managed path:
+
+- `TELNYX_API_KEY` — required to create/update the managed assistant and place outbound calls
+- `TELNYX_ASSISTANT_ID` — optional after provisioning; if absent, the provisioner persists the created ID in Supabase `voice_memory`
+- `TELNYX_AI_MODEL` — defaults to `moonshotai/Kimi-K2.5`
+- `TELNYX_AI_VOICE` — defaults to `Telnyx.NaturalHD.andersen_johan`
+- `TELNYX_STT_MODEL` — defaults to `deepgram/flux`
+- `TELNYX_TOOL_TOKEN` — optional; if omitted, the server derives a one-way webhook token from `TELNYX_API_KEY`
+- `TELNYX_TEXML_APP_ID` — optional for inbound-only use; required by the protected outbound-call endpoint
+- `TELNYX_CALLER_ID` — optional for inbound-only use; required by the protected outbound-call endpoint
 - `PUBLIC_BASE_URL=https://www.donmatthews.live`
-- `STREAM_TOKEN`
-- `OWNER_PHONE`
-- `ADMIN_PASSCODE`
 
-Required for persistent memory:
+Persistence and owner tools:
 
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `DATABASE_URL` when the selected persistence path requires it
-
-Optional owner administration:
-
-- `GITHUB_TOKEN`
-- `GITHUB_USER` — defaults to `patriotnewsactivism`
-
-Other optional settings:
-
+- `DATABASE_URL` when needed by the selected persistence path
+- `OWNER_PHONE`
+- `ADMIN_PASSCODE`
 - `MAX_VERIFY_ATTEMPTS` — defaults to `3`
-- `DONATION_INFO_TEXT`
+- `GITHUB_TOKEN` — optional; enables owner GitHub tools
+- `GITHUB_USER` — defaults to `patriotnewsactivism`
+- `DONATION_INFO_TEXT` — optional override
 
-The runtime fails closed for owner access when `ADMIN_PASSCODE` is absent. A missing `XAI_API_KEY` makes `/health` return HTTP 503 and the voice webhook returns a controlled unavailable message instead of opening a broken media stream.
+Legacy rollback only:
 
-## Emergency failover
+- `XAI_API_KEY`
+- `XAI_AGENT_ID`
+- `STREAM_TOKEN`
 
-Do not rebuild the service during an outage. The Vercel routes are already deployed from the same repository.
+Secrets belong in the hosting provider environment. Do not commit them.
 
-When Vercel production health is fully configured, failover consists of:
+## Provisioning
 
-1. Confirm `https://www.donmatthews.live/health` returns `ok: true`, `platform: vercel`, and `xai: configured`.
-2. Point the Telnyx TeXML application's voice webhook to `POST https://www.donmatthews.live/voice`.
-3. Place one verification call for greeting, two-way audio, voice consistency, DTMF/owner verification if enabled, and clean hangup/session persistence.
-4. Keep Cloud Run available as rollback until the Vercel call succeeds.
+After `TELNYX_API_KEY`, Supabase credentials, `ADMIN_PASSCODE`, and `PUBLIC_BASE_URL` exist in the Vercel production environment, call the protected provisioning endpoint once. It creates the assistant when none exists or updates the existing assistant and promotes the new configuration to main.
 
-See `docs/VERCEL_VOICE_FAILOVER.md` for the exact runbook.
+Provisioning also registers all existing voice tools as Telnyx webhook tools and configures the dynamic-variable callback. The assistant ID is stored in `voice_memory` when `TELNYX_ASSISTANT_ID` is not explicitly set, allowing the runtime to switch to managed mode without another source-code change.
 
-## Local setup
+A Telnyx phone number can then be attached to the assistant, or an existing TeXML application/number can keep calling `https://www.donmatthews.live/voice`. The `/voice` response connects the call to the managed assistant.
 
-1. `cd voice-agent && npm install`
-2. Copy `.env.example` to `.env` and fill the required variables.
-3. Apply the schema and seed facts with `npm run db:setup`.
-4. Ingest article content with `npm run ingest`.
-5. Run `npm run check`, `npm run typecheck`, and `npm run build`.
-6. Start with `npm run dev` or `npm run start`.
+## Outbound calls
+
+When `TELNYX_TEXML_APP_ID` and `TELNYX_CALLER_ID` are configured, the protected `/api/voice/telnyx/call` route accepts JSON like:
+
+```json
+{ "to": "+15551234567" }
+```
+
+and starts the call with the same managed assistant.
 
 ## Owner ("sudo") mode
 
-The agent grants owner tools only when both conditions hold: the normalized caller number equals `OWNER_PHONE`, and `verify_access` succeeds with `ADMIN_PASSCODE`. Caller ID alone is not trusted. Failed verification attempts are limited by `MAX_VERIFY_ATTEMPTS`.
+Owner tools still require both conditions: the normalized caller number equals `OWNER_PHONE`, and `verify_access` succeeds with `ADMIN_PASSCODE`. Caller ID alone is not trusted. Failed verification attempts remain limited by `MAX_VERIFY_ATTEMPTS`.
 
-Every `admin_*` and `verify_access` invocation is written to `admin_audit_log`. Admin tools operate through the GitHub REST API; there is no arbitrary shell-execution tool in the voice agent.
+Every `admin_*` and `verify_access` invocation is written to `admin_audit_log`. Admin tools operate through the GitHub API; the voice agent does not expose arbitrary shell execution.
 
 ## Persistence
 
@@ -93,22 +124,25 @@ Every `admin_*` and `verify_access` invocation is written to `admin_audit_log`. 
 |---|---|
 | `voice_sessions` | one row per call |
 | `voice_messages` | user, assistant, and tool messages |
-| `voice_memory` | durable remembered facts |
+| `voice_memory` | durable facts plus the managed assistant ID when environment configuration does not provide it |
 | `voice_articles` | ingested article content |
 | `admin_audit_log` | owner/admin action audit records |
 
-## Security notes
+## Local standalone runner
 
-- Never commit xAI, Supabase, GitHub, stream-token, database, or passcode secrets.
-- Keep `SUPABASE_SERVICE_ROLE_KEY` and `DATABASE_URL` server-side only.
-- Use a strong random `STREAM_TOKEN` for production.
-- Keep GitHub token scopes as narrow as practical.
-- The configured xAI agent owns the Don voice. Session updates must not hard-code a different voice.
-- Vercel function/WebSocket duration limits apply to active calls.
+The `voice-agent/src/index.ts` standalone server remains the legacy/rollback implementation for Cloud Run or another container runtime. It has not been deleted. The Vercel-managed path lives in `src/app`, `src/lib`, and `voice-agent/src/telnyx-managed.ts`.
 
-## Scripts
+1. `cd voice-agent && npm install`
+2. Copy `.env.example` to `.env` and fill the required values.
+3. Apply the schema and seed facts with `npm run db:setup`.
+4. Ingest article content with `npm run ingest`.
+5. Run `npm run check`, `npm run typecheck`, and `npm run build`.
 
-- `npm run dev` / `npm run start` — local standalone server
-- `npm run build` / `npm run typecheck` — compile/type-check standalone voice code
-- `npm run check` — codec/utilities self-test
-- `npm run ingest` — idempotently refresh article content
+## Security
+
+- Never commit Telnyx, xAI, Supabase, GitHub, database, stream-token, or owner passcode secrets.
+- `SUPABASE_SERVICE_ROLE_KEY` and `DATABASE_URL` remain server-only.
+- Managed tool webhooks fail closed when their token is absent or incorrect.
+- Provisioning/outbound routes fail closed when `ADMIN_PASSCODE` is absent.
+- The owner caller number is only a first factor; privileged tools still require the passcode.
+- The legacy media/WebSocket code remains isolated as rollback and is not used when the managed assistant ID exists.
