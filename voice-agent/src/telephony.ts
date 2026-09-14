@@ -1,5 +1,4 @@
 import type { IncomingMessage } from "node:http";
-import { config } from "./config.js";
 
 export interface CallIdentifiers {
   streamSid: string;
@@ -21,13 +20,13 @@ export function xmlEscape(value: string): string {
     .replace(/'/g, "&apos;");
 }
 
-export function streamUrl(): string {
-  const tokenSuffix = config.streamToken ? `?token=${encodeURIComponent(config.streamToken)}` : "";
-  return `${toWsUrl(config.publicBaseUrl)}/stream${tokenSuffix}`;
+export function streamUrl(publicBaseUrl: string, streamToken = ""): string {
+  const tokenSuffix = streamToken ? `?token=${encodeURIComponent(streamToken)}` : "";
+  return `${toWsUrl(publicBaseUrl)}/stream${tokenSuffix}`;
 }
 
-export function voiceTeXml(from = "", to = ""): string {
-  const url = xmlEscape(streamUrl());
+export function voiceTeXml(url: string, from = "", to = ""): string {
+  const escapedUrl = xmlEscape(url);
   const fromParam = from
     ? `\n      <Parameter name="from" value="${xmlEscape(from)}" />`
     : "";
@@ -35,7 +34,7 @@ export function voiceTeXml(from = "", to = ""): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Connect>
-    <Stream url="${url}" track="inbound_track" codec="PCMU" bidirectionalMode="rtp" bidirectionalCodec="PCMU" bidirectionalSamplingRate="8000">${fromParam}${toParam}
+    <Stream url="${escapedUrl}" track="inbound_track" codec="PCMU" bidirectionalMode="rtp" bidirectionalCodec="PCMU" bidirectionalSamplingRate="8000">${fromParam}${toParam}
     </Stream>
   </Connect>
 </Response>`;

@@ -30,6 +30,7 @@ export interface XaiMessageHandlers {
   onAssistantTranscriptDelta(text: string): void;
   onAssistantTranscriptDone(text: string): void;
   onUserTranscript(text: string): void;
+  onDtmf?(digit: string): void;
   onError(error: string): void;
   onClose(): void;
 }

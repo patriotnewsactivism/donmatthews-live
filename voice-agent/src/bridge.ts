@@ -5,28 +5,23 @@ import { config } from "./config.js";
 import { normalizePhone, ulawSamplesToXaiBytes, xaiBytesToUlaw22ms } from "./audio.js";
 import { createSession, endSession, saveMessage, memoryAvailable } from "./memory.js";
 import { XaiRealtimeClient } from "./xai.js";
+import { dtmfDigit, type CallIdentifiers } from "./telephony.js";
 
-const BARGE_IN_WINDOW_MS = 1500;
 const FRAME_DROP_MS = 20;
-
-interface TwilioStartPayload {
-  streamSid: string;
-  callSid: string;
-  from: string;
-  to: string;
-}
+const XAI_BYTES_PER_20MS_FRAME = 24000 / 50 * 2;
 
 export class CallBridge {
   readonly session: CallSession;
   private readonly xai: XaiRealtimeClient;
   private outSequence = 0;
-  private lastAssistantAudioAt = 0;
-  private bargeCancelled = false;
   private teardownCalled = false;
+  private assistantPcmRemainder = Buffer.alloc(0);
+  private phoneAudioQueue: Buffer[] = [];
+  private phoneAudioTimer: NodeJS.Timeout | null = null;
 
   constructor(
     private readonly streamWs: WebSocket,
-    start: TwilioStartPayload,
+    start: CallIdentifiers,
   ) {
     this.session = {
       sessionId: randomUUID(),
@@ -42,6 +37,9 @@ export class CallBridge {
       assistantTranscript: "",
       dtmfBuffer: "",
     };
+    if (!config.xaiApiKey) {
+      throw new Error("XAI_API_KEY is required to answer calls");
+    }
     this.xai = new XaiRealtimeClient(config.xaiApiKey, config.xaiAgentId);
 
     void createSession({
@@ -91,21 +89,15 @@ export class CallBridge {
         this.handleInboundAudio(Buffer.from(payload, "base64"));
       }
     } else if (msg.event === "dtmf") {
-      const dtmf = msg.dtmf as Record<string, unknown> | undefined;
-      const digit = typeof dtmf?.digit === "string" ? dtmf.digit : "";
+      const digit = dtmfDigit(msg);
       if (digit) this.handleDtmf(digit);
     } else if (msg.event === "stop" || msg.event === "disconnected") {
-      this.teardown("twilio stream ended");
+      this.teardown("phone stream ended");
     }
   }
 
   private handleInboundAudio(ulaw: Buffer): void {
     if (this.teardownCalled) return;
-    const now = Date.now();
-    if (!this.bargeCancelled && now - this.lastAssistantAudioAt < BARGE_IN_WINDOW_MS) {
-      this.bargeCancelled = true;
-      this.xai.cancelResponse();
-    }
     const pcm = ulawSamplesToXaiBytes(ulaw);
     this.xai.appendInputBuffer(pcm);
   }
@@ -122,21 +114,53 @@ export class CallBridge {
 
   private handleAssistantAudio(base64: string): void {
     if (this.teardownCalled) return;
-    this.lastAssistantAudioAt = Date.now();
-    this.bargeCancelled = false;
-    const pcm = Buffer.from(base64, "base64");
-    const frames = xaiBytesToUlaw22ms(pcm);
-    for (const frame of frames) {
+    const pcm = Buffer.concat([this.assistantPcmRemainder, Buffer.from(base64, "base64")]);
+    const usableBytes = Math.floor(pcm.length / XAI_BYTES_PER_20MS_FRAME) * XAI_BYTES_PER_20MS_FRAME;
+    if (usableBytes <= 0) {
+      this.assistantPcmRemainder = pcm;
+      return;
+    }
+
+    const framedPcm = pcm.subarray(0, usableBytes);
+    this.assistantPcmRemainder = pcm.subarray(usableBytes);
+    this.phoneAudioQueue.push(...xaiBytesToUlaw22ms(framedPcm));
+    this.pumpPhoneAudio();
+  }
+
+  private pumpPhoneAudio(): void {
+    if (this.phoneAudioTimer || this.teardownCalled) return;
+    this.phoneAudioTimer = setInterval(() => {
+      if (this.teardownCalled) {
+        this.stopPhoneAudioPump();
+        return;
+      }
+
+      const frame = this.phoneAudioQueue.shift();
+      if (!frame) {
+        this.stopPhoneAudioPump();
+        return;
+      }
+
       this.outSequence += FRAME_DROP_MS;
-      this.sendToTwilio({
+      this.sendToPhone({
         event: "media",
         streamSid: this.session.streamSid,
-        media: { payload: frame.toString("base64") },
+        stream_id: this.session.streamSid,
+        media: {
+          payload: frame.toString("base64"),
+        },
       });
+    }, FRAME_DROP_MS);
+  }
+
+  private stopPhoneAudioPump(): void {
+    if (this.phoneAudioTimer) {
+      clearInterval(this.phoneAudioTimer);
+      this.phoneAudioTimer = null;
     }
   }
 
-  private sendToTwilio(payload: Record<string, unknown>): void {
+  private sendToPhone(payload: Record<string, unknown>): void {
     if (this.streamWs.readyState === WebSocket.OPEN) {
       this.streamWs.send(JSON.stringify(payload));
     }
@@ -146,6 +170,7 @@ export class CallBridge {
     if (this.teardownCalled) return;
     this.teardownCalled = true;
     console.log(`[bridge] teardown ${this.session.callSid}: ${reason}`);
+    this.stopPhoneAudioPump();
     try {
       this.xai.close();
     } catch {

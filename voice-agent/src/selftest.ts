@@ -10,6 +10,7 @@ import {
   timingSafeEqualStr,
 } from "./audio.js";
 import { stripHtml, isAllowedPageFetch } from "./content.js";
+import { parseStreamStart, toWsUrl, xmlEscape, dtmfDigit } from "./telephony.js";
 
 const pcm24k = Array.from({ length: 24000 }, (_, i) => Math.round(Math.sin(i / 64) * 12000));
 
@@ -46,6 +47,28 @@ assert.equal(stripHtml("<p>Hello &amp; bye</p>"), "Hello & bye");
 assert.ok(isAllowedPageFetch("https://www.wtpnews.org/feed/"));
 assert.ok(isAllowedPageFetch("https://civilrightshub.org"));
 assert.ok(!isAllowedPageFetch("https://evil.example.com"));
+
+assert.equal(toWsUrl("https://voice.example.com"), "wss://voice.example.com");
+assert.equal(toWsUrl("http://localhost:8080"), "ws://localhost:8080");
+assert.equal(xmlEscape(`a&b<"c">`), "a&amp;b&lt;&quot;c&quot;&gt;");
+
+const telnyxStart = parseStreamStart({
+  event: "start",
+  stream_id: "stream-1",
+  start: { call_control_id: "v2:abc", from: "+18325550100", to: "+18325550199" },
+});
+assert.ok(telnyxStart);
+assert.equal(telnyxStart.streamSid, "stream-1");
+assert.equal(telnyxStart.callSid, "v2:abc");
+assert.equal(telnyxStart.from, "+18325550100");
+
+const twilioStart = parseStreamStart({
+  event: "start",
+  start: { streamSid: "MZ1", callSid: "CA1", from: "+15551212", to: "+15550000" },
+});
+assert.ok(twilioStart);
+assert.equal(twilioStart.streamSid, "MZ1");
+assert.equal(dtmfDigit({ event: "dtmf", dtmf: { digit: "2" } }), "2");
 
 console.log("selftest: all audio/codec/phone/utils assertions passed");
 process.exit(0);

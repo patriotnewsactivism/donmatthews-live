@@ -2,26 +2,35 @@
 
 Voice agent that answers phone calls as Don Matthews: it answers questions from We The People News (`wtpnews.org`) and Civil Rights Hub (`civilrightshub.org`), gives donation/support info, persists memory across calls in Supabase, and — when called from the owner's phone with the passcode — unlocks admin tools that operate on the owner's GitHub repos through the GitHub API.
 
-Architecture: Twilio Media Streams (μ-law 8 kHz) <-> x.ai Realtime WebSocket (PCM16 24 kHz), bridged in this Node service. No auxiliary TTS/STT services needed — the x.ai `agent_id` supplies voice and speech recognition.
+Architecture: Telnyx TeXML Media Streams (μ-law 8 kHz; Twilio TwiML still accepted) <-> x.ai Realtime WebSocket (PCM16 24 kHz), bridged in this Node service. No auxiliary TTS/STT services needed — the x.ai `agent_id` supplies voice and speech recognition.
 
 ```
-Phone -> Twilio -> POST /twilio/voice (TwiML) -> wss /stream -> bridge -> wss api.x.ai/v1/realtime?agent_id=...
+Phone -> Telnyx -> POST /voice (TeXML) -> wss /stream -> bridge -> wss api.x.ai/v1/realtime?agent_id=...
                      <- μ-law 8k <- upsample/downsample <- PCM 24k <-
 ```
+
+## Live service
+
+- Cloud Run (separate from the flagship Next.js service): `https://don-voice-agent-406797137160.us-central1.run.app`
+- Telnyx number: `+1 832-975-7665` (TeXML app "Don Matthews Voice Agent" → `POST /voice`)
+- Health: `GET /health`
+- SIP join webhook (xAI Direct SIP): `POST /xai/sip`
+
+Calls will greet only after `XAI_API_KEY` is set on that Cloud Run service (`gcloud run services update don-voice-agent --region us-central1 --update-env-vars XAI_API_KEY=...`). Create the key at https://console.x.ai. Admin GitHub tools stay off until `GITHUB_TOKEN` is set the same way.
 
 ## Setup
 
 1. Install: `cd voice-agent && npm install`
 2. Create `.env` from `.env.example` and fill in:
-   - `XAI_API_KEY` — your x.ai key. `XAI_AGENT_ID` defaults to the agent shown in your snippet.
-   - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` — same Supabase project as donmatthews.live. Service role key must be set **only on the server**, never in the browser app.
-   - `PUBLIC_BASE_URL` — the public HTTPS URL of this service (used to build the TwiML Stream URL).
-   - `STREAM_TOKEN` — recommended: a random shared secret appended to the stream URL.
-   - `OWNER_PHONE=+18328804970`, `ADMIN_PASSCODE=2269` — owner verification.
+   - `XAI_API_KEY` — your x.ai key. `XAI_AGENT_ID` defaults to the voice agent id.
+   - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` / `DATABASE_URL` — same Supabase project as donmatthews.live. Service role and database URLs stay **only on the server**.
+   - `PUBLIC_BASE_URL` — the public HTTPS URL of this service (used to build the TeXML Stream URL).
+   - `STREAM_TOKEN` — required in production: a random shared secret appended to the stream URL.
+   - `OWNER_PHONE` and `ADMIN_PASSCODE` — owner verification. Do not commit the passcode.
    - `GITHUB_TOKEN` — optional fine-grained PAT (repos + actions scope) to enable `admin_*` tools.
-3. Apply `schema.sql` in the Supabase SQL editor (or `supabase db push`). Run the ingest once: `npm run ingest` (and re-run on a schedule, e.g., a cron/cloud scheduler, to keep articles fresh).
-4. Deploy (Node 20+, HTTPS required by Twilio). Docker: `docker build -t don-voice-agent .` then run with `-p 8080:8080`. Any TLS-capable host works (Cloud Run, a VPS with Caddy, etc.). If you deploy on Cloud Run, deploy to your own existing service — do not create replacement services, and keep release provenance via immutable image tags.
-5. Twilio console: take your voice-capable number -> Voice configuration -> "When a call comes in" -> **Webhook** -> `POST https://<host>/twilio/voice`.
+3. Apply schema and seed donation facts: `npm run db:setup`. Then ingest articles: `npm run ingest` (re-run on a schedule to keep articles fresh).
+4. Deploy this Node service on HTTPS (Cloud Run, a VPS with Caddy, etc.). This is a **separate** voice service — do not point it at the flagship Next.js Cloud Run service, and do not use mutable `latest` as release provenance.
+5. Telnyx Mission Control: TeXML application Voice webhook `POST https://<host>/voice`. Assign a voice-capable number to that TeXML app. `/twilio/voice` remains as a compatibility alias.
 6. Test: `npm run check`, then call the number. DTMF keys or spoken digits both work for the access code.
 
 ## Owner ("sudo") mode

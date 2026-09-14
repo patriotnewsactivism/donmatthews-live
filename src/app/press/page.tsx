@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { FlagshipPage, GoldButton, PageHero } from "@/components/FlagshipShell";
+import { DON_VOICE_DISPLAY, DON_VOICE_TEL } from "@/lib/voice";
 
 export const metadata: Metadata = {
   title: "Press & Media | Don Matthews",
@@ -55,7 +56,7 @@ export default function PressPage() {
           <h2 className="mt-10 text-2xl font-bold">Interview & commentary topics</h2>
           <div className="mt-4 flex flex-wrap gap-2">{topics.map(topic => <span key={topic} className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm text-white/60">{topic}</span>)}</div>
 
-          <div className="mt-10 rounded-xl border border-[#c9a84c]/25 bg-[#c9a84c]/[0.05] p-7"><h2 className="text-2xl font-bold">Bookings & inquiries</h2><p className="mt-3 leading-7 text-white/55">For interviews, commentary, podcast bookings, licensing, or media requests.</p><a href="mailto:press@wtpnews.org" className="mt-5 inline-block font-bold text-[#c9a84c]">press@wtpnews.org →</a></div>
+          <div className="mt-10 rounded-xl border border-[#c9a84c]/25 bg-[#c9a84c]/[0.05] p-7"><h2 className="text-2xl font-bold">Bookings & inquiries</h2><p className="mt-3 leading-7 text-white/55">For interviews, commentary, podcast bookings, licensing, or media requests. Call the official Don Matthews line or email press.</p><div className="mt-5 flex flex-wrap gap-x-6 gap-y-2"><a href={DON_VOICE_TEL} className="inline-block font-bold text-[#c9a84c]">{DON_VOICE_DISPLAY} →</a><a href="mailto:press@wtpnews.org" className="inline-block font-bold text-[#c9a84c]">press@wtpnews.org →</a></div></div>
         </div>
       </section>
 

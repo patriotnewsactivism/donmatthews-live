@@ -1,4 +1,4 @@
-import { fetchFeedAll } from "./content.js";
+import { fetchFeedAll, fetchPageText } from "./content.js";
 import { upsertArticles, memoryAvailable } from "./memory.js";
 
 async function main(): Promise<void> {
@@ -6,6 +6,21 @@ async function main(): Promise<void> {
   const { rows, errors } = await fetchFeedAll();
   for (const error of errors) {
     console.warn("[ingest] source error:", error);
+  }
+  if (!rows.some((row) => /civil rights hub/i.test(row.source))) {
+    try {
+      const summary = await fetchPageText("https://civilrightshub.org");
+      rows.push({
+        source: "Civil Rights Hub",
+        url: "https://civilrightshub.org",
+        title: "Civil Rights Hub",
+        summary,
+        publishedAt: new Date().toISOString(),
+      });
+      console.log("[ingest] added Civil Rights Hub homepage snapshot (no RSS feed)");
+    } catch (error) {
+      console.warn("[ingest] Civil Rights Hub homepage snapshot failed:", error);
+    }
   }
   console.log(`[ingest] ${rows.length} items fetched (${errors.length} source errors)`);
 

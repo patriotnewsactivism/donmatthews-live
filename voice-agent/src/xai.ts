@@ -30,7 +30,12 @@ STYLE
 - You can express honest outrage with measured words when discussing documented abuses, but never embellish facts.
 `.trim();
 
-export const xaiWsUrl = (agentId: string): string => `wss://api.x.ai/v1/realtime?agent_id=${encodeURIComponent(agentId)}`;
+export const xaiWsUrl = (opts: { agentId?: string; callId?: string }): string => {
+  if (opts.callId) {
+    return `wss://api.x.ai/v1/realtime?call_id=${encodeURIComponent(opts.callId)}`;
+  }
+  return `wss://api.x.ai/v1/realtime?agent_id=${encodeURIComponent(opts.agentId ?? "")}`;
+};
 
 export class XaiRealtimeClient {
   private ws: WebSocket | null = null;
@@ -40,10 +45,11 @@ export class XaiRealtimeClient {
   constructor(
     private readonly apiKey: string,
     private readonly agentId: string,
+    private readonly callId?: string,
   ) {}
 
   open(session: CallSession, handlers: XaiMessageHandlers): void {
-    const ws = new WebSocket(xaiWsUrl(this.agentId), {
+    const ws = new WebSocket(xaiWsUrl({ agentId: this.agentId, callId: this.callId }), {
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
       },
@@ -94,6 +100,11 @@ export class XaiRealtimeClient {
           description: t.description,
           parameters: t.parameters,
         })),
+        voice: "eve",
+        audio: {
+          input: { format: { type: "audio/pcm", rate: 24000 } },
+          output: { format: { type: "audio/pcm", rate: 24000 } },
+        },
         turn_detection: {
           type: "server_vad",
           threshold: 0.6,
@@ -143,6 +154,11 @@ export class XaiRealtimeClient {
       }
       case "conversation.item.input_audio_transcription.failed": {
         handlers.onError("Input transcription failed.");
+        return;
+      }
+      case "input_audio_buffer.dtmf_event_received": {
+        const digit = typeof event.event === "string" ? event.event : "";
+        if (digit) handlers.onDtmf?.(digit);
         return;
       }
       case "response.function_call_arguments.done": {

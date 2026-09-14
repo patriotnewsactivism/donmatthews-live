@@ -22,7 +22,7 @@ const DEFAULT_DONATION_INFO =
 
 export const config = {
   port: Number(optEnv("PORT", "8080")),
-  xaiApiKey: requireEnv("XAI_API_KEY"),
+  xaiApiKey: optEnv("XAI_API_KEY"),
   xaiAgentId: optEnv("XAI_AGENT_ID", "agent_BVrCNfKW2CpeZyH2"),
   publicBaseUrl: optEnv("PUBLIC_BASE_URL", "http://localhost:8080").replace(/\/+$/, ""),
   streamToken: optEnv("STREAM_TOKEN"),

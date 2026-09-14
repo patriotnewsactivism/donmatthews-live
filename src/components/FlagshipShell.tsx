@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { DON_VOICE_DISPLAY, DON_VOICE_TEL } from "@/lib/voice";
 
 const nav = [
   ["About", "/about"],
@@ -66,6 +67,7 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-white/45">
+          <a href={DON_VOICE_TEL} className="hover:text-white">{DON_VOICE_DISPLAY}</a>
           <Link href="/updates" className="hover:text-white">Updates</Link>
           <Link href="/privacy-policy" className="hover:text-white">Privacy</Link>
           <Link href="/terms" className="hover:text-white">Terms</Link>

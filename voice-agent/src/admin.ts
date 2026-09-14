@@ -24,7 +24,7 @@ function parseRepo(input: string): RepoPair {
   const clean = input.trim().replace(/^https?:\/\/(www\.)?github\.com\//, "");
   const parts = clean.split("/").filter(Boolean);
   if (parts.length >= 2) return { owner: parts[0], repo: parts[1].replace(/\.git$/, "") };
-  return { owner: config.githubUser || "donmatthews", repo: parts[0] };
+  return { owner: config.githubUser || "patriotnewsactivism", repo: parts[0] };
 }
 
 async function ghGet(path: string): Promise<unknown> {
