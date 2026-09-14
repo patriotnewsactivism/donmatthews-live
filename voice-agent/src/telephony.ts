@@ -16,7 +16,7 @@ export function xmlEscape(value: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
+    .replace(/\"/g, "&quot;")
     .replace(/'/g, "&apos;");
 }
 
@@ -25,6 +25,20 @@ export function streamUrl(publicBaseUrl: string, streamToken = ""): string {
   return `${toWsUrl(publicBaseUrl)}/stream${tokenSuffix}`;
 }
 
+/**
+ * Telnyx-managed Conversational AI path. The carrier owns the media, STT,
+ * orchestration and TTS path; our app only returns the assistant identifier.
+ */
+export function aiAssistantTeXml(assistantId: string): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <AIAssistant id="${xmlEscape(assistantId)}"></AIAssistant>
+  </Connect>
+</Response>`;
+}
+
+/** Legacy custom WebSocket bridge, retained for rollback. */
 export function voiceTeXml(url: string, from = "", to = ""): string {
   const escapedUrl = xmlEscape(url);
   const fromParam = from
