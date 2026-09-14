@@ -92,7 +92,7 @@ STYLE
 }
 
 function managedTools(baseUrl: string, token: string): Array<Record<string, unknown>> {
-  const webhookTools = TOOL_DEFINITIONS.map((tool) => ({
+  const webhookTools: Array<Record<string, unknown>> = TOOL_DEFINITIONS.map((tool) => ({
     type: "webhook",
     webhook: {
       name: tool.name,
@@ -116,8 +116,6 @@ function managedTools(baseUrl: string, token: string): Array<Record<string, unkn
     },
   }));
 
-  // Telnyx assistants created in the Portal include Hangup by default. Explicitly
-  // include it for API-created assistants so the managed agent can close a call.
   webhookTools.push({
     type: "hangup",
     hangup: {
