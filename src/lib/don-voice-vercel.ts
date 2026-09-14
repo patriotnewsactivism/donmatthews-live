@@ -1,6 +1,7 @@
 import { config } from "../../voice-agent/src/config";
 import { memoryAvailable } from "../../voice-agent/src/memory";
-import { parseVoiceWebhook, streamUrl, voiceTeXml } from "../../voice-agent/src/telephony";
+import { getManagedAssistantId, managedWebhookToken } from "../../voice-agent/src/telnyx-managed";
+import { aiAssistantTeXml, parseVoiceWebhook, streamUrl, voiceTeXml } from "../../voice-agent/src/telephony";
 
 const XML_HEADERS = {
   "content-type": "text/xml; charset=utf-8",
@@ -9,8 +10,6 @@ const XML_HEADERS = {
 
 function normalizePublicBaseUrl(value: string): string {
   const url = new URL(value);
-  // The apex hostname redirects to www. Telephony and WebSocket traffic should
-  // use the redirect-free canonical host directly.
   if (url.hostname.toLowerCase() === "donmatthews.live") {
     url.hostname = "www.donmatthews.live";
   }
@@ -20,7 +19,7 @@ function normalizePublicBaseUrl(value: string): string {
   return url.toString().replace(/\/+$/, "");
 }
 
-function requestBaseUrl(request: Request): string {
+export function requestVoiceBaseUrl(request: Request): string {
   const configured = process.env.PUBLIC_BASE_URL?.trim();
   if (configured) {
     try {
@@ -43,42 +42,67 @@ function unavailableTeXml(): string {
 }
 
 export async function handleVoiceRequest(request: Request): Promise<Response> {
-  if (!config.xaiApiKey) {
-    console.error("[voice] XAI_API_KEY missing; refusing to open a media stream");
-    return new Response(unavailableTeXml(), {
+  const managedAssistantId = await getManagedAssistantId();
+  if (managedAssistantId) {
+    console.log(`[voice] managed Telnyx assistant ${managedAssistantId} selected`);
+    return new Response(aiAssistantTeXml(managedAssistantId), {
       status: 200,
       headers: XML_HEADERS,
     });
   }
 
-  const body = request.method === "POST" ? await request.text() : "";
-  const contentType = request.headers.get("content-type") ?? "";
-  const caller = parseVoiceWebhook(body, contentType);
-  const baseUrl = requestBaseUrl(request);
-  const xml = voiceTeXml(streamUrl(baseUrl, config.streamToken), caller.from, caller.to);
+  if (config.xaiApiKey) {
+    const body = request.method === "POST" ? await request.text() : "";
+    const contentType = request.headers.get("content-type") ?? "";
+    const caller = parseVoiceWebhook(body, contentType);
+    const baseUrl = requestVoiceBaseUrl(request);
+    const xml = voiceTeXml(streamUrl(baseUrl, config.streamToken), caller.from, caller.to);
+    console.warn("[voice] managed assistant unavailable; using legacy xAI/WebSocket fallback");
+    return new Response(xml, {
+      status: 200,
+      headers: XML_HEADERS,
+    });
+  }
 
-  return new Response(xml, {
+  console.error("[voice] neither TELNYX_ASSISTANT_ID nor XAI_API_KEY is available");
+  return new Response(unavailableTeXml(), {
     status: 200,
     headers: XML_HEADERS,
   });
 }
 
-export function handleVoiceHealth(): Response {
-  const xaiConfigured = Boolean(config.xaiApiKey);
+export async function handleVoiceHealth(): Promise<Response> {
+  const managedAssistantId = await getManagedAssistantId();
+  const managedReady = Boolean(managedAssistantId);
+  const legacyReady = Boolean(config.xaiApiKey && config.xaiAgentId);
+  const ok = managedReady || legacyReady;
 
   return Response.json(
     {
-      ok: xaiConfigured,
+      ok,
       service: "don-voice-agent",
       platform: "vercel",
+      mode: managedReady ? "telnyx-managed" : legacyReady ? "xai-websocket-fallback" : "unconfigured",
       memory: memoryAvailable() ? "supabase" : "disabled",
       admin: config.githubToken ? "configured" : "disabled",
       ownerAccess: config.adminPasscode ? "configured" : "disabled",
-      agent: Boolean(config.xaiAgentId),
-      xai: xaiConfigured ? "configured" : "missing",
+      telnyx: {
+        assistant: managedReady ? "configured" : "missing",
+        provisioningApi: config.telnyxApiKey ? "configured" : "missing",
+        toolSecurity: managedWebhookToken() ? "configured" : "missing",
+        model: config.telnyxModel,
+        voice: config.telnyxVoice,
+        stt: config.telnyxTranscriptionModel,
+        texmlApp: config.telnyxTexmlAppId ? "configured" : "optional",
+        callerId: config.telnyxCallerId ? "configured" : "optional",
+      },
+      legacy: {
+        agent: Boolean(config.xaiAgentId),
+        xai: config.xaiApiKey ? "configured" : "missing",
+      },
     },
     {
-      status: xaiConfigured ? 200 : 503,
+      status: ok ? 200 : 503,
       headers: { "cache-control": "no-store" },
     },
   );
