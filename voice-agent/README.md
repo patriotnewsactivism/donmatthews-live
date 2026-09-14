@@ -7,11 +7,13 @@ Voice agent that answers phone calls as Don Matthews. It answers questions from 
 The production target is **Vercel**, in the same `donmatthews-live` project that serves `donmatthews.live`.
 
 ```text
-Phone -> Telnyx -> POST https://donmatthews.live/voice
-                   -> wss://donmatthews.live/stream
+Phone -> Telnyx -> POST https://www.donmatthews.live/voice
+                   -> wss://www.donmatthews.live/stream
                    -> xAI Realtime WebSocket
                    -> response audio back to Telnyx
 ```
+
+The apex hostname currently redirects to `www.donmatthews.live`. Telephony webhooks must use the `www` URL directly so Telnyx receives TeXML instead of an HTTP redirect.
 
 Vercel routes:
 
@@ -32,7 +34,7 @@ Required for live calling:
 
 - `XAI_API_KEY`
 - `XAI_AGENT_ID` (defaults to the configured Don agent ID when omitted)
-- `PUBLIC_BASE_URL=https://donmatthews.live`
+- `PUBLIC_BASE_URL=https://www.donmatthews.live`
 - `STREAM_TOKEN` — random shared secret protecting the media stream URL
 - `OWNER_PHONE`
 - `ADMIN_PASSCODE`
@@ -53,14 +55,14 @@ Other optional settings:
 - `MAX_VERIFY_ATTEMPTS` — defaults to `3`
 - `DONATION_INFO_TEXT`
 
-The runtime fails closed for owner access when `ADMIN_PASSCODE` is absent. `/health` reports only whether sensitive integrations are configured; it never returns secret values.
+The runtime fails closed for owner access when `ADMIN_PASSCODE` is absent. `/health` reports only whether sensitive integrations are configured; it never returns secret values. A missing `XAI_API_KEY` makes `/health` return HTTP 503 and the voice webhook returns a controlled unavailable message rather than attempting a broken media stream.
 
 ## Cutover procedure
 
 1. Merge a Vercel-verified migration commit to `main`.
-2. Confirm `https://donmatthews.live/health` returns `ok: true`, `platform: vercel`, and `xai: configured`.
+2. Confirm `https://www.donmatthews.live/health` returns `ok: true`, `platform: vercel`, and `xai: configured`.
 3. Confirm Supabase/admin fields show the intended state.
-4. Point the Telnyx TeXML application's voice webhook at `POST https://donmatthews.live/voice`.
+4. Point the Telnyx TeXML application's voice webhook at `POST https://www.donmatthews.live/voice`.
 5. Place a real inbound test call and verify greeting, conversational voice consistency, two-way audio, DTMF, and hangup cleanup.
 6. Verify Supabase session persistence and owner verification if those features are enabled.
 7. Only after the live call passes, retire the old Cloud Run service and Google deployment credentials.
