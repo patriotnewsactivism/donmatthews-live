@@ -1,69 +1,109 @@
 # Don Voice Agent
 
-Voice agent that answers phone calls as Don Matthews: it answers questions from We The People News (`wtpnews.org`) and Civil Rights Hub (`civilrightshub.org`), gives donation/support info, persists memory across calls in Supabase, and — when called from the owner's phone with the passcode — unlocks admin tools that operate on the owner's GitHub repos through the GitHub API.
+Voice agent that answers phone calls as Don Matthews. It answers questions from We The People News (`wtpnews.org`) and Civil Rights Hub (`civilrightshub.org`), gives donation/support information, can persist memory across calls in Supabase, and can unlock owner-only GitHub administration tools after phone-number plus passcode verification.
 
-Architecture: Telnyx TeXML Media Streams (μ-law 8 kHz; Twilio TwiML still accepted) <-> x.ai Realtime WebSocket (PCM16 24 kHz), bridged in this Node service. No auxiliary TTS/STT services needed — the x.ai `agent_id` supplies the configured voice and speech recognition. Session updates intentionally do not override that voice.
+## Production architecture
 
+The production target is **Vercel**, in the same `donmatthews-live` project that serves `donmatthews.live`.
+
+```text
+Phone -> Telnyx -> POST https://donmatthews.live/voice
+                   -> wss://donmatthews.live/stream
+                   -> xAI Realtime WebSocket
+                   -> response audio back to Telnyx
 ```
-Phone -> Telnyx -> POST /voice (TeXML) -> wss /stream -> bridge -> wss api.x.ai/v1/realtime?agent_id=...
-                     <- μ-law 8k <- upsample/downsample <- PCM 24k <-
-```
 
-## Live service
+Vercel routes:
 
-- Cloud Run (separate from the flagship Next.js service): `https://don-voice-agent-406797137160.us-central1.run.app`
-- Telnyx number: `+1 832-975-7665` (TeXML app "Don Matthews Voice Agent" → `POST /voice`)
-- Health: `GET /health`
-- SIP join webhook (xAI Direct SIP): `POST /xai/sip`
+- `GET /health` — voice runtime health/configuration-presence check
+- `GET|POST /voice` — primary Telnyx/TwiML-compatible voice webhook
+- `GET|POST /telnyx/voice` — Telnyx compatibility alias
+- `GET|POST /twilio/voice` — Twilio compatibility alias
+- `GET /stream` — bidirectional media WebSocket
+- `POST /xai/sip` — xAI Direct SIP webhook
 
-Calls will greet only after `XAI_API_KEY` is set on that Cloud Run service (`gcloud run services update don-voice-agent --region us-central1 --update-env-vars XAI_API_KEY=...`). Create the key at https://console.x.ai. Admin GitHub tools stay off until `GITHUB_TOKEN` is set the same way.
+The `voice-agent/src` directory remains the shared voice engine and local standalone runner. Vercel adapters live under `src/app` and `src/lib` so the website and voice backend deploy together from the same Git commit.
 
-## Setup
+## Required Vercel environment variables
 
-1. Install: `cd voice-agent && npm install`
-2. Create `.env` from `.env.example` and fill in:
-   - `XAI_API_KEY` — your x.ai key. `XAI_AGENT_ID` defaults to the voice agent id.
-   - `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` / `DATABASE_URL` — same Supabase project as donmatthews.live. Service role and database URLs stay **only on the server**.
-   - `PUBLIC_BASE_URL` — the public HTTPS URL of this service (used to build the TeXML Stream URL).
-   - `STREAM_TOKEN` — required in production: a random shared secret appended to the stream URL.
-   - `OWNER_PHONE` and `ADMIN_PASSCODE` — owner verification. Do not commit the passcode.
-   - `GITHUB_TOKEN` — optional fine-grained PAT (repos + actions scope) to enable `admin_*` tools.
-3. Apply schema and seed donation facts: `npm run db:setup`. Then ingest articles: `npm run ingest` (re-run on a schedule to keep articles fresh).
-4. Deploy this Node service on HTTPS (Cloud Run, a VPS with Caddy, etc.). This is a **separate** voice service — do not point it at the flagship Next.js Cloud Run service, and do not use mutable `latest` as release provenance.
-5. Telnyx Mission Control: TeXML application Voice webhook `POST https://<host>/voice`. Assign a voice-capable number to that TeXML app. `/twilio/voice` remains as a compatibility alias.
-6. Test: `npm run check`, then call the number. DTMF keys or spoken digits both work for the access code.
+Set secrets in Vercel Project Settings -> Environment Variables. Do **not** commit them.
+
+Required for live calling:
+
+- `XAI_API_KEY`
+- `XAI_AGENT_ID` (defaults to the configured Don agent ID when omitted)
+- `PUBLIC_BASE_URL=https://donmatthews.live`
+- `STREAM_TOKEN` — random shared secret protecting the media stream URL
+- `OWNER_PHONE`
+- `ADMIN_PASSCODE`
+
+Required for persistent memory:
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `DATABASE_URL`
+
+Optional owner administration:
+
+- `GITHUB_TOKEN` — fine-grained token with only the repository/actions permissions the owner intends to expose
+- `GITHUB_USER` — defaults to `patriotnewsactivism`
+
+Other optional settings:
+
+- `MAX_VERIFY_ATTEMPTS` — defaults to `3`
+- `DONATION_INFO_TEXT`
+
+The runtime fails closed for owner access when `ADMIN_PASSCODE` is absent. `/health` reports only whether sensitive integrations are configured; it never returns secret values.
+
+## Cutover procedure
+
+1. Merge a Vercel-verified migration commit to `main`.
+2. Confirm `https://donmatthews.live/health` returns `ok: true`, `platform: vercel`, and `xai: configured`.
+3. Confirm Supabase/admin fields show the intended state.
+4. Point the Telnyx TeXML application's voice webhook at `POST https://donmatthews.live/voice`.
+5. Place a real inbound test call and verify greeting, conversational voice consistency, two-way audio, DTMF, and hangup cleanup.
+6. Verify Supabase session persistence and owner verification if those features are enabled.
+7. Only after the live call passes, retire the old Cloud Run service and Google deployment credentials.
+
+The old Cloud Run instance is a rollback source during migration only; it is no longer the deployment target.
+
+## Local setup
+
+1. `cd voice-agent && npm install`
+2. Copy `.env.example` to `.env` and fill the required variables.
+3. Apply the schema and seed facts with `npm run db:setup`.
+4. Ingest article content with `npm run ingest`.
+5. Run `npm run check`, `npm run typecheck`, and `npm run build`.
+6. Start with `npm run dev` or `npm run start`.
 
 ## Owner ("sudo") mode
 
-- The agent only grants admin tools when **both** hold: the caller's number (normalized from Twilio `From`) equals `OWNER_PHONE`, and `verify_access` succeeds with `ADMIN_PASSCODE`.
-- Caller ID can be spoofed on telco networks, so the phone number alone is worth nothing; the passcode is the real gate. Keep it 6+ digits if you can, and expect ~3 attempts max per call (configurable `MAX_VERIFY_ATTEMPTS`).
-- Every `admin_*` and `verify_access` invocation is written to `admin_audit_log` (session, caller, tool, args, result).
-- Admin tools act through the GitHub REST API only: list repos, repo status (commits/PRs/CI), read a file, open an issue, comment on a PR/issue, list workflows, trigger a workflow (deploy by default). There is no shell execution and no way to run arbitrary commands — the GitHub token and its scopes bound what the agent can do, and the audit log records everything.
+The agent grants owner tools only when both conditions hold: the normalized caller number equals `OWNER_PHONE`, and `verify_access` succeeds with `ADMIN_PASSCODE`. Caller ID alone is not trusted. Failed verification attempts are limited by `MAX_VERIFY_ATTEMPTS`.
 
-## Persistence (Supabase)
+Every `admin_*` and `verify_access` invocation is written to `admin_audit_log`. Admin tools operate through the GitHub REST API; there is no arbitrary shell-execution tool in the voice agent.
+
+## Persistence
 
 | Table | Purpose |
 |---|---|
-| `voice_sessions` | one row per call (caller, owner flag, sudo state, verify attempts, summary) |
-| `voice_messages` | every user/assistant/tool message per call |
-| `voice_memory` | durable key/value facts for `remember` / `recall` across calls |
-| `voice_articles` | ingested articles from wtpnews.org / civilrightshub.org, searched by `search_articles` |
-| `admin_audit_log` | immutable admin action log |
-
-## Tools exposed to the agent
-
-Public: `search_articles`, `latest_articles`, `fetch_page` (allow-listed to wtpnews.org, civilrightshub.org, donmatthews.live), `donation_info` (from `voice_memory.donation_info` or `DONATION_INFO_TEXT`), `remember`, `recall`, `verify_access`. Owner-only (server-enforced, not just prompt-enforced): `admin_*` listed above.
+| `voice_sessions` | one row per call |
+| `voice_messages` | user, assistant, and tool messages |
+| `voice_memory` | durable remembered facts |
+| `voice_articles` | ingested article content |
+| `admin_audit_log` | owner/admin action audit records |
 
 ## Security notes
 
-- No secrets are printed in logs or returned to callers. Diagnostic output reports only presence (`admin: configured`).
-- The x.ai key, Supabase service key, GitHub token, and passcode live only in server env vars.
-- Do not enable admin tools (`GITHUB_TOKEN`) on the same deployment that faces arbitrary callers until you have watched the audit log behave for a while.
-- Responses over the phone quote article text; the agent is instructed to cite source and never fabricate filings. Ingest drops ~all HTML and caps summary length (8k chars per item); `fetch_page` caps at 8k chars.
+- Never commit xAI, Supabase, GitHub, stream-token, database, or passcode secrets.
+- Keep `SUPABASE_SERVICE_ROLE_KEY` and `DATABASE_URL` server-side only.
+- Use a strong random `STREAM_TOKEN` for production.
+- Keep GitHub token scopes as narrow as practical.
+- The configured xAI agent owns the Don voice. Session updates must not hard-code a different voice.
+- Vercel function/WebSocket duration limits apply to active calls; clients/carriers must tolerate reconnect/termination behavior at the platform limit.
 
 ## Scripts
 
-- `npm run dev` / `npm run start` — run the server (dev watch / compiled)
-- `npm run build` / `npm run typecheck` — compile / type-check
-- `npm run check` — audio codec + utils self-test (no network)
-- `npm run ingest` — pull feeds into `voice_articles` (idempotent; upsert on URL)
+- `npm run dev` / `npm run start` — local standalone server
+- `npm run build` / `npm run typecheck` — compile/type-check standalone voice code
+- `npm run check` — codec/utilities self-test
+- `npm run ingest` — idempotently refresh article content
