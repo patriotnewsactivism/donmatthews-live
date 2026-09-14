@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import BookLaunchForm from "@/components/BookLaunchForm";
-import { FlagshipPage, GoldButton, OutlineButton, PageHero } from "@/components/FlagshipShell";
+import { FlagshipPage, GoldButton, PageHero } from "@/components/FlagshipShell";
 
 export const metadata: Metadata = {
   title: "American Injustice | Don Matthews",
@@ -50,29 +50,6 @@ const parts = [
   ["Part VI · Systemic Analysis", "Reference", "Legal analysis and appendices that separate the author's conclusions from the underlying documentary record."],
 ] as const;
 
-const sourceLinks = [
-  {
-    title: "Publication Table of Contents",
-    text: "The current 39-chapter structure and six-part organization used by the publication build.",
-    href: "https://github.com/patriotnewsactivism/American-Injustice/blob/main/full-rewrite/000_contents.md",
-  },
-  {
-    title: "Organized Evidence Archive",
-    text: "Publicly organized source folders for court matters, records requests, filings, and related documentary material.",
-    href: "https://github.com/patriotnewsactivism/American-Injustice/tree/main/evidence-organized",
-  },
-  {
-    title: "Latest Source Packet",
-    text: "A dated editorial index recording newly integrated documents, verified facts, preserved conflicts, and corrections.",
-    href: "https://github.com/patriotnewsactivism/American-Injustice/blob/main/evidence-organized/NEW_SOURCE_PACKET_2026-08-22.md",
-  },
-  {
-    title: "Sample Source-First Chapter",
-    text: "The May 1, 2017 chapter demonstrates the method: surviving recording, officer report, the author's account, and limits on what the record can establish.",
-    href: "https://github.com/patriotnewsactivism/American-Injustice/blob/main/full-rewrite/02_chapter2_may1_arrest.md",
-  },
-] as const;
-
 const method = [
   ["Documented fact", "A fact directly supported by a filing, order, official record, recording, transcript, or other identified source."],
   ["Attributed allegation", "A disputed claim is identified as an allegation and attributed to the person or filing making it."],
@@ -96,7 +73,6 @@ const bookSchema = {
   genre: ["Nonfiction", "Legal memoir", "Investigative journalism"],
   description: "A 39-chapter nonfiction legal-thriller memoir built alongside a source-first documentary record.",
   numberOfPages: 291,
-  isBasedOn: "https://github.com/patriotnewsactivism/American-Injustice",
   offers: [
     { "@type": "Offer", priceCurrency: "USD", price: "25.99", availability: "https://schema.org/PreOrder", name: "Paperback" },
     { "@type": "Offer", priceCurrency: "USD", price: "35.99", availability: "https://schema.org/PreOrder", name: "Hardback" },
@@ -217,8 +193,8 @@ export default function AmericanInjusticePage() {
       <PageHero
         eyebrow="AMERICAN INJUSTICE"
         title="The story. The record behind it. Both matter."
-        intro="A nonfiction legal-thriller memoir built in parallel with a documentary record so readers can follow the narrative and inspect the underlying sources for themselves."
-        actions={<><GoldButton href="https://help.donmatthews.live">Explore the Current Story</GoldButton><OutlineButton href="/record">Open The Record</OutlineButton></>}
+        intro="A nonfiction legal-thriller memoir built in parallel with a documentary record so readers can follow the narrative with care."
+        actions={<GoldButton href="https://help.donmatthews.live">Explore the Current Story</GoldButton>}
       />
 
       <section className="mx-auto max-w-7xl px-5 py-14 sm:py-20">
@@ -232,23 +208,6 @@ export default function AmericanInjusticePage() {
               <p className="mt-3 leading-7 text-white/55 sm:mt-4 sm:leading-8">{text}</p>
             </article>
           ))}
-        </div>
-      </section>
-
-      <section className="border-y border-white/10 bg-[#101010]">
-        <div className="mx-auto max-w-7xl px-5 py-14 sm:py-20">
-          <p className="text-xs font-black tracking-[0.2em] text-[#c9a84c]">READ THE SOURCES</p>
-          <h2 className="mt-3 text-3xl font-black sm:text-5xl">The documentary record is public.</h2>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-white/55 sm:mt-5 sm:text-lg sm:leading-8">The public repository is not just a code archive. It contains the working manuscript, organized evidence, source indexes, transcriptions, and editorial notes used to keep narrative claims tied to the record.</p>
-          <div className="mt-8 grid gap-4 sm:mt-10 sm:gap-5 md:grid-cols-2">
-            {sourceLinks.map((source) => (
-              <a key={source.title} href={source.href} target="_blank" rel="noopener noreferrer" className="group rounded-xl border border-white/10 bg-black/25 p-6 transition hover:border-[#c9a84c]/40 sm:p-7">
-                <h3 className="text-xl font-bold group-hover:text-[#c9a84c] sm:text-2xl">{source.title}</h3>
-                <p className="mt-3 leading-7 text-white/50 sm:leading-8">{source.text}</p>
-                <span className="mt-5 inline-block text-sm font-bold text-[#c9a84c] sm:mt-6">Open source →</span>
-              </a>
-            ))}
-          </div>
         </div>
       </section>
 

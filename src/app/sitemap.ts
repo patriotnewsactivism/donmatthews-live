@@ -10,7 +10,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ["/projects", 0.9, "weekly"],
     ["/technology", 0.9, "weekly"],
     ["/american-injustice", 1, "weekly"],
-    ["/record", 1, "weekly"],
     ["/music", 0.8, "weekly"],
     ["/press", 0.7, "monthly"],
     ["/updates", 0.9, "weekly"],

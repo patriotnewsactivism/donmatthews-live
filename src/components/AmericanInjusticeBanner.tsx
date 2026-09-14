@@ -140,7 +140,6 @@ export default function AmericanInjusticeBanner() {
           {[
             ["About", "/about"],
             ["The Book", "/american-injustice"],
-            ["The Record", "/record"],
             ["Media", "/press"],
             ["Updates", "/updates"],
             ["Contact", "/contact"],

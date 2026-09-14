@@ -72,7 +72,7 @@ export default function MusicPage() {
             <p className="text-xs font-black uppercase tracking-[0.2em] text-[#c9a84c]">FEATURED TRACKS</p>
             <h2 className="display-serif mt-4 text-4xl font-semibold tracking-[-0.035em] sm:text-6xl">Songs with a paper trail.</h2>
           </div>
-          <p className="max-w-2xl text-base leading-8 text-white/50 sm:text-lg lg:justify-self-end">A few entry points into the catalog. The full release belongs at BadActors.online; related reporting and evidence stay connected through WTP News and The Record.</p>
+          <p className="max-w-2xl text-base leading-8 text-white/50 sm:text-lg lg:justify-self-end">A few entry points into the catalog. The full release belongs at BadActors.online; related reporting and context stay connected through WTP News.</p>
         </div>
 
         <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -88,7 +88,7 @@ export default function MusicPage() {
       </section>
 
       <section className="border-y border-white/10 bg-[#101010]">
-        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:py-20 lg:grid-cols-3">
+        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:py-20 lg:grid-cols-2">
           <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
             <p className="text-[10px] font-black uppercase tracking-[.18em] text-[#c9a84c]">MUSIC</p>
             <h3 className="mt-3 text-2xl font-black">BadActors.online</h3>
@@ -100,12 +100,6 @@ export default function MusicPage() {
             <h3 className="mt-3 text-2xl font-black">We The People News</h3>
             <p className="mt-3 text-sm leading-7 text-white/48">Stories, context, people, chronology, and public-accountability reporting that overlap with the songs.</p>
             <a href="https://www.wtpnews.org/category/music/" target="_blank" rel="noopener noreferrer" className="mt-5 inline-block text-sm font-black text-[#c9a84c]">Read music coverage ↗</a>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
-            <p className="text-[10px] font-black uppercase tracking-[.18em] text-[#c9a84c]">SOURCES</p>
-            <h3 className="mt-3 text-2xl font-black">The Record</h3>
-            <p className="mt-3 text-sm leading-7 text-white/48">Primary-source PDFs, case collections, filings, orders, records, and the documents behind the broader narrative.</p>
-            <a href="/record" className="mt-5 inline-block text-sm font-black text-[#c9a84c]">Inspect the documents →</a>
           </div>
         </div>
       </section>

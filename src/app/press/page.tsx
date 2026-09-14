@@ -21,8 +21,7 @@ const topics = [
 
 const mediaLinks = [
   ["We The People News", "Independent reporting and newsroom work.", "https://wtpnews.org"],
-  ["American Injustice", "Book, source archive, publication structure, and editorial method.", "/american-injustice"],
-  ["The Record", "Public source archive and record-label methodology.", "/record"],
+  ["American Injustice", "Book, publication structure, and editorial method.", "/american-injustice"],
   ["Technology & AI", "Autonomous-agent systems, legal technology, and software portfolio.", "/technology"],
   ["Projects", "Current live, beta, and in-development ventures.", "/projects"],
   ["Music", "Bad Actors and documentary-style releases.", "/music"],

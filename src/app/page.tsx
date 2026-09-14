@@ -116,50 +116,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-b border-white/10 bg-[#0d0b09]">
-        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:py-24 lg:grid-cols-[.78fr_1.22fr] lg:items-center">
-          <div className="mx-auto w-full max-w-[520px] overflow-hidden rounded-[1.5rem] border border-[#c9a84c]/20 bg-black p-2 shadow-[0_28px_90px_rgba(0,0,0,0.55)]">
-            <Image
-              src="/images/wanted-poster.jpg"
-              alt="Wanted poster artwork from the Don Matthews documentary record"
-              width={1024}
-              height={1060}
-              sizes="(max-width: 1024px) 90vw, 520px"
-              className="h-auto w-full rounded-[1rem] object-contain"
-            />
-          </div>
-
-          <div className="lg:pl-6">
-            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#c9a84c] sm:text-xs">THE RECORD</p>
-            <h2 className="display-serif mt-4 text-4xl font-semibold leading-[.95] tracking-[-0.035em] sm:text-6xl lg:text-7xl">
-              Cases. Filings.<br />Evidence. Conflicts.
-            </h2>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-white/58 sm:text-lg">
-              A source-first public archive built to distinguish documents, allegations, court findings, unresolved conflicts, and editorial corrections. The record stays visible so readers can inspect the source material instead of being asked to take anyone&apos;s word for it.
-            </p>
-
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              {[
-                ["Verified source", "Directly supported by an identified record."],
-                ["Attributed claim", "A disputed statement preserved with its source."],
-                ["Record conflict", "Contradictions remain visible instead of being erased."],
-                ["Court finding", "What a court actually stated or decided."],
-              ].map(([title, text]) => (
-                <div key={title} className="rounded-xl border border-white/8 bg-white/[0.025] p-4">
-                  <p className="text-sm font-black text-[#e5ce8b]">{title}</p>
-                  <p className="mt-1.5 text-sm leading-6 text-white/42">{text}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/record" className="rounded-lg bg-[#c9a84c] px-5 py-3 text-sm font-black text-black transition hover:-translate-y-0.5 hover:bg-[#dab95f]">Open The Record</Link>
-              <Link href="/american-injustice" className="rounded-lg border border-[#c9a84c]/35 px-5 py-3 text-sm font-black text-[#e0c370] transition hover:-translate-y-0.5 hover:bg-[#c9a84c]/10">Book & Source Archive</Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="border-b border-white/10 bg-[linear-gradient(180deg,#100e0c,#090807)]">
         <div className="mx-auto max-w-7xl px-5 py-16 sm:py-24">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
@@ -224,7 +180,7 @@ export default function Home() {
         <div className="mx-auto max-w-5xl px-5 py-16 text-center sm:py-24">
           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#c9a84c] sm:text-xs">STAY CONNECTED</p>
           <h2 className="display-serif mt-4 text-4xl font-semibold tracking-[-0.035em] sm:text-6xl">Book. Cases. Projects. Music.</h2>
-          <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-white/52 sm:text-lg">Join the flagship update list for major investigations, product launches, American Injustice publication news, music releases, and important developments from The Record.</p>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-white/52 sm:text-lg">Join the flagship update list for major investigations, product launches, American Injustice publication news, music releases, and important case developments.</p>
           <div className="mx-auto mt-8 max-w-3xl text-left"><FlagshipLeadForm /></div>
           <div className="mt-8 flex flex-wrap justify-center gap-5 text-sm font-black text-[#d6b65e]">
             <Link href="/updates">Updates →</Link>

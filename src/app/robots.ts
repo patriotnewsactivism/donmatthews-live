@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/new"],
+      disallow: ["/api/", "/new", "/record", "/record/", "/api/record/"],
     },
     sitemap: "https://donmatthews.live/sitemap.xml",
     host: "https://donmatthews.live",

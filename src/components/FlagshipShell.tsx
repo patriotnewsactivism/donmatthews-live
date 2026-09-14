@@ -6,7 +6,6 @@ const nav = [
   ["Projects", "/projects"],
   ["Technology", "/technology"],
   ["American Injustice", "/american-injustice"],
-  ["The Record", "/record"],
   ["Music", "/music"],
   ["Press", "/press"],
   ["Updates", "/updates"],

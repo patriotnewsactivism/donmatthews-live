@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Leaf, Github, Music2, Disc } from "lucide-react";
+import { Leaf, Music2, Disc } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -49,15 +49,6 @@ export default function Footer() {
 
         {/* Right: Social icons */}
         <div className="flex items-center gap-4">
-          <a
-            href="https://github.com/patriotnewsactivism"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="GitHub"
-            className="p-2 border border-white/10 hover:border-gold/30 bg-white/5 rounded-full text-gray-400 hover:text-gold transition-all"
-          >
-            <Github className="w-4 h-4" />
-          </a>
           <a
             href="https://www.bandlab.com/badactors/albums/8ea7105d-acc1-f011-8195-6045bd30a4b0"
             target="_blank"

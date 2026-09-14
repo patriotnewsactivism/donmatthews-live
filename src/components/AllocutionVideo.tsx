@@ -68,11 +68,8 @@ export default function AllocutionVideo() {
           </h2>
           <p className="mt-6 max-w-2xl text-base leading-7 text-white/62 sm:text-lg sm:leading-8">
             Delivered at the federal sentencing hearing and published in full. No edit, no summary — the statement as
-            it was made, alongside the filings and the rest of the documentary record.
+            it was made.
           </p>
-          <a href="/record" className="mt-7 inline-block font-bold text-[#c9a84c] transition hover:text-[#e2c66d]">
-            Open The Record →
-          </a>
         </div>
 
         <div className="mx-auto w-full max-w-[420px]">

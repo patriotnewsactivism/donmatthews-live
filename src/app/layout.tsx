@@ -62,7 +62,6 @@ const personSchema = {
   sameAs: [
     "https://wtpnews.org",
     "https://badactors.online",
-    "https://github.com/patriotnewsactivism",
   ],
 };
 
