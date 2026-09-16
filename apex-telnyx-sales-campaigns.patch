@@ -1,0 +1,1036 @@
+--- a/packages/core/src/telnyx-missions.ts
++++ b/packages/core/src/telnyx-missions.ts
+@@ -0,0 +1,185 @@
++const TELNYX_API_BASE = 'https://api.telnyx.com/v2';
++
++export interface TelnyxMission {
++  mission_id: string;
++  name: string;
++  description?: string | null;
++  model?: string | null;
++  instructions?: string | null;
++  execution_mode?: 'external' | 'managed' | string;
++  created_at?: string;
++  updated_at?: string;
++}
++
++export interface TelnyxMissionRun {
++  run_id: string;
++  mission_id: string;
++  status: string;
++  started_at?: string;
++  updated_at?: string;
++  result_summary?: string | null;
++  result_payload?: unknown;
++  input?: Record<string, unknown>;
++  metadata?: Record<string, unknown>;
++}
++
++interface TelnyxListResponse<T> {
++  data: T[];
++  meta?: {
++    total_pages?: number;
++    total_results?: number;
++    page_number?: number;
++    page_size?: number;
++  };
++}
++
++interface TelnyxDataResponse<T> {
++  data: T;
++}
++
++export class TelnyxApiError extends Error {
++  constructor(
++    message: string,
++    public readonly status: number,
++  ) {
++    super(message);
++    this.name = 'TelnyxApiError';
++  }
++}
++
++function getApiKey(): string {
++  const apiKey = process.env.TELNYX_API_KEY?.trim();
++  if (!apiKey) {
++    throw new Error('TELNYX_API_KEY is not configured');
++  }
++  return apiKey;
++}
++
++async function telnyxRequest<T>(
++  path: string,
++  init: RequestInit = {},
++): Promise<T> {
++  const response = await fetch(`${TELNYX_API_BASE}${path}`, {
++    ...init,
++    headers: {
++      Authorization: `Bearer ${getApiKey()}`,
++      'Content-Type': 'application/json',
++      ...(init.headers ?? {}),
++    },
++  });
++
++  const body = await response.text();
++  if (!response.ok) {
++    throw new TelnyxApiError(
++      `Telnyx request failed (${response.status}): ${body.slice(0, 500)}`,
++      response.status,
++    );
++  }
++
++  if (!body) {
++    return undefined as T;
++  }
++
++  return JSON.parse(body) as T;
++}
++
++/**
++ * Minimal Telnyx Missions client.
++ *
++ * APEX owns campaign state. Telnyx remains an execution provider whose mission
++ * and run IDs are observed through this boundary, which keeps a future provider
++ * migration possible without rewriting the dashboard.
++ */
++export class TelnyxMissionsClient {
++  isConfigured(): boolean {
++    return Boolean(process.env.TELNYX_API_KEY?.trim());
++  }
++
++  async listMissions(pageSize = 100): Promise<TelnyxMission[]> {
++    const response = await telnyxRequest<TelnyxListResponse<TelnyxMission>>(
++      `/ai/missions?page[size]=${Math.min(Math.max(pageSize, 1), 1000)}`,
++    );
++    return response.data ?? [];
++  }
++
++  async listRuns(pageSize = 100): Promise<TelnyxMissionRun[]> {
++    const response = await telnyxRequest<TelnyxListResponse<TelnyxMissionRun>>(
++      `/ai/missions/runs?page[size]=${Math.min(Math.max(pageSize, 1), 1000)}`,
++    );
++    return response.data ?? [];
++  }
++
++  async createMission(input: {
++    name: string;
++    description?: string;
++    model?: string;
++    instructions?: string;
++    executionMode?: 'external' | 'managed';
++    metadata?: Record<string, unknown>;
++  }): Promise<TelnyxMission> {
++    const response = await telnyxRequest<TelnyxDataResponse<TelnyxMission>>(
++      '/ai/missions',
++      {
++        method: 'POST',
++        body: JSON.stringify({
++          name: input.name,
++          description: input.description,
++          model: input.model,
++          instructions: input.instructions,
++          execution_mode: input.executionMode ?? 'managed',
++          metadata: input.metadata,
++        }),
++      },
++    );
++    return response.data;
++  }
++
++  async startRun(
++    missionId: string,
++    input?: Record<string, unknown>,
++    metadata?: Record<string, unknown>,
++  ): Promise<TelnyxMissionRun> {
++    const response = await telnyxRequest<TelnyxDataResponse<TelnyxMissionRun>>(
++      `/ai/missions/${encodeURIComponent(missionId)}/runs`,
++      {
++        method: 'POST',
++        body: JSON.stringify({ input, metadata }),
++      },
++    );
++    return response.data;
++  }
++
++  async pauseRun(missionId: string, runId: string): Promise<TelnyxMissionRun> {
++    return this.runAction(missionId, runId, 'pause');
++  }
++
++  async resumeRun(missionId: string, runId: string): Promise<TelnyxMissionRun> {
++    return this.runAction(missionId, runId, 'resume');
++  }
++
++  async cancelRun(missionId: string, runId: string): Promise<TelnyxMissionRun> {
++    return this.runAction(missionId, runId, 'cancel');
++  }
++
++  private async runAction(
++    missionId: string,
++    runId: string,
++    action: 'pause' | 'resume' | 'cancel',
++  ): Promise<TelnyxMissionRun> {
++    const response = await telnyxRequest<TelnyxDataResponse<TelnyxMissionRun>>(
++      `/ai/missions/${encodeURIComponent(missionId)}/runs/${encodeURIComponent(runId)}/${action}`,
++      {
++        method: 'POST',
++        body: JSON.stringify({}),
++      },
++    );
++    return response.data;
++  }
++}
++
++let sharedClient: TelnyxMissionsClient | null = null;
++
++export function getTelnyxMissionsClient(): TelnyxMissionsClient {
++  sharedClient ??= new TelnyxMissionsClient();
++  return sharedClient;
++}
+--- a/packages/core/src/index.ts
++++ b/packages/core/src/index.ts
+@@ -36,3 +36,5 @@
+ export * from './work-classifier.js';
+ export * from './worker-heartbeat.js';
+ export * from './execution-outcome.js';
++
++export * from './telnyx-missions.js';
+--- a/packages/api-server/src/routes/sales-campaigns.ts
++++ b/packages/api-server/src/routes/sales-campaigns.ts
+@@ -0,0 +1,240 @@
++import { Router } from 'express';
++import { z } from 'zod';
++import { desc, eq } from 'drizzle-orm';
++import { db, emailCampaigns, emailSends } from '@workspace/db';
++import { getTelnyxMissionsClient } from '@workspace/core';
++
++const createTelnyxMissionSchema = z.object({
++  name: z.string().min(3).max(120),
++  description: z.string().max(1000).optional(),
++  instructions: z.string().min(10).max(20_000),
++  model: z.string().max(200).optional(),
++  input: z.record(z.string(), z.unknown()).optional(),
++  metadata: z.record(z.string(), z.unknown()).optional(),
++});
++
++const EMAIL_LIVE_STATUSES = new Set(['running', 'paused']);
++
++function countStatuses(rows: Array<typeof emailSends.$inferSelect>) {
++  const counts: Record<string, number> = {};
++  for (const row of rows) {
++    counts[row.status] = (counts[row.status] ?? 0) + 1;
++  }
++  return counts;
++}
++
++export function createSalesCampaignsRouter(): Router {
++  const router = Router();
++  const telnyx = getTelnyxMissionsClient();
++
++  router.get('/', async (_req, res) => {
++    try {
++      const campaigns = await db
++        .select()
++        .from(emailCampaigns)
++        .orderBy(desc(emailCampaigns.createdAt))
++        .limit(100);
++
++      const sends = await db.select().from(emailSends);
++      const sendsByCampaign = new Map<string, Array<typeof emailSends.$inferSelect>>();
++      for (const send of sends) {
++        if (!send.campaignId) continue;
++        const list = sendsByCampaign.get(send.campaignId) ?? [];
++        list.push(send);
++        sendsByCampaign.set(send.campaignId, list);
++      }
++
++      let voice: {
++        configured: boolean;
++        missions: Array<{
++          missionId: string;
++          name: string;
++          description?: string | null;
++          updatedAt?: string;
++          latestRun?: {
++            runId: string;
++            status: string;
++            startedAt?: string;
++            updatedAt?: string;
++            resultSummary?: string | null;
++          };
++        }>;
++        error?: string;
++      } = {
++        configured: telnyx.isConfigured(),
++        missions: [],
++      };
++
++      if (voice.configured) {
++        try {
++          const [missions, runs] = await Promise.all([
++            telnyx.listMissions(100),
++            telnyx.listRuns(100),
++          ]);
++          const latestRunByMission = new Map<string, (typeof runs)[number]>();
++          for (const run of runs) {
++            const previous = latestRunByMission.get(run.mission_id);
++            if (
++              !previous ||
++              Date.parse(run.updated_at ?? run.started_at ?? '1970-01-01') >
++                Date.parse(previous.updated_at ?? previous.started_at ?? '1970-01-01')
++            ) {
++              latestRunByMission.set(run.mission_id, run);
++            }
++          }
++
++          voice.missions = missions.map((mission) => {
++            const latest = latestRunByMission.get(mission.mission_id);
++            return {
++              missionId: mission.mission_id,
++              name: mission.name,
++              description: mission.description,
++              updatedAt: mission.updated_at,
++              latestRun: latest
++                ? {
++                    runId: latest.run_id,
++                    status: latest.status,
++                    startedAt: latest.started_at,
++                    updatedAt: latest.updated_at,
++                    resultSummary: latest.result_summary,
++                  }
++                : undefined,
++            };
++          });
++        } catch (err) {
++          voice.error = err instanceof Error ? err.message : String(err);
++        }
++      }
++
++      res.json({
++        email: campaigns.map((campaign) => {
++          const rows = sendsByCampaign.get(campaign.id) ?? [];
++          return {
++            ...campaign,
++            counts: countStatuses(rows),
++            recentSends: rows
++              .slice()
++              .sort(
++                (a, b) =>
++                  b.createdAt.getTime() - a.createdAt.getTime(),
++              )
++              .slice(0, 10),
++          };
++        }),
++        voice,
++      });
++    } catch (err) {
++      res.status(500).json({
++        error: err instanceof Error ? err.message : String(err),
++      });
++    }
++  });
++
++  router.post('/email/:id/:action', async (req, res) => {
++    const action = req.params.action;
++    if (!['pause', 'resume', 'cancel'].includes(action)) {
++      res.status(404).json({ error: 'Unknown campaign action' });
++      return;
++    }
++
++    const [campaign] = await db
++      .select()
++      .from(emailCampaigns)
++      .where(eq(emailCampaigns.id, req.params.id))
++      .limit(1);
++
++    if (!campaign) {
++      res.status(404).json({ error: 'Email campaign not found' });
++      return;
++    }
++
++    if (!EMAIL_LIVE_STATUSES.has(campaign.status)) {
++      res.status(409).json({
++        error: `Campaign is ${campaign.status} and cannot be ${action}d.`,
++      });
++      return;
++    }
++
++    const nextStatus =
++      action === 'pause'
++        ? 'paused'
++        : action === 'resume'
++          ? 'running'
++          : 'cancelled';
++
++    await db
++      .update(emailCampaigns)
++      .set({
++        status: nextStatus,
++        lastProgressAt: new Date(),
++        ...(nextStatus === 'cancelled'
++          ? {
++              completedAt: new Date(),
++              result: 'Cancelled by operator from Sales Campaigns.',
++            }
++          : {}),
++      })
++      .where(eq(emailCampaigns.id, campaign.id));
++
++    res.json({ campaignId: campaign.id, status: nextStatus });
++  });
++
++  router.post('/voice', async (req, res) => {
++    if (!telnyx.isConfigured()) {
++      res.status(503).json({ error: 'TELNYX_API_KEY is not configured' });
++      return;
++    }
++
++    const parsed = createTelnyxMissionSchema.safeParse(req.body);
++    if (!parsed.success) {
++      res.status(400).json({ error: parsed.error.flatten() });
++      return;
++    }
++
++    try {
++      const mission = await telnyx.createMission({
++        name: parsed.data.name,
++        description: parsed.data.description,
++        instructions: parsed.data.instructions,
++        model: parsed.data.model,
++        executionMode: 'managed',
++        metadata: parsed.data.metadata,
++      });
++      const run = await telnyx.startRun(
++        mission.mission_id,
++        parsed.data.input,
++        parsed.data.metadata,
++      );
++      res.status(201).json({ mission, run });
++    } catch (err) {
++      res.status(502).json({
++        error: err instanceof Error ? err.message : String(err),
++      });
++    }
++  });
++
++  router.post('/voice/:missionId/:runId/:action', async (req, res) => {
++    const { missionId, runId, action } = req.params;
++    if (!['pause', 'resume', 'cancel'].includes(action)) {
++      res.status(404).json({ error: 'Unknown run action' });
++      return;
++    }
++
++    try {
++      const run =
++        action === 'pause'
++          ? await telnyx.pauseRun(missionId, runId)
++          : action === 'resume'
++            ? await telnyx.resumeRun(missionId, runId)
++            : await telnyx.cancelRun(missionId, runId);
++
++      res.json({ run });
++    } catch (err) {
++      res.status(502).json({
++        error: err instanceof Error ? err.message : String(err),
++      });
++    }
++  });
++
++  return router;
++}
+--- a/packages/api-server/src/index.ts
++++ b/packages/api-server/src/index.ts
+@@ -41,6 +41,7 @@
+ import { createPredictiveRouter } from './routes/predictive.js';
+ import { createLeadsRouter } from './routes/leads.js';
+ import { createCampaignsRouter } from './routes/campaigns.js';
++import { createSalesCampaignsRouter } from './routes/sales-campaigns.js';
+ import { createArtifactsRouter } from './routes/artifacts.js';
+ import { createAutonomyRouter } from './routes/autonomy.js';
+ import { requireAdminAuth } from './middleware/auth.js';
+@@ -410,6 +411,7 @@
+   app.use('/api/settings', createSettingsRouter());
+   app.use('/api/leads', createLeadsRouter());
+   app.use('/api/campaigns', createCampaignsRouter());
++  app.use('/api/sales-campaigns', createSalesCampaignsRouter());
+   app.use('/api/artifacts', createArtifactsRouter());
+   app.use('/api/autonomy', createAutonomyRouter());
+ 
+--- a/packages/api-server/src/routes/settings.ts
++++ b/packages/api-server/src/routes/settings.ts
+@@ -57,6 +57,19 @@
+       { key: 'GOOGLE_PLACES_API_KEY', label: 'Google Places API Key', placeholder: 'Google Places key', secret: true },
+       { key: 'TAVILY_API_KEY', label: 'Tavily API Key', placeholder: 'tvly-...', secret: true },
+       { key: 'BRAVE_SEARCH_API_KEY', label: 'Brave Search API Key', placeholder: 'Brave Search key', secret: true },
++    ],
++  },
++  {
++    id: 'telnyx',
++    name: 'Telnyx',
++    description: 'Voice infrastructure and AI Missions for APEX sales outreach. Missions provide auditable run status and pause/resume/cancel controls.',
++    category: 'voice',
++    docsUrl: 'https://developers.telnyx.com/docs/inference/missions',
++    envVars: [
++      { key: 'TELNYX_API_KEY', label: 'API Key', placeholder: 'KEY...', secret: true },
++      { key: 'TELNYX_WEBHOOK_SECRET', label: 'Webhook Secret', placeholder: 'Webhook shared secret', secret: true },
++      { key: 'TELNYX_MESSAGING_NUMBER', label: 'Messaging Number', placeholder: '+1...' },
++      { key: 'TELNYX_OWNER_NUMBER', label: 'Owner Number', placeholder: '+1...' },
+     ],
+   },
+   {
+--- a/packages/dashboard/src/lib/api.ts
++++ b/packages/dashboard/src/lib/api.ts
+@@ -192,6 +192,29 @@
+     }) => apiFetch<{ campaignId: string; segments: number }>('/campaigns', { method: 'POST', body: JSON.stringify(body) }),
+     control: (id: string, action: 'pause' | 'resume' | 'cancel') =>
+       apiFetch<{ status: string }>(`/campaigns/${id}/${action}`, { method: 'POST' }),
++  },
++
++
++  salesCampaigns: {
++    overview: () => apiFetch<SalesCampaignOverview>('/sales-campaigns'),
++    controlEmail: (id: string, action: 'pause' | 'resume' | 'cancel') =>
++      apiFetch<{ campaignId: string; status: string }>(`/sales-campaigns/email/${id}/${action}`, { method: 'POST' }),
++    createVoiceMission: (body: {
++      name: string;
++      description?: string;
++      instructions: string;
++      model?: string;
++      input?: Record<string, unknown>;
++      metadata?: Record<string, unknown>;
++    }) => apiFetch<{ mission: TelnyxMissionSummary; run: TelnyxRunSummary }>('/sales-campaigns/voice', {
++      method: 'POST',
++      body: JSON.stringify(body),
++    }),
++    controlVoice: (missionId: string, runId: string, action: 'pause' | 'resume' | 'cancel') =>
++      apiFetch<{ run: TelnyxRunSummary }>(
++        `/sales-campaigns/voice/${encodeURIComponent(missionId)}/${encodeURIComponent(runId)}/${action}`,
++        { method: 'POST' },
++      ),
+   },
+ 
+   tools: {
+@@ -794,3 +817,59 @@
+     }>;
+   };
+ }
++
++
++export interface EmailSalesCampaign {
++  id: string;
++  name: string;
++  leadCampaignId: string | null;
++  goalId: string | null;
++  subjectTemplate: string;
++  bodyTemplate: string;
++  status: string;
++  totalTargets: number;
++  sentCount: number;
++  failedCount: number;
++  createdByAgentId: string | null;
++  createdAt: string;
++  startedAt: string | null;
++  completedAt: string | null;
++  lastProgressAt: string | null;
++  result: string | null;
++  counts: Record<string, number>;
++  recentSends: Array<{
++    id: string;
++    toEmail: string;
++    toName: string | null;
++    subject: string;
++    status: string;
++    createdAt: string;
++    sentAt: string | null;
++  }>;
++}
++
++export interface TelnyxRunSummary {
++  runId: string;
++  status: string;
++  startedAt?: string;
++  updatedAt?: string;
++  resultSummary?: string | null;
++}
++
++export interface TelnyxMissionSummary {
++  missionId: string;
++  name: string;
++  description?: string | null;
++  updatedAt?: string;
++  latestRun?: TelnyxRunSummary;
++}
++
++export interface SalesCampaignOverview {
++  email: EmailSalesCampaign[];
++  voice: {
++    configured: boolean;
++    missions: TelnyxMissionSummary[];
++    error?: string;
++  };
++}
++
+--- a/packages/dashboard/src/components/SalesCampaignsPanel.tsx
++++ b/packages/dashboard/src/components/SalesCampaignsPanel.tsx
+@@ -0,0 +1,351 @@
++import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
++import { api, type EmailSalesCampaign, type TelnyxMissionSummary } from '../lib/api.js';
++import { Mail, PhoneCall, Pause, Play, Square, RefreshCw, AlertTriangle } from 'lucide-react';
++
++function statusColor(status: string): string {
++  if (['running', 'in_progress', 'active'].includes(status)) return 'var(--color-apex-green)';
++  if (['paused', 'pending', 'queued'].includes(status)) return 'var(--color-apex-brass)';
++  if (['failed', 'bounced', 'complained'].includes(status)) return 'var(--color-apex-red)';
++  if (['completed', 'succeeded', 'delivered'].includes(status)) return 'var(--color-apex-signal)';
++  return 'var(--color-apex-muted)';
++}
++
++function Stat({ label, value }: { label: string; value: number | string }) {
++  return (
++    <div
++      style={{
++        padding: '12px 14px',
++        border: '1px solid var(--color-apex-line)',
++        borderRadius: 6,
++        background: 'rgba(255,255,255,0.02)',
++      }}
++    >
++      <div className="apex-eyebrow" style={{ marginBottom: 5 }}>{label}</div>
++      <div className="apex-display" style={{ fontSize: 20, color: 'var(--color-apex-text)' }}>{value}</div>
++    </div>
++  );
++}
++
++function StatusPill({ status }: { status: string }) {
++  return (
++    <span
++      style={{
++        display: 'inline-flex',
++        alignItems: 'center',
++        gap: 6,
++        padding: '4px 8px',
++        borderRadius: 999,
++        border: `1px solid ${statusColor(status)}55`,
++        color: statusColor(status),
++        fontFamily: 'var(--font-mono)',
++        fontSize: 10,
++        textTransform: 'uppercase',
++        letterSpacing: '0.05em',
++      }}
++    >
++      <span style={{ width: 6, height: 6, borderRadius: '50%', background: statusColor(status) }} />
++      {status}
++    </span>
++  );
++}
++
++function CampaignActions({
++  status,
++  onAction,
++  busy,
++}: {
++  status: string;
++  onAction: (action: 'pause' | 'resume' | 'cancel') => void;
++  busy: boolean;
++}) {
++  const canPause = ['running', 'in_progress', 'active'].includes(status);
++  const canResume = status === 'paused';
++  const canCancel = !['completed', 'cancelled', 'canceled', 'succeeded', 'failed'].includes(status);
++
++  return (
++    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
++      {canPause && (
++        <button className="btn-secondary" disabled={busy} onClick={() => onAction('pause')}>
++          <Pause size={13} /> Pause
++        </button>
++      )}
++      {canResume && (
++        <button className="btn-secondary" disabled={busy} onClick={() => onAction('resume')}>
++          <Play size={13} /> Resume
++        </button>
++      )}
++      {canCancel && (
++        <button className="btn-secondary" disabled={busy} onClick={() => onAction('cancel')}>
++          <Square size={13} /> Stop
++        </button>
++      )}
++    </div>
++  );
++}
++
++function EmailCampaignCard({
++  campaign,
++  onAction,
++  busy,
++}: {
++  campaign: EmailSalesCampaign;
++  onAction: (id: string, action: 'pause' | 'resume' | 'cancel') => void;
++  busy: boolean;
++}) {
++  const delivered = campaign.counts.delivered ?? 0;
++  const opened = campaign.counts.opened ?? 0;
++  const clicked = campaign.counts.clicked ?? 0;
++  const bounced = campaign.counts.bounced ?? 0;
++  const queued = campaign.counts.queued ?? 0;
++
++  return (
++    <div className="glass-card" style={{ padding: 18 }}>
++      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'flex-start' }}>
++        <div style={{ minWidth: 0 }}>
++          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
++            <Mail size={16} color="var(--color-apex-brass)" />
++            <strong style={{ color: 'var(--color-apex-text)' }}>{campaign.name}</strong>
++          </div>
++          <div style={{ color: 'var(--color-apex-muted)', fontSize: 12 }}>
++            {campaign.subjectTemplate}
++          </div>
++        </div>
++        <StatusPill status={campaign.status} />
++      </div>
++
++      <div
++        style={{
++          display: 'grid',
++          gridTemplateColumns: 'repeat(auto-fit,minmax(90px,1fr))',
++          gap: 8,
++          marginTop: 16,
++        }}
++      >
++        <Stat label="Targets" value={campaign.totalTargets} />
++        <Stat label="Sent" value={campaign.sentCount} />
++        <Stat label="Queued" value={queued} />
++        <Stat label="Delivered" value={delivered} />
++        <Stat label="Opened" value={opened} />
++        <Stat label="Clicked" value={clicked} />
++        <Stat label="Bounced" value={bounced} />
++        <Stat label="Failed" value={campaign.failedCount} />
++      </div>
++
++      <div style={{ marginTop: 16 }}>
++        <CampaignActions
++          status={campaign.status}
++          busy={busy}
++          onAction={(action) => onAction(campaign.id, action)}
++        />
++      </div>
++
++      {campaign.recentSends.length > 0 && (
++        <div style={{ marginTop: 16, borderTop: '1px solid var(--color-apex-line)', paddingTop: 12 }}>
++          <div className="apex-eyebrow" style={{ marginBottom: 8 }}>Recent recipients</div>
++          <div style={{ display: 'grid', gap: 6 }}>
++            {campaign.recentSends.slice(0, 5).map((send) => (
++              <div
++                key={send.id}
++                style={{
++                  display: 'flex',
++                  justifyContent: 'space-between',
++                  gap: 10,
++                  fontFamily: 'var(--font-mono)',
++                  fontSize: 11,
++                  color: 'var(--color-apex-muted)',
++                }}
++              >
++                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
++                  {send.toName ? `${send.toName} · ` : ''}{send.toEmail}
++                </span>
++                <span style={{ color: statusColor(send.status), flexShrink: 0 }}>{send.status}</span>
++              </div>
++            ))}
++          </div>
++        </div>
++      )}
++    </div>
++  );
++}
++
++function VoiceMissionCard({
++  mission,
++  onAction,
++  busy,
++}: {
++  mission: TelnyxMissionSummary;
++  onAction: (missionId: string, runId: string, action: 'pause' | 'resume' | 'cancel') => void;
++  busy: boolean;
++}) {
++  const run = mission.latestRun;
++  return (
++    <div className="glass-card" style={{ padding: 18 }}>
++      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'flex-start' }}>
++        <div>
++          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
++            <PhoneCall size={16} color="var(--color-apex-purple)" />
++            <strong style={{ color: 'var(--color-apex-text)' }}>{mission.name}</strong>
++          </div>
++          <div style={{ color: 'var(--color-apex-muted)', fontSize: 12 }}>
++            {mission.description || 'Telnyx AI Mission'}
++          </div>
++        </div>
++        <StatusPill status={run?.status ?? 'idle'} />
++      </div>
++
++      {run ? (
++        <>
++          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 8, marginTop: 16 }}>
++            <Stat label="Run" value={run.runId.slice(0, 8)} />
++            <Stat label="Started" value={run.startedAt ? new Date(run.startedAt).toLocaleString() : '—'} />
++            <Stat label="Updated" value={run.updatedAt ? new Date(run.updatedAt).toLocaleString() : '—'} />
++          </div>
++          {run.resultSummary && (
++            <div style={{ marginTop: 12, color: 'var(--color-apex-muted)', fontSize: 12, lineHeight: 1.5 }}>
++              {run.resultSummary}
++            </div>
++          )}
++          <div style={{ marginTop: 16 }}>
++            <CampaignActions
++              status={run.status}
++              busy={busy}
++              onAction={(action) => onAction(mission.missionId, run.runId, action)}
++            />
++          </div>
++        </>
++      ) : (
++        <div style={{ marginTop: 16, color: 'var(--color-apex-muted)', fontSize: 12 }}>
++          No run has been started for this mission.
++        </div>
++      )}
++    </div>
++  );
++}
++
++export function SalesCampaignsPanel() {
++  const queryClient = useQueryClient();
++  const overview = useQuery({
++    queryKey: ['sales-campaigns'],
++    queryFn: () => api.salesCampaigns.overview(),
++    refetchInterval: 10_000,
++  });
++
++  const emailControl = useMutation({
++    mutationFn: ({ id, action }: { id: string; action: 'pause' | 'resume' | 'cancel' }) =>
++      api.salesCampaigns.controlEmail(id, action),
++    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sales-campaigns'] }),
++  });
++
++  const voiceControl = useMutation({
++    mutationFn: ({ missionId, runId, action }: { missionId: string; runId: string; action: 'pause' | 'resume' | 'cancel' }) =>
++      api.salesCampaigns.controlVoice(missionId, runId, action),
++    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sales-campaigns'] }),
++  });
++
++  if (overview.isLoading) {
++    return <div style={{ color: 'var(--color-apex-muted)' }}>Loading sales campaigns…</div>;
++  }
++
++  if (overview.error || !overview.data) {
++    return (
++      <div className="glass-card" style={{ padding: 20, color: 'var(--color-apex-red)' }}>
++        <AlertTriangle size={18} style={{ marginRight: 8, verticalAlign: 'middle' }} />
++        {overview.error instanceof Error ? overview.error.message : 'Unable to load sales campaigns.'}
++      </div>
++    );
++  }
++
++  const { email, voice } = overview.data;
++  const activeEmail = email.filter((campaign) => campaign.status === 'running').length;
++  const activeVoice = voice.missions.filter((mission) =>
++    ['running', 'in_progress', 'active', 'pending'].includes(mission.latestRun?.status ?? ''),
++  ).length;
++
++  return (
++    <div style={{ display: 'grid', gap: 18 }}>
++      <div
++        className="glass-card"
++        style={{
++          padding: 18,
++          display: 'flex',
++          justifyContent: 'space-between',
++          gap: 16,
++          alignItems: 'center',
++          flexWrap: 'wrap',
++        }}
++      >
++        <div>
++          <div className="apex-eyebrow">Outbound control plane</div>
++          <div className="apex-display" style={{ color: 'var(--color-apex-text)', fontSize: 22, marginTop: 4 }}>
++            Email + Voice Campaigns
++          </div>
++          <div style={{ color: 'var(--color-apex-muted)', fontSize: 12, marginTop: 5 }}>
++            Email is sourced from APEX/Resend. Voice is sourced live from Telnyx AI Missions.
++          </div>
++        </div>
++        <button
++          className="btn-secondary"
++          onClick={() => overview.refetch()}
++          disabled={overview.isFetching}
++        >
++          <RefreshCw size={13} /> Refresh
++        </button>
++      </div>
++
++      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 10 }}>
++        <Stat label="Email campaigns" value={email.length} />
++        <Stat label="Active email" value={activeEmail} />
++        <Stat label="Voice missions" value={voice.missions.length} />
++        <Stat label="Active voice" value={activeVoice} />
++      </div>
++
++      <section>
++        <div className="apex-eyebrow" style={{ marginBottom: 10 }}>Email / Resend</div>
++        <div style={{ display: 'grid', gap: 12 }}>
++          {email.length === 0 ? (
++            <div className="glass-card" style={{ padding: 18, color: 'var(--color-apex-muted)' }}>
++              No outbound email campaigns exist yet.
++            </div>
++          ) : email.map((campaign) => (
++            <EmailCampaignCard
++              key={campaign.id}
++              campaign={campaign}
++              busy={emailControl.isPending}
++              onAction={(id, action) => emailControl.mutate({ id, action })}
++            />
++          ))}
++        </div>
++      </section>
++
++      <section>
++        <div className="apex-eyebrow" style={{ marginBottom: 10 }}>Voice / Telnyx AI Missions</div>
++        {!voice.configured ? (
++          <div className="glass-card" style={{ padding: 18, color: 'var(--color-apex-muted)' }}>
++            TELNYX_API_KEY is not configured. Add it in Settings → Telnyx to enable live mission monitoring.
++          </div>
++        ) : voice.error ? (
++          <div className="glass-card" style={{ padding: 18, color: 'var(--color-apex-red)' }}>
++            Telnyx is configured, but the Missions API could not be read: {voice.error}
++          </div>
++        ) : voice.missions.length === 0 ? (
++          <div className="glass-card" style={{ padding: 18, color: 'var(--color-apex-muted)' }}>
++            Telnyx is connected. No AI Missions exist yet.
++          </div>
++        ) : (
++          <div style={{ display: 'grid', gap: 12 }}>
++            {voice.missions.map((mission) => (
++              <VoiceMissionCard
++                key={mission.missionId}
++                mission={mission}
++                busy={voiceControl.isPending}
++                onAction={(missionId, runId, action) =>
++                  voiceControl.mutate({ missionId, runId, action })
++                }
++              />
++            ))}
++          </div>
++        )}
++      </section>
++    </div>
++  );
++}
+--- a/packages/dashboard/src/App.tsx
++++ b/packages/dashboard/src/App.tsx
+@@ -19,6 +19,7 @@
+ import { MultiAppPanel } from './components/MultiAppPanel.js';
+ import { LeadsPanel } from './components/LeadsPanel.js';
+ import { CampaignsPanel } from './components/CampaignsPanel.js';
++import { SalesCampaignsPanel } from './components/SalesCampaignsPanel.js';
+ import { ControlRoom } from './components/ControlRoom.js';
+ import { SuggestionsPanel } from './components/SuggestionsPanel.js';
+ import { ArtifactsPanel } from './components/ArtifactsPanel.js';
+@@ -27,6 +28,7 @@
+ import {
+   Target,
+   Crosshair,
++  PhoneCall,
+   Network,
+   Kanban,
+   Terminal,
+@@ -240,7 +242,8 @@
+     {
+       label: 'Business',
+       items: [
+-        { id: 'campaigns', label: 'Campaigns', icon: <Crosshair size={16} /> },
++        { id: 'campaigns', label: 'Lead Campaigns', icon: <Crosshair size={16} /> },
++        { id: 'sales-campaigns', label: 'Sales Campaigns', icon: <PhoneCall size={16} /> },
+         { id: 'leads', label: 'Leads', icon: <Search size={16} /> },
+         { id: 'suggestions', label: 'Suggestions', icon: <Lightbulb size={16} /> },
+         { id: 'multiapp', label: 'Portfolio', icon: <FolderGit2 size={16} /> },
+@@ -600,6 +603,7 @@
+     agents: <AgentNetwork agents={agents} />,
+     tasks: <TaskBoard />,
+     campaigns: <CampaignsPanel />,
++    'sales-campaigns': <SalesCampaignsPanel />,
+     leads: <LeadsPanel />,
+     control: <ControlRoom />,
+     artifacts: <ArtifactsPanel />,
+@@ -631,6 +635,7 @@
+     agents: { title: 'Agent Network', kicker: 'Workforce' },
+     tasks: { title: 'Task Board', kicker: 'Workforce' },
+     campaigns: { title: 'Lead Campaigns', kicker: 'Business' },
++    'sales-campaigns': { title: 'Sales Campaigns', kicker: 'Business' },
+     leads: { title: 'Lead Pipeline', kicker: 'Business' },
+     control: { title: 'Control Room', kicker: 'Systems' },
+     artifacts: { title: 'Artifacts', kicker: 'Systems' },
+--- a/.env.example
++++ b/.env.example
+@@ -206,8 +206,8 @@
+ # VAPI_WEBHOOK_SECRET=
+ # VAPI_WEBHOOK_URL=
+ 
+-# ─── Telnyx Voice (BuildMyBot inbound calls) ─────────────────────────────────
+-# Required for the Telnyx ↔ Deepgram voice bridge (inbound BuildMyBot calls).
++# ─── Telnyx Voice + AI Missions ─────────────────────────────────────────────
++# TELNYX_API_KEY powers the inbound voice bridge and the Sales Campaigns AI Missions monitor/control plane.
+ # DEEPGRAM_API_KEY is also used by the /api/transcribe route above.
+ # TELNYX_API_KEY=
+ # TELNYX_WEBHOOK_SECRET=          # shared secret verified on every Telnyx webhook
+--- a/TELNYX_SALES_CAMPAIGNS_IMPLEMENTATION.md
++++ b/TELNYX_SALES_CAMPAIGNS_IMPLEMENTATION.md
+@@ -0,0 +1,51 @@
++# APEX Sales Campaigns + Telnyx Missions
++
++Implemented from the Telnyx documentation reviewed on 2026-09-15.
++
++## What changed
++
++- Added a dedicated **Business → Sales Campaigns** dashboard section.
++- Kept **Lead Campaigns** separate from sales outreach.
++- Added `/api/sales-campaigns` for a combined email + voice control-plane view.
++- Email campaigns now expose operator pause/resume/cancel controls from the dashboard.
++- Added a provider-boundary Telnyx Missions client in `packages/core/src/telnyx-missions.ts`.
++- Added live Telnyx mission/run monitoring and pause/resume/cancel controls.
++- Added an authenticated API endpoint to create a managed Telnyx Mission and start its first run.
++- Added Telnyx to the Settings integration catalog.
++- Reused the existing `TELNYX_API_KEY`; no secret is committed.
++
++## Architecture
++
++APEX remains the control plane. Resend remains the email delivery provider. Telnyx is treated as a voice execution provider.
++
++The dashboard reads:
++- APEX `email_campaigns` + `email_sends` for email.
++- Telnyx AI Missions + recent Mission runs for voice.
++
++Telnyx mission IDs and run IDs are provider identifiers, not replacements for APEX campaign identity.
++
++## Endpoints
++
++- `GET /api/sales-campaigns`
++- `POST /api/sales-campaigns/email/:id/pause`
++- `POST /api/sales-campaigns/email/:id/resume`
++- `POST /api/sales-campaigns/email/:id/cancel`
++- `POST /api/sales-campaigns/voice`
++- `POST /api/sales-campaigns/voice/:missionId/:runId/pause`
++- `POST /api/sales-campaigns/voice/:missionId/:runId/resume`
++- `POST /api/sales-campaigns/voice/:missionId/:runId/cancel`
++
++## Verification performed here
++
++All modified TypeScript/TSX files were parsed/transpiled with the installed TypeScript compiler and produced no syntax diagnostics.
++
++A full workspace typecheck could not be run in this isolated runtime because this copy of the repository does not include workspace `node_modules`, and Corepack could not download pnpm because external package-registry DNS access is unavailable. Run the repository's normal `pnpm run typecheck:production` after installing dependencies.
++
++## Production activation
++
++1. Set `TELNYX_API_KEY` through APEX Settings or the production secret/environment system.
++2. Deploy through the repository's documented Cloud Run release path.
++3. Open **Business → Sales Campaigns**.
++4. Confirm existing Resend email campaigns appear.
++5. Confirm Telnyx connectivity shows configured.
++6. Start with a 2–3-call Telnyx Mission and verify pause/resume/cancel and result visibility before increasing volume.
