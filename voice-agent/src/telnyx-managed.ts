@@ -39,6 +39,7 @@ export async function getManagedAssistantId(): Promise<string> {
     .from("voice_memory")
     .select("detail")
     .eq("label", ASSISTANT_MEMORY_LABEL)
+    .retry(false)
     .maybeSingle<{ detail: string }>();
   return data?.detail?.trim() ?? "";
 }
@@ -239,45 +240,51 @@ export async function ensureManagedSession(
   const isOwner = samePhoneNumber(normalizedCaller, config.ownerPhone);
 
   if (db) {
-    const { data: existing } = await db
-      .from("voice_sessions")
-      .select("session_id,call_sid,caller_number,is_owner,sudo_verified,verify_attempts,started_at")
-      .eq("session_id", sessionId)
-      .maybeSingle<StoredVoiceSession>();
+    try {
+      const { data: existing } = await db
+        .from("voice_sessions")
+        .select("session_id,call_sid,caller_number,is_owner,sudo_verified,verify_attempts,started_at")
+        .eq("session_id", sessionId)
+        .retry(false)
+        .maybeSingle<StoredVoiceSession>();
 
-    if (!existing) {
-      await db.from("voice_sessions").upsert(
-        {
-          session_id: sessionId,
-          call_sid: callControlId || sessionId,
-          caller_number: normalizedCaller,
-          is_owner: isOwner,
-        },
-        { onConflict: "session_id" },
-      );
-    }
+      if (!existing) {
+        await db.from("voice_sessions").upsert(
+          {
+            session_id: sessionId,
+            call_sid: callControlId || sessionId,
+            caller_number: normalizedCaller,
+            is_owner: isOwner,
+          },
+          { onConflict: "session_id" },
+        ).retry(false);
+      }
 
-    const { data: row } = await db
-      .from("voice_sessions")
-      .select("session_id,call_sid,caller_number,is_owner,sudo_verified,verify_attempts,started_at")
-      .eq("session_id", sessionId)
-      .maybeSingle<StoredVoiceSession>();
+      const { data: row } = await db
+        .from("voice_sessions")
+        .select("session_id,call_sid,caller_number,is_owner,sudo_verified,verify_attempts,started_at")
+        .eq("session_id", sessionId)
+        .retry(false)
+        .maybeSingle<StoredVoiceSession>();
 
-    if (row) {
-      return {
-        sessionId: row.session_id,
-        callSid: row.call_sid ?? callControlId ?? row.session_id,
-        streamSid: `managed:${row.session_id}`,
-        callerNumber: row.caller_number,
-        toNumber: "",
-        isOwner: row.is_owner,
-        sudoVerified: row.sudo_verified,
-        verifyAttempts: row.verify_attempts,
-        startedAt: row.started_at ? new Date(row.started_at).getTime() : Date.now(),
-        userTranscript: "",
-        assistantTranscript: "",
-        dtmfBuffer: "",
-      };
+      if (row) {
+        return {
+          sessionId: row.session_id,
+          callSid: row.call_sid ?? callControlId ?? row.session_id,
+          streamSid: `managed:${row.session_id}`,
+          callerNumber: row.caller_number,
+          toNumber: "",
+          isOwner: row.is_owner,
+          sudoVerified: row.sudo_verified,
+          verifyAttempts: row.verify_attempts,
+          startedAt: row.started_at ? new Date(row.started_at).getTime() : Date.now(),
+          userTranscript: "",
+          assistantTranscript: "",
+          dtmfBuffer: "",
+        };
+      }
+    } catch (error) {
+      console.warn("[telnyx-managed] session store unavailable, using in-memory session:", String(error).slice(0, 160));
     }
   }
 

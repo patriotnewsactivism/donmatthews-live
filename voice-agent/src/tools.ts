@@ -213,8 +213,10 @@ async function dispatchTool(session: CallSession, name: string, args: Record<str
         const detail = String(args.detail ?? "").trim();
         if (!label || !detail) return "label and detail are required.";
         if (!memoryAvailable()) return "Memory is not configured; the fact was not saved.";
-        await rememberFact(label, detail);
-        return "Remembered. I'll have that available in future calls.";
+        const saved = await rememberFact(label, detail);
+        return saved
+          ? "Remembered. I'll have that available in future calls."
+          : "I could not save that right now, so it was not remembered. Do not tell the caller it was saved.";
       }
       case "recall": {
         const topic = String(args.topic ?? "").trim();

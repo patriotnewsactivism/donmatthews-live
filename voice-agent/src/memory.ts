@@ -3,14 +3,44 @@ import { config } from "./config.js";
 
 let db: SupabaseClient | null = null;
 
+
+/**
+ * supabase-js does not expose PostgREST's retry flag at client level, so wrap
+ * from() to turn retries off on every query builder it returns.
+ */
+function disablePostgrestRetries(client: SupabaseClient): void {
+  const originalFrom = client.from.bind(client);
+  (client as unknown as { from: unknown }).from = (table: string) => {
+    const query = originalFrom(table);
+    for (const method of ["select", "insert", "upsert", "update", "delete"] as const) {
+      const original = (query as any)[method]?.bind(query);
+      if (!original) continue;
+      (query as any)[method] = (...args: unknown[]) => {
+        const builder = original(...args);
+        return typeof builder?.retry === "function" ? builder.retry(false) : builder;
+      };
+    }
+    return query;
+  };
+}
+
 export function getDb(): SupabaseClient | null {
   if (db) return db;
   if (!config.supabaseUrl || !config.supabaseServiceKey) {
     return null;
   }
+  // Voice tools have a hard ~5s budget on the Telnyx side. PostgREST retries
+  // network failures with 1s/2s/4s backoff (~7s per GET), which alone blows
+  // that budget whenever the Supabase host is unreachable. Disable retries for
+  // every query made through this client, and bound each request too.
   db = createClient(config.supabaseUrl, config.supabaseServiceKey, {
     auth: { persistSession: false },
+    global: {
+      fetch: (input, init) =>
+        fetch(input, { ...init, signal: init?.signal ?? AbortSignal.timeout(1500) }),
+    },
   });
+  disablePostgrestRetries(db);
   return db;
 }
 
@@ -85,14 +115,20 @@ export async function getDonationInfo(): Promise<string | null> {
     .from("voice_memory")
     .select("detail")
     .eq("label", "donation_info")
+    .retry(false)
     .maybeSingle<{ detail: string }>();
   return data?.detail ?? null;
 }
 
-export async function rememberFact(label: string, detail: string): Promise<void> {
+export async function rememberFact(label: string, detail: string): Promise<boolean> {
   const client = getDb();
-  if (!client) return;
-  await client.from("voice_memory").upsert({ label, detail }, { onConflict: "label" });
+  if (!client) return false;
+  try {
+    const { error } = await client.from("voice_memory").upsert({ label, detail }, { onConflict: "label" });
+    return !error;
+  } catch {
+    return false;
+  }
 }
 
 export async function recallFacts(topic: string, limit = 10): Promise<string[]> {
@@ -103,7 +139,8 @@ export async function recallFacts(topic: string, limit = 10): Promise<string[]> 
     .from("voice_memory")
     .select("label, detail")
     .or(`label.ilike.${pattern},detail.ilike.${pattern}`)
-    .limit(limit);
+    .limit(limit)
+    .retry(false);
   return (data ?? []).map((row) => `${row.label}: ${row.detail}`);
 }
 
