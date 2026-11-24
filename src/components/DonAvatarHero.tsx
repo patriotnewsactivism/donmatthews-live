@@ -166,11 +166,16 @@ export default function DonAvatarHero() {
             />
             {(state === "idle" || state === "offline") && (
               <>
-                <img
-                  src="/images/don-avatar-poster.jpg"
-                  alt="Don Matthews — tap to talk live"
-                  className="absolute inset-0 aspect-square h-full w-full object-cover"
-                />
+                <picture>
+                  <source srcSet="/images/don-avatar-photo.webp" type="image/webp" />
+                  <img
+                    src="/images/don-avatar-photo.jpg"
+                    alt="Don Matthews — tap to talk live"
+                    width={720}
+                    height={1086}
+                    className="absolute inset-0 aspect-square h-full w-full object-cover object-top"
+                  />
+                </picture>
                 <button
                   type="button"
                   onClick={activate}
