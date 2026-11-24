@@ -17,6 +17,23 @@ const nextConfig = {
     };
     return config;
   },
+  async rewrites() {
+    // Don Matthews live avatar: the DonAvatarHero component talks to the Don
+    // LiveTalking avatar + orchestrator on the WTP News GPU box through these
+    // same-origin /don/* paths. The box frontdoor (Vast public port 57053)
+    // strips the /don prefix and routes /speak, /ws/listen and /health to the
+    // Don orchestrator (port 8023, Don's Cartesia voice) and /offer, /human
+    // and /humanaudio to LiveTalking (avatar don_matthews_v2).
+    const DON = 'http://142.252.100.103:57053';
+    return [
+      { source: '/don/offer', destination: `${DON}/don/offer` },
+      { source: '/don/speak', destination: `${DON}/don/speak` },
+      { source: '/don/human', destination: `${DON}/don/human` },
+      { source: '/don/humanaudio', destination: `${DON}/don/humanaudio` },
+      { source: '/don/health', destination: `${DON}/don/health` },
+      { source: '/don/ws/listen', destination: `${DON}/don/ws/listen` },
+    ];
+  },
 };
 
 module.exports = nextConfig;

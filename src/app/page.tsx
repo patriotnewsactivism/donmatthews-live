@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import AmericanInjusticeBanner from "@/components/AmericanInjusticeBanner";
+import DonAvatarHero from "@/components/DonAvatarHero";
 import AllocutionVideo from "@/components/AllocutionVideo";
 import CaughtRedHandedVideo from "@/components/CaughtRedHandedVideo";
 import FlagshipLeadForm from "@/components/FlagshipLeadForm";
@@ -53,6 +54,8 @@ const lanes = [
 export default function Home() {
   return (
     <main className="min-h-screen w-full overflow-hidden bg-[#090807] text-[#f5eedb]">
+      <DonAvatarHero />
+
       <AmericanInjusticeBanner />
 
       <section className="border-b border-[#c9a84c]/15 bg-[radial-gradient(circle_at_20%_0%,rgba(201,168,76,0.08),transparent_32rem),#0a0908]">
