@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { gatherAvatarOffer } from "@/lib/avatar-webrtc.mjs";
 
 /**
  * Don Matthews live avatar hero — first thing visitors see on donmatthews.live.
@@ -68,8 +69,10 @@ export default function DonAvatarHero() {
       pc.addTransceiver("video", { direction: "recvonly" });
       pc.addTransceiver("audio", { direction: "recvonly" });
 
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
+      await pc.setLocalDescription(await pc.createOffer());
+      // /don/offer is non-trickle: send candidates in the initial SDP.
+      // The original createOffer() result does not contain gathered ICE.
+      const offer = await gatherAvatarOffer(pc);
       const res = await fetch("/don/offer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
