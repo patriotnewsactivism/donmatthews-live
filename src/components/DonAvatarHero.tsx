@@ -12,6 +12,15 @@ import { gatherAvatarOffer } from "@/lib/avatar-webrtc.mjs";
  * own Cartesia voice. The avatar is don_matthews_v2, built from the trimmed
  * reference Matthew approved (straight, wider framing, no zoomed opening).
  *
+ * Voice (mic) path: the same click also opens the visitor's mic and a
+ * WebSocket to /don/ws/listen (hello {sessionid} -> binary PCM16 16kHz).
+ * The Don orchestrator does energy VAD + faster-whisper STT server-side and
+ * answers through the avatar, so it is a live two-way conversation. Default
+ * mode is open mic (talk any time); Push to talk gates the mic to while the
+ * button is held. If the mic is denied or the socket drops, the text box
+ * still works. Barge-in: when Don is speaking and the visitor starts
+ * talking, the client sends {"type":"barge"} so Don stops and listens.
+ *
  * TURN credentials come from Vercel env vars (NEXT_PUBLIC_TURN_USERNAME /
  * NEXT_PUBLIC_TURN_CREDENTIAL). No credential is committed here: without them
  * the session still tries over STUN alone. The Don TURN user is `don-avatar`
@@ -22,6 +31,12 @@ const TURN_USERNAME = process.env.NEXT_PUBLIC_TURN_USERNAME || "";
 const TURN_CREDENTIAL = process.env.NEXT_PUBLIC_TURN_CREDENTIAL || "";
 
 type HeroState = "idle" | "connecting" | "live" | "offline";
+type MicMode = "open" | "ptt";
+
+// RMS (float32, 0..1) above which the mic counts as the visitor speaking.
+const MIC_SPEECH_RMS = 0.03;
+// Don't send barge-in more often than this while Don is speaking.
+const BARGE_DEBOUNCE_MS = 1000;
 
 export default function DonAvatarHero() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -30,6 +45,218 @@ export default function DonAvatarHero() {
   const sessionRef = useRef<string | null>(null);
   const [state, setState] = useState<HeroState>("idle");
   const [speaking, setSpeaking] = useState(false);
+
+  // --- live voice (mic + /don/ws/listen) ---
+  const wsRef = useRef<WebSocket | null>(null);
+  const micStreamRef = useRef<MediaStream | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const processorRef = useRef<ScriptProcessorNode | null>(null);
+  const [micMode, setMicMode] = useState<MicMode>("open");
+  const micModeRef = useRef<MicMode>("open");
+  const [micLive, setMicLive] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
+  const [voiceNote, setVoiceNote] = useState<string | null>(null);
+  const [pttHeld, setPttHeld] = useState(false);
+  const pttHeldRef = useRef(false);
+  const [micLevel, setMicLevel] = useState(0);
+  const [caption, setCaption] = useState("");
+  const [donSpeaking, setDonSpeaking] = useState(false);
+  const donSpeakingRef = useRef(false);
+  const lastBargeRef = useRef(0);
+  const lastLevelAtRef = useRef(0);
+
+  function setMode(mode: MicMode) {
+    micModeRef.current = mode;
+    setMicMode(mode);
+  }
+
+  function sendBargeIfNeeded(rms: number) {
+    if (!donSpeakingRef.current) return;
+    if (rms < MIC_SPEECH_RMS) return;
+    const now = Date.now();
+    if (now - lastBargeRef.current < BARGE_DEBOUNCE_MS) return;
+    lastBargeRef.current = now;
+    try {
+      wsRef.current?.send(JSON.stringify({ type: "barge" }));
+    } catch {
+      /* socket gone; server VAD still ends the turn on silence */
+    }
+  }
+
+  function streamMicChunk(input: Float32Array, sampleRate: number) {
+    // Resample to 16 kHz mono PCM16, the format the orchestrator expects.
+    const ratio = sampleRate / 16000;
+    const outLen = Math.max(1, Math.floor(input.length / ratio));
+    const pcm = new Int16Array(outLen);
+    let sumSq = 0;
+    for (let i = 0; i < outLen; i++) {
+      const pos = i * ratio;
+      const idx = Math.floor(pos);
+      const frac = pos - idx;
+      const a = input[idx] || 0;
+      const b = input[Math.min(idx + 1, input.length - 1)] || 0;
+      const s = a + (b - a) * frac;
+      sumSq += s * s;
+      const clamped = Math.max(-1, Math.min(1, s));
+      pcm[i] = clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff;
+    }
+    const rms = Math.sqrt(sumSq / outLen);
+    // Mic level meter (throttled so we don't re-render every audio chunk).
+    const now = Date.now();
+    if (now - lastLevelAtRef.current > 150) {
+      lastLevelAtRef.current = now;
+      setMicLevel(Math.min(1, rms * 4));
+    }
+    sendBargeIfNeeded(rms);
+    // Gate: open mic streams always; push-to-talk streams only while held.
+    const streaming =
+      micModeRef.current === "open" || pttHeldRef.current;
+    if (!streaming) return;
+    const ws = wsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      try {
+        ws.send(pcm.buffer);
+      } catch {
+        /* drop the chunk; the socket reports its own close */
+      }
+    }
+  }
+
+  async function startVoice(sessionid: string) {
+    // WebSocket to the Don orchestrator (same-origin /don/ws/listen rewrite).
+    try {
+      const proto =
+        window.location.protocol === "https:" ? "wss://" : "ws://";
+      const ws = new WebSocket(
+        proto + window.location.host + "/don/ws/listen"
+      );
+      wsRef.current = ws;
+      ws.onopen = () => {
+        try {
+          ws.send(JSON.stringify({ type: "hello", sessionid }));
+        } catch {
+          /* hello failed; the socket will close on its own */
+        }
+        setVoiceNote(null);
+      };
+      ws.onmessage = (ev) => {
+        let data: {
+          type?: string;
+          text?: string;
+          sentence?: string;
+          state?: boolean;
+          message?: string;
+        };
+        try {
+          data = JSON.parse(String(ev.data));
+        } catch {
+          return;
+        }
+        if (data.type === "transcript" && data.text) {
+          setCaption("You: " + data.text);
+        } else if (data.type === "speaking") {
+          const speakingNow = data.state === true;
+          donSpeakingRef.current = speakingNow;
+          setDonSpeaking(speakingNow);
+          if (data.sentence) setCaption("Don: " + data.sentence);
+        } else if (data.type === "interrupted") {
+          donSpeakingRef.current = false;
+          setDonSpeaking(false);
+        } else if (data.type === "error") {
+          console.warn("[don-avatar] voice error:", data.message);
+        }
+      };
+      ws.onclose = () => {
+        setMicLive(false);
+        setVoiceNote("Voice link dropped — type instead, or tap End and start again.");
+      };
+      ws.onerror = () => {
+        /* onclose follows; the text box still works */
+      };
+    } catch (err) {
+      console.warn("[don-avatar] voice socket failed:", err);
+    }
+
+    // Mic: opened on the same click that started the avatar (user gesture),
+    // so the permission prompt is allowed. Default is open two-way.
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+      micStreamRef.current = stream;
+      let ctx: AudioContext;
+      try {
+        ctx = new AudioContext({ sampleRate: 16000 });
+      } catch {
+        ctx = new AudioContext();
+      }
+      audioCtxRef.current = ctx;
+      const src = ctx.createMediaStreamSource(stream);
+      const proc = ctx.createScriptProcessor(4096, 1, 1);
+      processorRef.current = proc;
+      // Mute the processor output: onaudioprocess must stay connected to
+      // fire, but the mic must never play back through the speakers.
+      const mute = ctx.createGain();
+      mute.gain.value = 0;
+      src.connect(proc);
+      proc.connect(mute);
+      mute.connect(ctx.destination);
+      const rate = ctx.sampleRate;
+      proc.onaudioprocess = (e) => {
+        const input = e.inputBuffer.getChannelData(0);
+        streamMicChunk(input, rate);
+      };
+      setMicError(null);
+      setMicLive(true);
+    } catch (err) {
+      console.warn("[don-avatar] mic unavailable:", err);
+      setMicError("Mic blocked — type instead, or allow the mic and retry.");
+      setMicLive(false);
+    }
+  }
+
+  function stopVoice() {
+    try {
+      wsRef.current?.close();
+    } catch {
+      /* already closed */
+    }
+    wsRef.current = null;
+    try {
+      processorRef.current?.disconnect();
+    } catch {
+      /* already disconnected */
+    }
+    processorRef.current = null;
+    try {
+      micStreamRef.current?.getTracks().forEach((t) => t.stop());
+    } catch {
+      /* already stopped */
+    }
+    micStreamRef.current = null;
+    try {
+      void audioCtxRef.current?.close();
+    } catch {
+      /* already closed */
+    }
+    audioCtxRef.current = null;
+    pttHeldRef.current = false;
+    donSpeakingRef.current = false;
+    setPttHeld(false);
+    setMicLive(false);
+    setDonSpeaking(false);
+    setMicLevel(0);
+    setVoiceNote(null);
+  }
+
+  function setPtt(next: boolean) {
+    pttHeldRef.current = next;
+    setPttHeld(next);
+  }
 
   async function activate() {
     if (state === "connecting" || state === "live") return;
@@ -61,6 +288,7 @@ export default function DonAvatarHero() {
         const st = pc.connectionState;
         if (st === "connected") setState("live");
         else if (st === "failed" || st === "disconnected" || st === "closed") {
+          stopVoice();
           setState("offline");
           sessionRef.current = null;
         }
@@ -87,7 +315,11 @@ export default function DonAvatarHero() {
       if (!answer || !answer.sdp)
         throw new Error("no answer from avatar server");
       await pc.setRemoteDescription(new RTCSessionDescription(answer));
-      if (answer.sessionid) sessionRef.current = answer.sessionid;
+      if (answer.sessionid) {
+        sessionRef.current = answer.sessionid;
+        // Same click opens the mic + voice socket (open two-way by default).
+        void startVoice(answer.sessionid);
+      }
     } catch (err) {
       console.warn("[don-avatar] activation failed:", err);
       setState("offline");
@@ -95,6 +327,7 @@ export default function DonAvatarHero() {
   }
 
   function endSession() {
+    stopVoice();
     try {
       pcRef.current?.close();
     } catch {
@@ -103,6 +336,8 @@ export default function DonAvatarHero() {
     pcRef.current = null;
     sessionRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
+    setCaption("");
+    setMicError(null);
     setState("idle");
   }
 
@@ -197,6 +432,106 @@ export default function DonAvatarHero() {
 
           {state === "live" ? (
             <>
+              {/* Live voice: open mic by default, push-to-talk on demand. */}
+              <div className="mt-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={
+                        "inline-block h-2.5 w-2.5 rounded-full " +
+                        (micLive
+                          ? "bg-emerald-400"
+                          : "bg-white/25")
+                      }
+                      aria-hidden="true"
+                    />
+                    <span className="text-sm font-black text-white/80">
+                      {micLive
+                        ? micMode === "open"
+                          ? "Mic live — just talk"
+                          : pttHeld
+                            ? "Talking…"
+                            : "Push to talk ready"
+                        : "Mic off"}
+                    </span>
+                    {donSpeaking && (
+                      <span className="text-xs font-black uppercase tracking-wider text-[#e0c16b]">
+                        Don speaking
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setMode("open")}
+                      aria-pressed={micMode === "open"}
+                      className={
+                        "rounded-md px-3 py-1.5 text-xs font-black transition " +
+                        (micMode === "open"
+                          ? "bg-[#c9a84c]/20 text-[#e0c16b]"
+                          : "text-white/50 hover:text-white")
+                      }
+                    >
+                      Open mic
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMode("ptt")}
+                      aria-pressed={micMode === "ptt"}
+                      className={
+                        "rounded-md px-3 py-1.5 text-xs font-black transition " +
+                        (micMode === "ptt"
+                          ? "bg-[#c9a84c]/20 text-[#e0c16b]"
+                          : "text-white/50 hover:text-white")
+                      }
+                    >
+                      Push to talk
+                    </button>
+                  </div>
+                </div>
+                {/* Mic level meter */}
+                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full rounded-full bg-emerald-400 transition-[width] duration-150"
+                    style={{ width: Math.round(micLevel * 100) + "%" }}
+                  />
+                </div>
+                {micMode === "ptt" && (
+                  <button
+                    type="button"
+                    onPointerDown={() => setPtt(true)}
+                    onPointerUp={() => setPtt(false)}
+                    onPointerLeave={() => setPtt(false)}
+                    onPointerCancel={() => setPtt(false)}
+                    onContextMenu={(e) => e.preventDefault()}
+                    className={
+                      "mt-3 w-full touch-none select-none rounded-lg border px-5 py-3 text-sm font-black transition " +
+                      (pttHeld
+                        ? "border-[#c9a84c] bg-[#c9a84c]/30 text-[#e0c16b]"
+                        : "border-[#c9a84c]/40 bg-[#c9a84c]/10 text-[#e0c16b] hover:bg-[#c9a84c]/15")
+                    }
+                  >
+                    {pttHeld ? "● Talking — release to stop" : "Hold to talk"}
+                  </button>
+                )}
+                {micError && (
+                  <p className="mt-2 text-xs leading-5 text-amber-300/90">
+                    {micError}
+                  </p>
+                )}
+                {voiceNote && !micError && (
+                  <p className="mt-2 text-xs leading-5 text-amber-300/90">
+                    {voiceNote}
+                  </p>
+                )}
+              </div>
+
+              {caption && (
+                <p className="mt-3 text-center text-sm leading-6 text-white/70">
+                  {caption}
+                </p>
+              )}
+
               <div className="mt-4 flex gap-2">
                 <input
                   ref={inputRef}
@@ -225,7 +560,8 @@ export default function DonAvatarHero() {
                 </button>
               </div>
               <p className="mt-3 text-center text-xs leading-6 text-white/40">
-                Live with Don Matthews, in his own voice. Type and he answers.
+                Mic is open — just talk, and Don answers. Type also works,
+                or switch to push to talk.
               </p>
             </>
           ) : (
