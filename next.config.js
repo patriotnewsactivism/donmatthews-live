@@ -18,13 +18,9 @@ const nextConfig = {
     return config;
   },
   async rewrites() {
-    // Don Matthews live avatar: the DonAvatarHero component talks to the Don
-    // LiveTalking avatar + orchestrator on the WTP News GPU box through these
-    // same-origin /don/* paths. The box frontdoor (Vast public port 50800 on the RTX 5090)
-    // strips the /don prefix and routes /speak, /ws/listen and /health to the
-    // Don orchestrator (port 8023, Don's Cartesia voice) and /offer, /human
-    // and /humanaudio to LiveTalking (avatar don_matthews_v2).
-    const DON = 'http://142.252.100.103:50800';
+    // A stable HTTPS gateway keeps GPU host/port changes out of site releases.
+    // The gateway forwards Don's routes to the existing avatar stack.
+    const DON = 'https://avatar.wtpnews.org';
     return [
       { source: '/don/offer', destination: `${DON}/don/offer` },
       { source: '/don/speak', destination: `${DON}/don/speak` },

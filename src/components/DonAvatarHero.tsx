@@ -13,7 +13,7 @@ import { gatherAvatarOffer } from "@/lib/avatar-webrtc.mjs";
  * reference Matthew approved (straight, wider framing, no zoomed opening).
  *
  * Voice (mic) path: the same click also opens the visitor's mic and a
- * WebSocket to /don/ws/listen (hello {sessionid} -> binary PCM16 16kHz).
+ * WebSocket to the avatar gateway (hello {sessionid} -> binary PCM16 16kHz).
  * The Don orchestrator does energy VAD + faster-whisper STT server-side and
  * answers through the avatar, so it is a live two-way conversation. Default
  * mode is open mic (talk any time); Push to talk gates the mic to while the
@@ -123,13 +123,11 @@ export default function DonAvatarHero() {
   }
 
   async function startVoice(sessionid: string) {
-    // WebSocket to the Don orchestrator (same-origin /don/ws/listen rewrite).
+    // WebSocket to the Don orchestrator through its stable HTTPS gateway.
     try {
-      const proto =
-        window.location.protocol === "https:" ? "wss://" : "ws://";
-      const ws = new WebSocket(
-        proto + window.location.host + "/don/ws/listen"
-      );
+      // Connect directly to the WebSocket gateway. Vercel HTTP rewrites do
+      // not carry persistent WebSocket upgrades.
+      const ws = new WebSocket("wss://avatar.wtpnews.org/don/ws/listen");
       wsRef.current = ws;
       ws.onopen = () => {
         try {
