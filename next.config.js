@@ -20,11 +20,11 @@ const nextConfig = {
   async rewrites() {
     // Don Matthews live avatar: the DonAvatarHero component talks to the Don
     // LiveTalking avatar + orchestrator on the WTP News GPU box through these
-    // same-origin /don/* paths. The box frontdoor (Vast public port 57098)
+    // same-origin /don/* paths. The box frontdoor (Vast public port 50800 on the RTX 5090)
     // strips the /don prefix and routes /speak, /ws/listen and /health to the
     // Don orchestrator (port 8023, Don's Cartesia voice) and /offer, /human
     // and /humanaudio to LiveTalking (avatar don_matthews_v2).
-    const DON = 'http://142.252.100.103:57098';
+    const DON = 'http://142.252.100.103:50800';
     return [
       { source: '/don/offer', destination: `${DON}/don/offer` },
       { source: '/don/speak', destination: `${DON}/don/speak` },
