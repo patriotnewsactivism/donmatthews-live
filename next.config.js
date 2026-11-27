@@ -17,19 +17,10 @@ const nextConfig = {
     };
     return config;
   },
-  async rewrites() {
-    // A stable HTTPS gateway keeps GPU host/port changes out of site releases.
-    // The gateway forwards Don's routes to the existing avatar stack.
-    const DON = 'https://avatar.wtpnews.org';
-    return [
-      { source: '/don/offer', destination: `${DON}/don/offer` },
-      { source: '/don/speak', destination: `${DON}/don/speak` },
-      { source: '/don/human', destination: `${DON}/don/human` },
-      { source: '/don/humanaudio', destination: `${DON}/don/humanaudio` },
-      { source: '/don/health', destination: `${DON}/don/health` },
-      { source: '/don/ws/listen', destination: `${DON}/don/ws/listen` },
-    ];
-  },
+  // NOTE: the old /don/* rewrites to avatar.wtpnews.org were removed with
+  // the Don paywall (Nov. 27, 2026). That LiveTalking backend died with the
+  // China 5090; the hero now talks to the hosted Anam stage server via
+  // /api/don/session (see docs/don-paywall.md).
 };
 
 module.exports = nextConfig;
